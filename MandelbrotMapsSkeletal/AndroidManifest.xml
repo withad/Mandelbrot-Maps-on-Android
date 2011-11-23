@@ -34,7 +34,7 @@
               android:label="Fractal"
               android:screenOrientation="landscape"/>
               
-        <activity android:name = ".UIMockup"
+        <activity android:name = "uk.ac.ed.inf.mandelbrotmaps.UIMockup"
         		android:label="UIMockup"
         		android:screenOrientation="landscape"/>
     </application>

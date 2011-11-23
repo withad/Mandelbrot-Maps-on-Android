@@ -1,4 +1,6 @@
-package org.example.sudoku;
+package uk.ac.ed.inf.mandelbrotmaps;
+
+import org.example.sudoku.R;
 
 import android.app.Activity;
 import android.content.Intent;

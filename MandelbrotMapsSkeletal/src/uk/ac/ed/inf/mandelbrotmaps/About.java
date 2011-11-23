@@ -6,7 +6,9 @@
  * We make no guarantees that this code is fit for any purpose. 
  * Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
 ***/
-package org.example.sudoku;
+package uk.ac.ed.inf.mandelbrotmaps;
+
+import org.example.sudoku.R;
 
 import android.app.Activity;
 import android.os.Bundle;
