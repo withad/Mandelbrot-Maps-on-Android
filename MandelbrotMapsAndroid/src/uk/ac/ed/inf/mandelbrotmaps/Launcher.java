@@ -8,8 +8,7 @@
 ***/
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import org.example.sudoku.R;
-
+import uk.ac.ed.inf.mandelbrotmaps.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
