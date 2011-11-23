@@ -1,0 +1,8 @@
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        
+        <item android:title="Colours" android:id="@+id/Colours"></item><item android:title="Save" android:id="@+id/Save"></item><item android:title="Share Fractal" android:id="@+id/Share"></item><item android:id="@+id/Settings" android:title="Settings"></item><item android:title="About" android:id="@+id/About"></item>
+        
+        
+        
+    </menu>

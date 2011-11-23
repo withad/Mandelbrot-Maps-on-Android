@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ! Excerpted from "Hello, Android! 3e",
+ ! published by The Pragmatic Bookshelf.
+ ! Copyrights apply to this code. It may not be used to create training material, 
+ ! courses, books, articles, and the like. Contact us if you are in doubt.
+ ! We make no guarantees that this code is fit for any purpose. 
+ ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
+-->
+<resources>
+   <color name="background">#3500ffff</color>
+   <color name="puzzle_background">#ffe6f0ff</color>
+   <color name="puzzle_hilite">#ffffffff</color>
+   <color name="puzzle_light">#64c6d4ef</color>
+   <color name="puzzle_dark">#6456648f</color>
+   <color name="puzzle_foreground">#ff000000</color>
+   <color name="puzzle_hint_0">#64ff0000</color>
+   <color name="puzzle_hint_1">#6400ff80</color>
+   <color name="puzzle_hint_2">#2000ff80</color>
+   <color name="puzzle_selected">#64ff8000</color>
+   <color name="uibackground">#64ff8000</color>
+</resources>

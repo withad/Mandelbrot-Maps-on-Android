@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ! Excerpted from "Hello, Android! 3e",
+ ! published by The Pragmatic Bookshelf.
+ ! Copyrights apply to this code. It may not be used to create training material, 
+ ! courses, books, articles, and the like. Contact us if you are in doubt.
+ ! We make no guarantees that this code is fit for any purpose. 
+ ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
+-->
+<LinearLayout
+   xmlns:android="http://schemas.android.com/apk/res/android"
+   android:background="@color/background"
+   android:layout_height="fill_parent"
+   android:layout_width="fill_parent"
+   android:padding="15dip"
+   android:orientation="horizontal">
+   <LinearLayout
+      android:orientation="vertical"
+      android:layout_height="wrap_content"
+      android:layout_width="fill_parent"
+      android:layout_gravity="center"
+      android:paddingLeft="20dip"
+      android:paddingRight="20dip">
+      <TextView
+         android:text="@string/main_title"
+         android:layout_height="wrap_content"
+         android:layout_width="wrap_content"
+         android:layout_gravity="center"
+         android:layout_marginBottom="20dip"
+         android:textSize="24.5sp" />
+      <TableLayout
+         android:layout_height="wrap_content"
+         android:layout_width="wrap_content"
+         android:layout_gravity="center"
+         android:stretchColumns="*">
+         <TableRow>
+         	<Button
+               android:id="@+id/fractal_button"
+               android:text="@string/fractal_label" />
+            <Button
+               android:id="@+id/UI_mockup_button"
+               android:text="@string/UI_mockup_label" />
+         </TableRow>
+         <TableRow>
+         	<Button
+               android:id="@+id/about_button"
+               android:text="@string/about_label" />
+        	 
+            <Button
+               android:id="@+id/exit_button"
+               android:text="@string/exit_label" />
+         </TableRow>
+      </TableLayout>
+   </LinearLayout>
+</LinearLayout>

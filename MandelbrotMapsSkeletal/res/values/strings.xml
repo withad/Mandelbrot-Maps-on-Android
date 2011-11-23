@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ! Excerpted from "Hello, Android! 3e",
+ ! published by The Pragmatic Bookshelf.
+ ! Copyrights apply to this code. It may not be used to create training material, 
+ ! courses, books, articles, and the like. Contact us if you are in doubt.
+ ! We make no guarantees that this code is fit for any purpose. 
+ ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
+-->
+<resources>
+   <string name="app_name">MandelbrotMaps</string>
+   <string name="main_title">Mandelbrot Maps (skeletal)</string>
+   <string name="continue_label">Continue</string>
+   <string name="fractal_label">Graphics Examples</string>
+   <string name="UI_mockup_label">UI Mockup</string>
+   <string name="exit_label">Exit</string>
+
+   <string name="settings_label">Settings...</string>
+   <string name="settings_title">Mandelbrot Maps settings</string>
+   <string name="settings_shortcut">s</string>
+
+   <string name="draw_type_title">Drawing type</string>
+   <string name="standard_label">Standard Android Graphics</string>
+   <string name="opengl_label">OpenGL (not implemented)</string>
+   <string name="renderscript_label">Renderscript (not implemented)</string>
+
+   <string name="mmaps_title">Mandelbrot Maps</string>
+   
+   <string name="about_title">About Mandelbrot Maps</string>
+   <string name="about_text">\
+A basic skeleton implementation of
+Mandelbrot Maps for Android, 
+designed to show graphics drawing, etc.
+Fractals to be added soon.
+</string>
+   <string name="about_label">About</string>
+   <string name="bitmap_label">Bitmap (not implemented)</string>
+</resources>
