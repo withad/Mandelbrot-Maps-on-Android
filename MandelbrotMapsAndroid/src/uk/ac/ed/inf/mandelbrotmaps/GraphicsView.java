@@ -12,7 +12,7 @@ import android.view.View;
 
 public class GraphicsView extends View {
    
-   private static final String TAG = "Sudoku";
+   private static final String TAG = "GraphicsView";
    public Paint paint = new Paint();
    private Canvas canvas;
 
@@ -22,12 +22,12 @@ public class GraphicsView extends View {
    
    int[] colors;
    
-   private final Fractal game;
+   private final FractalActivity game;
    
    public GraphicsView(Context context) {
       
       super(context);
-      this.game = (Fractal) context;
+      this.game = (FractalActivity) context;
       setFocusable(true);
       setFocusableInTouchMode(true);
       paint.setColor(Color.GREEN);
@@ -49,10 +49,9 @@ public class GraphicsView extends View {
    
    @Override
    protected void onRestoreInstanceState(Parcelable state) { 
+	  super.onRestoreInstanceState(state);
       Log.d(TAG, "onRestoreInstanceState");
       Bundle bundle = (Bundle) state;
-      //select(bundle.getInt(SELX), bundle.getInt(SELY));
-      //super.onRestoreInstanceState(bundle.getParcelable(VIEW_STATE));
    }
    
 

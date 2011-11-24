@@ -1,11 +1,3 @@
-/***
- * Excerpted from "Hello, Android! 3e",
- * published by The Pragmatic Bookshelf.
- * Copyrights apply to this code. It may not be used to create training material, 
- * courses, books, articles, and the like. Contact us if you are in doubt.
- * We make no guarantees that this code is fit for any purpose. 
- * Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
-***/
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import uk.ac.ed.inf.mandelbrotmaps.R;
@@ -17,30 +9,27 @@ import android.preference.PreferenceManager;
 
 public class Prefs extends PreferenceActivity {
    // Option names and default values
-   private static final String OPT_MUSIC = "music";
-   private static final boolean OPT_MUSIC_DEF = true;
-   private static final String OPT_HINTS = "hints";
-   private static final boolean OPT_HINTS_DEF = true;
+   private static final String OPT_1 = "Option1";
+   private static final boolean OPT_1_DEF = true;
+   private static final String OPT_2 = "Option2";
+   private static final boolean OPT_2_DEF = true;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       addPreferencesFromResource(R.xml.settings);
    }
-
-   /** Get the current value of the music option */
+   
    
    public static boolean getMusic(Context context) {
       return PreferenceManager.getDefaultSharedPreferences(context)
-            .getBoolean(OPT_MUSIC, OPT_MUSIC_DEF);
+            .getBoolean(OPT_1, OPT_1_DEF);
    }
    
    
-   /** Get the current value of the hints option */
-   
    public static boolean getHints(Context context) {
       return PreferenceManager.getDefaultSharedPreferences(context)
-            .getBoolean(OPT_HINTS, OPT_HINTS_DEF);
+            .getBoolean(OPT_2, OPT_2_DEF);
    }
    
 }

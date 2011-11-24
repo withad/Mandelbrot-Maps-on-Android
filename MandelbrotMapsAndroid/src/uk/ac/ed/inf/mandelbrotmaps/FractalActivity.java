@@ -1,11 +1,3 @@
-/***
- * Excerpted from "Hello, Android! 3e",
- * published by The Pragmatic Bookshelf.
- * Copyrights apply to this code. It may not be used to create training material, 
- * courses, books, articles, and the like. Contact us if you are in doubt.
- * We make no guarantees that this code is fit for any purpose. 
- * Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
-***/
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import uk.ac.ed.inf.mandelbrotmaps.R;
@@ -23,17 +15,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class Fractal extends Activity {
+public class FractalActivity extends Activity {
    private static final String TAG = "MMaps";
 
-   private GraphicsView fractalView;
+   private FractalView fractalView;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       Log.d(TAG, "onCreate");
 
-      fractalView = new GraphicsView(this);
+      fractalView = new FractalView(this);
       setContentView(fractalView);
       fractalView.requestFocus();
    }
@@ -65,15 +57,15 @@ public class Fractal extends Activity {
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
       case R.id.Blue:
-    	  fractalView.paint.setColor(Color.BLUE);
+    	  //fractalView.paint.setColor(Color.BLUE);
     	  fractalView.invalidate();
     	  return true;
       case R.id.Green:
-    	  fractalView.paint.setColor(Color.GREEN);
+    	  //fractalView.paint.setColor(Color.GREEN);
     	  fractalView.invalidate();
     	  return true;
       case R.id.Red:
-    	  fractalView.paint.setColor(Color.RED);
+    	  //fractalView.paint.setColor(Color.RED);
     	  fractalView.invalidate();
     	  return true;
       }

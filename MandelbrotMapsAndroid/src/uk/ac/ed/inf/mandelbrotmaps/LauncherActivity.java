@@ -1,11 +1,3 @@
-/***
- * Excerpted from "Hello, Android! 3e",
- * published by The Pragmatic Bookshelf.
- * Copyrights apply to this code. It may not be used to create training material, 
- * courses, books, articles, and the like. Contact us if you are in doubt.
- * We make no guarantees that this code is fit for any purpose. 
- * Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
-***/
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import uk.ac.ed.inf.mandelbrotmaps.R;
@@ -21,7 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-public class Launcher extends Activity implements OnClickListener {
+public class LauncherActivity extends Activity implements OnClickListener {
    private static final String TAG = "Sudoku";
    
    /** Called when the activity is first created. */
@@ -110,7 +102,7 @@ public class Launcher extends Activity implements OnClickListener {
    private void startGame(int i) {
 	   	if (i != 0) return;
 	   	Log.d(TAG, "clicked on " + i);
-   		Intent intent = new Intent(this, Fractal.class);
+   		Intent intent = new Intent(this, FractalActivity.class);
    		//intent.putExtra(Game.KEY_DIFFICULTY, i);
    		startActivity(intent);
    }
