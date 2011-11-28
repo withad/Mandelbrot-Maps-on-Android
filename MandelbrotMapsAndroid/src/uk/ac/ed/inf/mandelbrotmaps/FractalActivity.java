@@ -1,33 +1,29 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import uk.ac.ed.inf.mandelbrotmaps.R;
-
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 public class FractalActivity extends Activity {
    private static final String TAG = "MMaps";
 
-   private FractalView fractalView;
+   private MandelbrotFractalView fractalView;
+   private MandelbrotJuliaLocation mjLocation;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       Log.d(TAG, "onCreate");
 
-      fractalView = new FractalView(this);
+      fractalView = new MandelbrotFractalView(this);
       setContentView(fractalView);
       fractalView.requestFocus();
+      
+      mjLocation = new MandelbrotJuliaLocation();
+      fractalView.loadLocation(mjLocation);
    }
 
    

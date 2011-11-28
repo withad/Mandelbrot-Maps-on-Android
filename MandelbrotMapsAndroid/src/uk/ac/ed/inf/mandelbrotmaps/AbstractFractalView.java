@@ -1,7 +1,5 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import android.content.Context;
@@ -17,32 +15,25 @@ import android.view.View;
 abstract class AbstractFractalView extends View {
    
    private static final String TAG = "FractalView";
-   private Canvas canvas;
 
    private int WIDTH;
    private int HEIGHT;
    private int STRIDE;
    
-   int[] colors;
+   // How many different, discrete zoom and contrast levels?
+   public static final int ZOOM_SLIDER_SCALING = 300;
+   public static final int CONTRAST_SLIDER_SCALING = 200;
+   
+   // Default "crude rendering" pixel block size?
+   int INITIAL_PIXEL_BLOCK = 2;
+   
+   // How much of a zoom, on each increment?
+   public static final int zoomPercent = 20;
    
    // Rendering queue
-	LinkedBlockingDeque<CanvasRendering> renderingQueue = new LinkedBlockingDeque<CanvasRendering>();
-	
-	// How many different, discrete zoom levels?
-	public static final int ZOOM_SLIDER_SCALING = 300;
-	
-	// How many different, discrete contrast levels?
-	public static final int CONTRAST_SLIDER_SCALING = 200;
-	
-	FractalActivity parentActivity;
-	
-	CanvasRenderThread renderThread = new CanvasRenderThread(this);
-	
-	// Default "crude rendering" pixel block size?
-	int INITIAL_PIXEL_BLOCK = 2;
-	
-	// How much of a zoom, on each increment?
-	public static final int zoomPercent = 20;
+   LinkedBlockingDeque<CanvasRendering> renderingQueue = new LinkedBlockingDeque<CanvasRendering>();	
+   CanvasRenderThread renderThread = new CanvasRenderThread(this);
+   FractalActivity parentActivity;	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
 	double MINZOOM_LN_PIXEL = -3;
@@ -98,8 +89,7 @@ abstract class AbstractFractalView extends View {
       Log.d(TAG, "onRestoreInstanceState");
       super.onRestoreInstanceState(state);
    }
-   
-   
+     
    @Override
    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
       super.onSizeChanged(w, h, oldw, oldh);
@@ -109,10 +99,9 @@ abstract class AbstractFractalView extends View {
    }
    
 
+   /* Graphics Stuff */
    @Override
-   protected void onDraw(Canvas canvas) {
-	   this.canvas = canvas;      
-	   
+   protected void onDraw(Canvas canvas) {	   
 	// (Re)create pixel grid, if not initialised - or if wrong size.
 	if (
 		(pixelIterations == null) ||
@@ -120,24 +109,14 @@ abstract class AbstractFractalView extends View {
 	) {
 		pixelIterations = new int[getWidth() * getHeight()];
 		//bitmapPixels = new MemoryImageSource(getDimensions().width, getDimensions().height, pixelIterations, 0, getDimensions().width);
-		Bitmap.createBitmap(colors, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+		Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		updateDisplay();
 	}
-	
-	canvas.drawBitmap(bitmapPixels, 0,0, new Paint()); 
+	if(bitmapPixels != null)
+		canvas.drawBitmap(bitmapPixels, 0,0, new Paint()); 
    }
-
 	
-	// Get a handle on Parent
-	public void setParentHandle(FractalActivity parentHandle) {
-		parentActivity = parentHandle;
-	}
-	
-	public double[] getGraphArea() {
-		return graphArea;
-	}
-	
-	// Called when we want to recompute everything
+   // Called when we want to recompute everything
 	void updateDisplay() {		
 		// Abort future rendering queue. If in real-time mode, interrupt current rendering too
 		stopAllRendering();
@@ -148,6 +127,17 @@ abstract class AbstractFractalView extends View {
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(1);
+	}
+   
+	
+	/* Utilities */
+	// Get a handle on Parent
+	public void setParentHandle(FractalActivity parentHandle) {
+		parentActivity = parentHandle;
+	}
+	
+	public double[] getGraphArea() {
+		return graphArea;
 	}
 	
 	// Do we need a crude rendering?

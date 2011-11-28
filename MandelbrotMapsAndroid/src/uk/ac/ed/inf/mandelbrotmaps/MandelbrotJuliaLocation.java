@@ -1,7 +1,4 @@
 package uk.ac.ed.inf.mandelbrotmaps;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Locale;
 
 
 class MandelbrotJuliaLocation {

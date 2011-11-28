@@ -1,5 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import android.util.Log;
+
 class CanvasRenderThread extends Thread {
 	private AbstractFractalView mjCanvas;
 	private volatile boolean abortThisRendering = false;
@@ -23,7 +25,9 @@ class CanvasRenderThread extends Thread {
 				CanvasRendering newRendering = mjCanvas.getNextRendering();
 				mjCanvas.computeAllPixels(newRendering.getPixelBlockSize());
 				abortThisRendering = false;
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+				Log.d("Testing", "Caught exception");
+			}
 		}
 	}
 }
