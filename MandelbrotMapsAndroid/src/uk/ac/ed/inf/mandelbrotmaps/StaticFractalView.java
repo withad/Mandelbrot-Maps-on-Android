@@ -12,7 +12,7 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 
-abstract class AbstractFractalView extends View {
+abstract class StaticFractalView extends View {
    
    private static final String TAG = "FractalView";
 
@@ -30,9 +30,7 @@ abstract class AbstractFractalView extends View {
    // How much of a zoom, on each increment?
    public static final int zoomPercent = 20;
    
-   // Rendering queue
-   LinkedBlockingDeque<CanvasRendering> renderingQueue = new LinkedBlockingDeque<CanvasRendering>();	
-   CanvasRenderThread renderThread = new CanvasRenderThread(this);
+   // Rendering queue	
    FractalActivity parentActivity;	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
@@ -65,14 +63,12 @@ abstract class AbstractFractalView extends View {
 	Bitmap bitmapPixels;
 	
    
-   public AbstractFractalView(Context context) {
+   public StaticFractalView(Context context) {
       super(context);
       setFocusable(true);
       setFocusableInTouchMode(true);
       setBackgroundColor(Color.BLUE);
       setId(0); 
-      
-      renderThread.start();
    }
 
    
@@ -109,27 +105,15 @@ abstract class AbstractFractalView extends View {
 	) {
 		pixelIterations = new int[getWidth() * getHeight()];
 		//bitmapPixels = new MemoryImageSource(getDimensions().width, getDimensions().height, pixelIterations, 0, getDimensions().width);
-		//Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+		Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		updateDisplay();
 	}
 	if(bitmapPixels != null)
-	{
-		canvas.drawBitmap(bitmapPixels, 0,0, new Paint());
-		Log.d(TAG, "Drawing bitmap");
-	}
+		canvas.drawBitmap(bitmapPixels, 0,0, new Paint()); 
    }
 	
    // Called when we want to recompute everything
 	void updateDisplay() {		
-		// Abort future rendering queue. If in real-time mode, interrupt current rendering too
-		stopAllRendering();
-		
-		// If in real-time mode, schedule a crude rendering
-		if (needCrudeRendering()) 
-			scheduleRendering(INITIAL_PIXEL_BLOCK);
-		
-		// Schedule a high-quality rendering
-		scheduleRendering(1);
 	}
    
 	
@@ -146,23 +130,6 @@ abstract class AbstractFractalView extends View {
 	// Do we need a crude rendering?
 	boolean needCrudeRendering() {
 		return getMaxIterations() > 200;
-	}
-	
-	public void stopPlannedRendering() {
-		renderingQueue.clear();
-	}
-	
-	void stopAllRendering() {
-		stopPlannedRendering();
-		renderThread.abortRendering();
-	}
-	
-	void scheduleRendering(int pixelBlockSize) {
-		renderingQueue.add( new CanvasRendering(pixelBlockSize) );
-	}
-	
-	public CanvasRendering getNextRendering() throws InterruptedException {
-		return renderingQueue.take();
 	}
 	
 	
@@ -346,19 +313,13 @@ abstract class AbstractFractalView extends View {
 			0,
 			getWidth(),
 			0,
-			getHeight(),
+			getWidth(),
 			graphArea[0],
 			graphArea[1],
 			getPixelSize(),
-			false,
-			10000
+			true,
+			300
 		);
-		
-		bitmapPixels = Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
-		
-		Log.d(TAG, "Checking pixels");
-		
-		postInvalidate();
 	}
 	
 	/* File saving, ignore for now

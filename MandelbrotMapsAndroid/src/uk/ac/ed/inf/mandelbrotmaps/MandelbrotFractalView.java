@@ -97,6 +97,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			) 
 				{
 					Log.d("MFV", "Returning based on interruption test");
+					Log.d("MFV", "Time taken: " + (System.currentTimeMillis() - timeBegin));
 					Log.d("MFV", "In: " + Integer.toString(inCount));
 					Log.d("MFV", "Out: " + Integer.toString(outCount));
 					return;
@@ -151,7 +152,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 					}
 				}
-				Log.d("MFV", "Reached end of x loop");
+				//Log.d("MFV", "Reached end of x loop");
 			}
 			// Show thread's work in progress
 			/*if (
@@ -161,6 +162,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
 			) outputMIS.newPixels();*/
 		}
+		postInvalidate();
 		Log.d("MFV", "Reached end of computation loop");
 		if (outputMIS!=null) 
 			Log.d("MFV", "Reaching end of computation loop");

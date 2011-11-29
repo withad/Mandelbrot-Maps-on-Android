@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 
 public class FractalActivity extends Activity {
    private static final String TAG = "MMaps";
@@ -19,6 +21,7 @@ public class FractalActivity extends Activity {
       Log.d(TAG, "onCreate");
 
       fractalView = new MandelbrotFractalView(this);
+      //fractalView.setLayoutParams(new LinearLayout.LayoutParams(500, 500));
       setContentView(fractalView);
       fractalView.requestFocus();
       
@@ -45,20 +48,21 @@ public class FractalActivity extends Activity {
    public boolean onCreateOptionsMenu(Menu menu) {
       super.onCreateOptionsMenu(menu);
       MenuInflater inflater = getMenuInflater();
-      inflater.inflate(R.menu.colourmenu, menu);
+      inflater.inflate(R.menu.navigationmenu, menu);
       return true;
    }
 
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
-      case R.id.Blue:
-    	  //fractalView.paint.setColor(Color.BLUE);
-    	  fractalView.invalidate();
+      case R.id.ZoomOut:
+    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 5);
     	  return true;
-      case R.id.Green:
+      case R.id.ZoomIn:
     	  //fractalView.paint.setColor(Color.GREEN);
-    	  fractalView.invalidate();
+    	  //fractalView.dragCanvas(100, 100);
+    	  //fractalView.invalidate();
+    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 2);
     	  return true;
       case R.id.Red:
     	  //fractalView.paint.setColor(Color.RED);
