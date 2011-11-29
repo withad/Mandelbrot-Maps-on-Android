@@ -56,17 +56,22 @@ public class FractalActivity extends Activity {
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
       case R.id.ZoomOut:
-    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 5);
+    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 1);
     	  return true;
       case R.id.ZoomIn:
-    	  //fractalView.paint.setColor(Color.GREEN);
-    	  //fractalView.dragCanvas(100, 100);
-    	  //fractalView.invalidate();
-    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 2);
+    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), -1);
     	  return true;
-      case R.id.Red:
-    	  //fractalView.paint.setColor(Color.RED);
-    	  fractalView.invalidate();
+      case R.id.PanUp:
+    	  fractalView.dragCanvas(0, -100);
+    	  return true;
+      case R.id.PanDown:
+    	  fractalView.dragCanvas(0, 100);
+    	  return true;
+      case R.id.PanLeft:
+    	  fractalView.dragCanvas(100, 0);
+    	  return true;
+      case R.id.PanRight:
+    	  fractalView.dragCanvas(-100, 0);
     	  return true;
       }
       return false;
