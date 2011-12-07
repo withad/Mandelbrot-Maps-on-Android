@@ -26,6 +26,9 @@ abstract class AbstractFractalView extends View {
    // Default "crude rendering" pixel block size?
    int INITIAL_PIXEL_BLOCK = 3;
    
+   //Default puixel size
+   int DEFAULT_PIXEL_SIZE = 4;
+   
    // How much of a zoom, on each increment?
    public static final int zoomPercent = 20;
    
@@ -46,7 +49,7 @@ abstract class AbstractFractalView extends View {
 	double ITERATION_CONSTANT_FACTOR;
 	
 	// Scaling factor for maxIterations() calculations
-	double iterationScaling = 0.5;
+	double iterationScaling = 0.1;
 	double ITERATIONSCALING_MIN = 0.01;
 	double ITERATIONSCALING_MAX = 100;
 	double ITERATIONSCALING_DEFAULT = 1;
@@ -63,8 +66,8 @@ abstract class AbstractFractalView extends View {
 	int[] pixelIterations;
 	Bitmap bitmapPixels;
 	
-	int bitmapX = 0;
-	int bitmapY = 0;
+	public int bitmapX = 0;
+	public int bitmapY = 0;
 	
    
    public AbstractFractalView(Context context) {
@@ -132,7 +135,7 @@ abstract class AbstractFractalView extends View {
 			scheduleRendering(INITIAL_PIXEL_BLOCK);
 		
 		// Schedule a high-quality rendering
-		scheduleRendering(2);
+		scheduleRendering(DEFAULT_PIXEL_SIZE);
 	}
    
 	
