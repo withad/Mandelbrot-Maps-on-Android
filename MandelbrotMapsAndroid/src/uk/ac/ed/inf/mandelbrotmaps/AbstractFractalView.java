@@ -24,7 +24,7 @@ abstract class AbstractFractalView extends View {
    public static final int CONTRAST_SLIDER_SCALING = 200;
    
    // Default "crude rendering" pixel block size?
-   int INITIAL_PIXEL_BLOCK = 2;
+   int INITIAL_PIXEL_BLOCK = 3;
    
    // How much of a zoom, on each increment?
    public static final int zoomPercent = 20;
@@ -46,7 +46,7 @@ abstract class AbstractFractalView extends View {
 	double ITERATION_CONSTANT_FACTOR;
 	
 	// Scaling factor for maxIterations() calculations
-	double iterationScaling = 1;
+	double iterationScaling = 0.5;
 	double ITERATIONSCALING_MIN = 0.01;
 	double ITERATIONSCALING_MAX = 100;
 	double ITERATIONSCALING_DEFAULT = 1;
@@ -63,6 +63,9 @@ abstract class AbstractFractalView extends View {
 	int[] pixelIterations;
 	Bitmap bitmapPixels;
 	
+	int bitmapX = 0;
+	int bitmapY = 0;
+	
    
    public AbstractFractalView(Context context) {
       super(context);
@@ -70,6 +73,8 @@ abstract class AbstractFractalView extends View {
       setFocusableInTouchMode(true);
       setBackgroundColor(Color.BLUE);
       setId(0); 
+      
+      setOnTouchListener((FractalActivity)context);
       
       renderThread.start();
    }
@@ -107,13 +112,12 @@ abstract class AbstractFractalView extends View {
 		(pixelIterations.length != getWidth()*getHeight())
 	) {
 		pixelIterations = new int[getWidth() * getHeight()];
-		//bitmapPixels = new MemoryImageSource(getDimensions().width, getDimensions().height, pixelIterations, 0, getDimensions().width);
-		//Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		updateDisplay();
 	}
 	if(bitmapPixels != null)
 	{
-		canvas.drawBitmap(bitmapPixels, 0,0, new Paint());
+		bitmapPixels = Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+		canvas.drawBitmap(bitmapPixels, bitmapX,bitmapY, new Paint());
 		Log.d(TAG, "Drawing bitmap");
 	}
    }
@@ -128,7 +132,7 @@ abstract class AbstractFractalView extends View {
 			scheduleRendering(INITIAL_PIXEL_BLOCK);
 		
 		// Schedule a high-quality rendering
-		scheduleRendering(1);
+		scheduleRendering(2);
 	}
    
 	
@@ -144,7 +148,7 @@ abstract class AbstractFractalView extends View {
 	
 	// Do we need a crude rendering?
 	boolean needCrudeRendering() {
-		return getMaxIterations() > 100;
+		return getMaxIterations() > 30;
 	}
 	
 	public void stopPlannedRendering() {
@@ -344,7 +348,7 @@ abstract class AbstractFractalView extends View {
 			pixelIterations,
 			pixelBlockSize,
 			bitmapPixels,
-			true,
+			false,//true,
 			0,
 			getWidth(),
 			0,
@@ -362,109 +366,6 @@ abstract class AbstractFractalView extends View {
 		
 		postInvalidate();
 	}
-	
-	/* File saving, ignore for now
-	// Save canvas area as a newly-generated image file
-	public void saveFile(File fileToSave, ProgressMonitor progressMonitor, final int imgWidth, final int imgHeight) {
-		try {
-			double imgAspectRatio = (double)imgWidth / (double)imgHeight;
-			double canvasAspectRatio = (double)getSize().width / (double)getSize().height;
-		
-			// Make image as wide/tall as possible without cropping, then center it.
-			double xMin, yMax, pixelSize;
-			if (imgAspectRatio < canvasAspectRatio) {
-				xMin = graphArea[0];
-				pixelSize = graphArea[2] / (double)imgWidth;
-				yMax = graphArea[1] + 0.5 * pixelSize * (double)(imgHeight - getSize().height);
-			} else {
-				double origPixelSize = getPixelSize();
-				yMax = graphArea[1];
-				pixelSize = origPixelSize * ((double)getSize().height / (double)imgHeight);
-				xMin = graphArea[0] - 0.5 * ( (pixelSize*(double)imgWidth) - (graphArea[2]) );
-			}
-		
-			BufferedImage bufferedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB);
-			int[] filePixels = new int[imgWidth * imgHeight];
-			computePixels(
-				filePixels,
-				1,
-				null,
-				false,
-				0,
-				imgWidth,
-				0,
-				imgHeight,
-				xMin,
-				yMax,
-				pixelSize,
-				false,
-				0
-			);
-			MemoryImageSource misFile = new MemoryImageSource(
-				imgWidth,
-				imgHeight,
-				filePixels,
-				0,
-				imgWidth
-			);
-			bufferedImage.createGraphics().drawImage( createImage(misFile), 0, 0, null );
-		
-			// Now is a good garbage collection time...
-			// We don't want to hit the Java applet upper bound on memory usage.
-			filePixels = null;
-			misFile = null;
-			System.gc();
-		
-			// Write out to the file
-			ImageIO.write(bufferedImage, "png", fileToSave);
-		} catch(OutOfMemoryError e) {
-			JOptionPane.showMessageDialog(
-				this,
-				String.format("Sorry, there is insufficient free memory available (%,dMB).%nYou may try saving the image at a smaller size, or saving only one image at a time.", (Runtime.getRuntime().freeMemory() / 1048576)),
-				"Out of memory",
-				JOptionPane.ERROR_MESSAGE
-			);
-			fileToSave.delete();
-		} catch(IOException e) {
-			JOptionPane.showMessageDialog(
-				this,
-				String.format("Could not write to file '%s' (%s).", fileToSave, e.getMessage()),
-				"Unable to write file",
-				JOptionPane.ERROR_MESSAGE
-			);
-			fileToSave.delete();
-		}
-	}*/
-	
-	
-	/*	Mouse handling stuff
-	// Mouse wheel: Adjust zoom level - if in real-time mode
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		zoomChange(e.getX(), e.getY(), e.getWheelRotation());
-	}
-	
-	// "Click and Drag" in Java is mousePressed, (mouseDragged)*, mouseReleased. Each mouseDragged is 1px move (horizontal | vertical | diagonal)
-	public void mousePressed(MouseEvent e) {	
-		// Remember mouse position
-		dragLastX = e.getX();
-		dragLastY = e.getY();
-	}
-	
-	// Mouse drag: Pans the canvas
-	public void mouseDragged(MouseEvent e) {
-		// If in real time mode, enable dragging.
-		// How has the mouse moved? Vars should each be one of: {-1, 0, 1}
-		int dragDiffPixelsX = e.getX() - dragLastX;
-		int dragDiffPixelsY = -(e.getY() - dragLastY);
-
-		// Move the canvas
-		dragCanvas(dragDiffPixelsX, dragDiffPixelsY);
-
-		// Update last mouse position
-		dragLastX = e.getX();
-		dragLastY = e.getY();
-	}
-	*/
 	
 	
 	// Abstract methods

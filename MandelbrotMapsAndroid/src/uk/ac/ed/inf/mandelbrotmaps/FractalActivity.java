@@ -2,18 +2,23 @@ package uk.ac.ed.inf.mandelbrotmaps;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Debug;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 
-public class FractalActivity extends Activity {
+public class FractalActivity extends Activity implements OnTouchListener {
    private static final String TAG = "MMaps";
 
    private MandelbrotFractalView fractalView;
    private MandelbrotJuliaLocation mjLocation;
+   
+   private int dragLastX;
+   private int dragLastY;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -76,4 +81,41 @@ public class FractalActivity extends Activity {
       }
       return false;
    }
+
+
+public boolean onTouch(View v, MotionEvent evt) {
+	Log.d(TAG, "Event: " + evt.getActionMasked());
+	switch (evt.getActionMasked())
+	{
+		case MotionEvent.ACTION_DOWN:
+			// Remember mouse position
+			Log.d(TAG, "Remembering touch position");
+			dragLastX = (int) evt.getX();
+			dragLastY = (int) evt.getY();
+			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
+			return true;
+		case MotionEvent.ACTION_MOVE:
+			Log.d(TAG, "Dragging detected");
+			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
+			// If in real time mode, enable dragging.
+			// How has the mouse moved? Vars should each be one of: {-1, 0, 1}
+			int dragDiffPixelsX = (int) (evt.getX() - dragLastX);
+			int dragDiffPixelsY = (int) -(evt.getY() - dragLastY);
+	
+			// Move the canvas
+			fractalView.dragCanvas(dragDiffPixelsX, dragDiffPixelsY);
+	
+			// Update last mouse position
+			dragLastX = (int) evt.getX();
+			dragLastY = (int) evt.getY();
+			
+			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
+			return true;
+		case MotionEvent.ACTION_UP:
+			Log.d(TAG, "Up detected");
+			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
+			return true;
+	}
+	return false;
+}
 }
