@@ -111,13 +111,11 @@ abstract class AbstractFractalView extends View {
 		//Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		updateDisplay();
 	}
-	
 	if(bitmapPixels != null)
 	{
-		//bitmapPixels = Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		canvas.drawBitmap(bitmapPixels, 0,0, new Paint());
+		Log.d(TAG, "Drawing bitmap");
 	}
-	else Log.d(TAG, "No bitmap");
    }
 	
    // Called when we want to recompute everything
@@ -127,7 +125,7 @@ abstract class AbstractFractalView extends View {
 		
 		// If in real-time mode, schedule a crude rendering
 		if (needCrudeRendering()) 
-			scheduleRendering(3);
+			scheduleRendering(INITIAL_PIXEL_BLOCK);
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(1);
@@ -146,7 +144,7 @@ abstract class AbstractFractalView extends View {
 	
 	// Do we need a crude rendering?
 	boolean needCrudeRendering() {
-		return getMaxIterations() > 50;
+		return getMaxIterations() > 100;
 	}
 	
 	public void stopPlannedRendering() {
@@ -331,7 +329,7 @@ abstract class AbstractFractalView extends View {
 		double dblIterations = iterationScaling * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
 		int iterationsToPerform = (int)dblIterations;
 		Log.d(TAG, "iterationsToPerform = " + iterationsToPerform);
-		return Math.max(iterationsToPerform/2, MIN_ITERATIONS);
+		return Math.max(iterationsToPerform, MIN_ITERATIONS);
 	}
 	
 	// Compute entire pixel grid

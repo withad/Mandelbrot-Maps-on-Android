@@ -158,7 +158,12 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				//Log.d("MFV", "Reached end of x loop");
 			}
 			// Show thread's work in progress
-			//if ((showRenderingProgress) && (yPixel % 3 == 0)) postInvalidate();
+			/*if (
+				(showRenderingProgress) &&
+				(outputMIS!=null) &&
+				(yPixel % 3 == 0) &&
+				(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
+			) outputMIS.newPixels();*/
 		}
 		postInvalidate();
 		Log.d("MFV", "Reached end of computation loop");
