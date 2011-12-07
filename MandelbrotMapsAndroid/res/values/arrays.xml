@@ -10,8 +10,8 @@
 <resources>
    <array name="render_type">
       <item>@string/standard_label</item>
-      <item>@string/opengl_label</item>
+      <!-- <item>@string/opengl_label</item>
       <item>@string/renderscript_label</item>
-      <item>@string/bitmap_label</item>
+      <item>@string/bitmap_label</item> -->
    </array>
 </resources>

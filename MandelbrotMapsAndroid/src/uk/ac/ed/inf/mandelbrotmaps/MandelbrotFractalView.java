@@ -6,6 +6,8 @@ import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
 
+	private static final String TAG = "MandelbrotFractalView";
+	
 	// Modes
 	private int mandelbrotMode;
 	private static final int MODE_REALTIMEJULIA = 0;
@@ -57,6 +59,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final int millisBeforeSlowRenderBehaviour  // How many millis before show rendering progress, and (if allowInterruption) before listening for this.
 	) {
 		int maxIterations = getMaxIterations();
+		Log.d(TAG, "maxIterations = " + maxIterations);
 		int imgWidth = xPixelMax - xPixelMin;
 		
 		// Efficiency: For very high-demanding pictures, increase pixel block.
@@ -155,17 +158,10 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				//Log.d("MFV", "Reached end of x loop");
 			}
 			// Show thread's work in progress
-			/*if (
-				(showRenderingProgress) &&
-				(outputMIS!=null) &&
-				(yPixel % 3 == 0) &&
-				(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
-			) outputMIS.newPixels();*/
+			//if ((showRenderingProgress) && (yPixel % 3 == 0)) postInvalidate();
 		}
 		postInvalidate();
 		Log.d("MFV", "Reached end of computation loop");
-		if (outputMIS!=null) 
-			Log.d("MFV", "Reaching end of computation loop");
 	}
 
 	

@@ -1,6 +1,5 @@
 package uk.ac.ed.inf.mandelbrotmaps;
-
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -30,8 +29,8 @@ abstract class AbstractFractalView extends View {
    // How much of a zoom, on each increment?
    public static final int zoomPercent = 20;
    
-   // Rendering queue
-   LinkedBlockingDeque<CanvasRendering> renderingQueue = new LinkedBlockingDeque<CanvasRendering>();	
+   // Rendering queue (modified from a LinkedBlockingDeque
+   LinkedBlockingQueue<CanvasRendering> renderingQueue = new LinkedBlockingQueue<CanvasRendering>();	
    CanvasRenderThread renderThread = new CanvasRenderThread(this);
    FractalActivity parentActivity;	
 	
@@ -112,11 +111,13 @@ abstract class AbstractFractalView extends View {
 		//Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		updateDisplay();
 	}
+	
 	if(bitmapPixels != null)
 	{
+		//bitmapPixels = Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		canvas.drawBitmap(bitmapPixels, 0,0, new Paint());
-		Log.d(TAG, "Drawing bitmap");
 	}
+	else Log.d(TAG, "No bitmap");
    }
 	
    // Called when we want to recompute everything
@@ -126,7 +127,7 @@ abstract class AbstractFractalView extends View {
 		
 		// If in real-time mode, schedule a crude rendering
 		if (needCrudeRendering()) 
-			scheduleRendering(INITIAL_PIXEL_BLOCK);
+			scheduleRendering(3);
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(1);
@@ -145,7 +146,7 @@ abstract class AbstractFractalView extends View {
 	
 	// Do we need a crude rendering?
 	boolean needCrudeRendering() {
-		return getMaxIterations() > 200;
+		return getMaxIterations() > 50;
 	}
 	
 	public void stopPlannedRendering() {
@@ -313,6 +314,8 @@ abstract class AbstractFractalView extends View {
 				(scaledIterationCount * (Math.log(ITERATIONSCALING_MAX) - Math.log(ITERATIONSCALING_MIN))) /
 				CONTRAST_SLIDER_SCALING)
 			);
+			Log.d(TAG, "iterationScaling = " + iterationScaling);
+			Log.d(TAG, "scaledIterationCount = " + scaledIterationCount);
 			updateDisplay();
 		}
 	}
@@ -327,7 +330,8 @@ abstract class AbstractFractalView extends View {
 		double absLnPixelSize = Math.abs(Math.log(getPixelSize()));
 		double dblIterations = iterationScaling * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
 		int iterationsToPerform = (int)dblIterations;
-		return Math.max(iterationsToPerform, MIN_ITERATIONS);
+		Log.d(TAG, "iterationsToPerform = " + iterationsToPerform);
+		return Math.max(iterationsToPerform/2, MIN_ITERATIONS);
 	}
 	
 	// Compute entire pixel grid

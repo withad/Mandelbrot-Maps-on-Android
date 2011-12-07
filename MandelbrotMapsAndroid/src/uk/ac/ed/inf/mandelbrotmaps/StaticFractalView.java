@@ -1,7 +1,5 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import java.util.concurrent.LinkedBlockingDeque;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

@@ -11,7 +11,7 @@
    <string name="app_name">MandelbrotMaps</string>
    <string name="main_title">Mandelbrot Maps (skeletal)</string>
    <string name="continue_label">Continue</string>
-   <string name="fractal_label">Graphics Examples</string>
+   <string name="fractal_label">Render fractal</string>
    <string name="UI_mockup_label">UI Mockup</string>
    <string name="exit_label">Exit</string>
 
