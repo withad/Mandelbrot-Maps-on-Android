@@ -15,19 +15,28 @@
         <activity android:name=".About"
               android:label="@string/about_title"
               android:theme="@android:style/Theme.Dialog"
-              android:screenOrientation="landscape">
-        </activity>
+              android:screenOrientation="landscape"
+              android:configChanges="orientation"/>
+              
         <activity android:name=".Prefs"
               android:label="@string/settings_title"
-              android:screenOrientation="landscape">
-        </activity>
+              android:screenOrientation="landscape"
+              android:configChanges="orientation"/>
+              
         <activity android:name=".FractalActivity"
               android:label="Fractal"
-              android:screenOrientation="landscape"/>
+              android:screenOrientation="landscape"
+              android:configChanges="orientation"/>
               
         <activity android:name = ".UIMockup"
         		android:label="UIMockup"
-        		android:screenOrientation="landscape"/>
+        		android:screenOrientation="landscape"
+        		android:configChanges="orientation"/>
+        		
+        <activity android:name = ".BitmapActivity"
+        		android:label="BitmapActivity"
+        		android:screenOrientation="landscape"
+        		android:configChanges="orientation"/>
     </application>
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8" />
 </manifest>

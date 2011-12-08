@@ -57,7 +57,7 @@ public class LauncherActivity extends Activity implements OnClickListener {
          break;
       case R.id.UI_mockup_button:
     	  Log.d(TAG, "Launching UI mockup");
-    	  startActivity(new Intent(this, UIMockup.class));
+    	  startActivity(new Intent(this, BitmapActivity.class));
     	  break;
       case R.id.exit_button:
          finish();
