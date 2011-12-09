@@ -67,7 +67,7 @@ abstract class AbstractFractalView extends View {
 	// Fractal image data
 	int[] fractalPixels;
 	Bitmap fractalBitmap;
-	Bitmap backgroundBitmap;
+	Bitmap movingBitmap;
 	
 	// Where to draw the image onscreen
 	public int bitmapX = 0;
@@ -131,13 +131,13 @@ abstract class AbstractFractalView extends View {
 	if(fractalBitmap != null && !draggingFractal)
 	{
 		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
-		canvas.drawBitmap(fractalBitmap, bitmapX,bitmapY, new Paint());
+		canvas.drawBitmap(fractalBitmap, 0, 0, new Paint());
+	}
+	else if (draggingFractal)
+	{
+		canvas.drawBitmap(fractalBitmap, bitmapX, bitmapY, new Paint());
 	}
 	
-	if(backgroundBitmap != null)
-	{
-		canvas.drawBitmap(backgroundBitmap, oldBitmapX, oldBitmapY, new Paint());
-	}
    }
 	
    
@@ -293,24 +293,28 @@ abstract class AbstractFractalView extends View {
 		setGraphArea(newGraphArea);
 	}
 	
-	// Shift the canvas x pixels right; y pixels up
-	public void dragCanvas(int dragDiffPixelsX, int dragDiffPixelsY) {
+	
+	/* Movement */
+	public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
 		// What does each pixel correspond to, on the complex plane?
 		double pixelSize = getPixelSize();
 		
 		// Adjust the Graph Area
 		double[] newGraphArea = getGraphArea();
 		newGraphArea[0] -= (dragDiffPixelsX * pixelSize);
-		newGraphArea[1] -= (dragDiffPixelsY * pixelSize);
+		newGraphArea[1] -= -(dragDiffPixelsY * pixelSize);
 		setGraphArea(newGraphArea);
 	}
 	
 	public void startDragging()
 	{
+		movingBitmap = Bitmap.createBitmap(fractalBitmap);
+		bitmapX = 0;
+		bitmapY = 0;
 		draggingFractal = true;
 	}
 	
-	public void dragCanvasImage(int dragDiffPixelsX, int dragDiffPixelsY) {		
+	public void dragFractal(int dragDiffPixelsX, int dragDiffPixelsY) {		
 		// Adjust the Graph Area
 		bitmapX += dragDiffPixelsX;
 		bitmapY += dragDiffPixelsY;
@@ -321,19 +325,7 @@ abstract class AbstractFractalView extends View {
 	public void stopDragging()
 	{
 		draggingFractal = false;
-	}
-	
-	public void resetImagePosition()
-	{
-		fractalPixels = new int[getWidth() * getHeight()];
-		oldBitmapX = bitmapX;
-		oldBitmapY = bitmapY;
-		bitmapX = 0;
-		bitmapY = 0;
-		
-		backgroundBitmap = Bitmap.createBitmap(fractalBitmap);
-		fractalBitmap = null;
-		
+		moveFractal(bitmapX, bitmapY);
 		invalidate();
 	}
 	
@@ -404,10 +396,6 @@ abstract class AbstractFractalView extends View {
 		);
 		
 		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
-		try {
-			if(!(renderingQueue.peek().getPixelBlockSize() == INITIAL_PIXEL_BLOCK))
-				backgroundBitmap = null;
-		} catch (Exception e) {}
 		
 		Log.d(TAG, "Checking pixels");
 		

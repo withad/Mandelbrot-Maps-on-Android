@@ -90,6 +90,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 			dragLastY = (int) evt.getY();
 			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
 			return true;
+			
 		case MotionEvent.ACTION_MOVE:
 			Log.d(TAG, "Dragging detected");
 			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
@@ -107,6 +108,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 			
 			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
 			return true;
+			
 		case MotionEvent.ACTION_UP:
 			Log.d(TAG, "Up detected");
 			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());

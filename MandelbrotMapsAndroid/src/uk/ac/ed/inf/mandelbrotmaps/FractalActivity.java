@@ -78,16 +78,16 @@ public class FractalActivity extends Activity implements OnTouchListener {
     	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), -1);
     	  return true;
       case R.id.PanUp:
-    	  fractalView.dragCanvas(0, -100);
+    	  fractalView.moveFractal(0, -100);
     	  return true;
       case R.id.PanDown:
-    	  fractalView.dragCanvas(0, 100);
+    	  fractalView.moveFractal(0, 100);
     	  return true;
       case R.id.PanLeft:
-    	  fractalView.dragCanvas(100, 0);
+    	  fractalView.moveFractal(100, 0);
     	  return true;
       case R.id.PanRight:
-    	  fractalView.dragCanvas(-100, 0);
+    	  fractalView.moveFractal(-100, 0);
     	  return true;
       }
       return false;
@@ -95,7 +95,6 @@ public class FractalActivity extends Activity implements OnTouchListener {
 
 
 public boolean onTouch(View v, MotionEvent evt) {
-	Log.d(TAG, "Event: " + evt.getActionMasked());
 	switch (evt.getActionMasked())
 	{
 		case MotionEvent.ACTION_DOWN:
@@ -107,36 +106,35 @@ public boolean onTouch(View v, MotionEvent evt) {
 			beforeDragY = (int) evt.getY();
 			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
 			return true;
+			
 		case MotionEvent.ACTION_MOVE:
 			if(!draggingFractal)
 			{
 				fractalView.startDragging();
 				draggingFractal = true;
+				Log.d(TAG, "Started dragging");
 			}
-			
-			Log.d(TAG, "Dragging detected");
-			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
-			// If in real time mode, enable dragging.
-			// How has the mouse moved? Vars should each be one of: {-1, 0, 1}
+
 			int dragDiffPixelsX = (int) (evt.getX() - dragLastX);
 			int dragDiffPixelsY = (int) (evt.getY() - dragLastY);
 	
-			// Move the canvas
-			fractalView.dragCanvasImage(dragDiffPixelsX, dragDiffPixelsY);
+			// Move the bitmap
+			fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
 	
 			// Update last mouse position
 			dragLastX = (int) evt.getX();
 			dragLastY = (int) evt.getY();
 			
-			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
 			return true;
+			
 		case MotionEvent.ACTION_UP:
+			draggingFractal = false;
+			fractalView.stopDragging();
+			
 			int postDragPosX = (int) (evt.getX() - beforeDragX);
 			int postDragPosY = (int) -(evt.getY() - beforeDragY);
 			
-			fractalView.pauseRendering = false;
-			fractalView.resetImagePosition();
-			fractalView.dragCanvas(postDragPosX, postDragPosY);
+			//fractalView.moveFractal(postDragPosX, postDragPosY);
 			Log.d(TAG, "Up detected");
 			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
 			return true;
