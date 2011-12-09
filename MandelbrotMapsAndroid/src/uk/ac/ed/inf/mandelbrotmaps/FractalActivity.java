@@ -9,7 +9,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnTouchListener;
+import android.view.Window;
+import android.widget.LinearLayout.LayoutParams;
 
 public class FractalActivity extends Activity implements OnTouchListener {
    private static final String TAG = "MMaps";
@@ -19,11 +22,17 @@ public class FractalActivity extends Activity implements OnTouchListener {
    
    private int dragLastX;
    private int dragLastY;
+   
+   private int beforeDragX;
+   private int beforeDragY;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       Log.d(TAG, "onCreate");
+      
+      requestWindowFeature(Window.FEATURE_NO_TITLE);
+      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
       fractalView = new MandelbrotFractalView(this);
       //fractalView.setLayoutParams(new LinearLayout.LayoutParams(500, 500));
@@ -92,18 +101,21 @@ public boolean onTouch(View v, MotionEvent evt) {
 			Log.d(TAG, "Remembering touch position");
 			dragLastX = (int) evt.getX();
 			dragLastY = (int) evt.getY();
+			beforeDragX = (int) evt.getX();
+			beforeDragY = (int) evt.getY();
 			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
 			return true;
 		case MotionEvent.ACTION_MOVE:
+			fractalView.pauseRendering = true;
 			Log.d(TAG, "Dragging detected");
 			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
 			// If in real time mode, enable dragging.
 			// How has the mouse moved? Vars should each be one of: {-1, 0, 1}
 			int dragDiffPixelsX = (int) (evt.getX() - dragLastX);
-			int dragDiffPixelsY = (int) -(evt.getY() - dragLastY);
+			int dragDiffPixelsY = (int) (evt.getY() - dragLastY);
 	
 			// Move the canvas
-			fractalView.dragCanvas(dragDiffPixelsX, dragDiffPixelsY);
+			fractalView.dragCanvasImage(dragDiffPixelsX, dragDiffPixelsY);
 	
 			// Update last mouse position
 			dragLastX = (int) evt.getX();
@@ -112,6 +124,12 @@ public boolean onTouch(View v, MotionEvent evt) {
 			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
 			return true;
 		case MotionEvent.ACTION_UP:
+			int postDragPosX = (int) (evt.getX() - beforeDragX);
+			int postDragPosY = (int) -(evt.getY() - beforeDragY);
+			
+			fractalView.pauseRendering = false;
+			fractalView.resetImagePosition();
+			fractalView.dragCanvas(postDragPosX, postDragPosY);
 			Log.d(TAG, "Up detected");
 			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
 			return true;

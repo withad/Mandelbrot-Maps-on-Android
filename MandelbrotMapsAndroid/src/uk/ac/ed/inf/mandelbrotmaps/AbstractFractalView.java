@@ -26,8 +26,8 @@ abstract class AbstractFractalView extends View {
    // Default "crude rendering" pixel block size?
    int INITIAL_PIXEL_BLOCK = 3;
    
-   //Default puixel size
-   int DEFAULT_PIXEL_SIZE = 4;
+   //Default pixel size
+   int DEFAULT_PIXEL_SIZE = 1;
    
    // How much of a zoom, on each increment?
    public static final int zoomPercent = 20;
@@ -49,7 +49,7 @@ abstract class AbstractFractalView extends View {
 	double ITERATION_CONSTANT_FACTOR;
 	
 	// Scaling factor for maxIterations() calculations
-	double iterationScaling = 0.1;
+	double iterationScaling = 0.3;
 	double ITERATIONSCALING_MIN = 0.01;
 	double ITERATIONSCALING_MAX = 100;
 	double ITERATIONSCALING_DEFAULT = 1;
@@ -63,18 +63,24 @@ abstract class AbstractFractalView extends View {
 	double[] homeGraphArea;
 	
 	// Pixel colours
-	int[] pixelIterations;
-	Bitmap bitmapPixels;
+	int[] fractalPixels;
+	Bitmap fractalBitmap;
+	Bitmap backgroundBitmap;
 	
 	public int bitmapX = 0;
 	public int bitmapY = 0;
+	
+	public int oldBitmapX = 0;
+	public int oldBitmapY = 0;
+	
+	boolean pauseRendering;
 	
    
    public AbstractFractalView(Context context) {
       super(context);
       setFocusable(true);
       setFocusableInTouchMode(true);
-      setBackgroundColor(Color.BLUE);
+      setBackgroundColor(Color.BLACK);
       setId(0); 
       
       setOnTouchListener((FractalActivity)context);
@@ -111,18 +117,25 @@ abstract class AbstractFractalView extends View {
    protected void onDraw(Canvas canvas) {	   
 	// (Re)create pixel grid, if not initialised - or if wrong size.
 	if (
-		(pixelIterations == null) ||
-		(pixelIterations.length != getWidth()*getHeight())
+		(fractalPixels == null) ||
+		(fractalPixels.length != getWidth()*getHeight())
 	) {
-		pixelIterations = new int[getWidth() * getHeight()];
+		fractalPixels = new int[getWidth() * getHeight()];
 		updateDisplay();
 	}
-	if(bitmapPixels != null)
+	
+	if(fractalBitmap != null)
 	{
-		bitmapPixels = Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
-		canvas.drawBitmap(bitmapPixels, bitmapX,bitmapY, new Paint());
-		Log.d(TAG, "Drawing bitmap");
+		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+		canvas.drawBitmap(fractalBitmap, bitmapX,bitmapY, new Paint());
 	}
+	
+	if(backgroundBitmap != null)
+	{
+		canvas.drawBitmap(backgroundBitmap, oldBitmapX, oldBitmapY, new Paint());
+	}
+	
+
    }
 	
    // Called when we want to recompute everything
@@ -132,7 +145,10 @@ abstract class AbstractFractalView extends View {
 		
 		// If in real-time mode, schedule a crude rendering
 		if (needCrudeRendering()) 
+		{
+			Log.d(TAG, "Performing crude rending");
 			scheduleRendering(INITIAL_PIXEL_BLOCK);
+		}
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(DEFAULT_PIXEL_SIZE);
@@ -295,6 +311,28 @@ abstract class AbstractFractalView extends View {
 		setGraphArea(newGraphArea);
 	}
 	
+	public void dragCanvasImage(int dragDiffPixelsX, int dragDiffPixelsY) {		
+		// Adjust the Graph Area
+		bitmapX += dragDiffPixelsX;
+		bitmapY += dragDiffPixelsY;
+		
+		invalidate();
+	}
+	
+	public void resetImagePosition()
+	{
+		oldBitmapX = bitmapX;
+		oldBitmapY = bitmapY;
+		bitmapX = 0;
+		bitmapY = 0;
+		
+		
+		backgroundBitmap = Bitmap.createBitmap(fractalBitmap);
+		fractalBitmap = null;
+		
+		invalidate();
+	}
+	
 	// Get the iteration scaling factor.
 	// Log scale, with values ITERATIONSCALING_MIN .. ITERATIONSCALING_MAX
 	// represented by values in range 0..CONTRAST_SLIDER_SCALING
@@ -339,19 +377,17 @@ abstract class AbstractFractalView extends View {
 		return Math.max(iterationsToPerform, MIN_ITERATIONS);
 	}
 	
+	
 	// Compute entire pixel grid
-	// "pixelBlockSize" is how many real pixels each of our pixels should span.
-	// eg, "3" will result in each of our "pixels" being 3x3 = 9 real pixels.
 	public void computeAllPixels(final int pixelBlockSize) {
 		// Nothing to do - stop if called before layout has been sanely set...
 		if (getWidth() <= 0) return;
 		if (graphArea == null) return;
 		
 		computePixels(
-			pixelIterations,
+			fractalPixels,
 			pixelBlockSize,
-			bitmapPixels,
-			false,//true,
+			true,
 			0,
 			getWidth(),
 			0,
@@ -363,7 +399,11 @@ abstract class AbstractFractalView extends View {
 			10000
 		);
 		
-		bitmapPixels = Bitmap.createBitmap(pixelIterations, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+		try {
+			if(!(renderingQueue.peek().getPixelBlockSize() == INITIAL_PIXEL_BLOCK))
+				backgroundBitmap = null;
+		} catch (Exception e) {}
 		
 		Log.d(TAG, "Checking pixels");
 		
@@ -376,7 +416,6 @@ abstract class AbstractFractalView extends View {
 	abstract void computePixels(
 			int[] outputPixelArray,  // Where pixels are output
 			int pixelBlockSize,  // Pixel "blockiness"
-			final Bitmap outputMIS,  // Memory image source to get newPixels() on
 			final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
 			final int xPixelMin,
 			final int xPixelMax,

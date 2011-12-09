@@ -46,7 +46,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	void computePixels(
 		int[] outputPixelArray,  // Where pixels are output
 		int pixelBlockSize,  // Pixel "blockiness"
-		final Bitmap outputBitmap,  // Memory image source to get newPixels() on
 		final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
 		final int xPixelMin,
 		final int xPixelMax,
@@ -59,7 +58,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final int millisBeforeSlowRenderBehaviour  // How many millis before show rendering progress, and (if allowInterruption) before listening for this.
 	) {
 		int maxIterations = getMaxIterations();
-		Log.d(TAG, "maxIterations = " + maxIterations);
 		int imgWidth = xPixelMax - xPixelMin;
 		
 		// Efficiency: For very high-demanding pictures, increase pixel block.
@@ -158,7 +156,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				//Log.d("MFV", "Reached end of x loop");
 			}
 			// Show thread's work in progress
-			if ((showRenderingProgress) && (outputBitmap!=null) &&	(yPixel % 3 == 0)
+			if ((showRenderingProgress) && (yPixel % 3 == 0)
 				//(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
 			) 
 				{
