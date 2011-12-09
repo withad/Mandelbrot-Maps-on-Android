@@ -32,7 +32,7 @@ public class LauncherActivity extends Activity implements OnClickListener {
       View exitButton = findViewById(R.id.exit_button);
       exitButton.setOnClickListener(this);
       
-      View uiMockupButton = findViewById(R.id.UI_mockup_button);
+      View uiMockupButton = findViewById(R.id.bitmap_test_button);
       uiMockupButton.setOnClickListener(this);
    }
 
@@ -53,10 +53,9 @@ public class LauncherActivity extends Activity implements OnClickListener {
          startActivity(i);
          break;
       case R.id.fractal_button:
-         openNewGameDialog();
+         startFractal();
          break;
-      case R.id.UI_mockup_button:
-    	  Log.d(TAG, "Launching UI mockup");
+      case R.id.bitmap_test_button:
     	  startActivity(new Intent(this, BitmapActivity.class));
     	  break;
       case R.id.exit_button:
@@ -73,37 +72,9 @@ public class LauncherActivity extends Activity implements OnClickListener {
       return true;
    }
 
-   @Override
-   public boolean onOptionsItemSelected(MenuItem item) {
-      switch (item.getItemId()) {
-      case R.id.settings:
-         startActivity(new Intent(this, Prefs.class));
-         return true;
-      // More items go here (if any) ...
-      }
-      return false;
-   }
-
-   /** Ask the user what difficulty level they want */
-   private void openNewGameDialog() {
-      new AlertDialog.Builder(this)
-           .setTitle(R.string.draw_type_title)
-           .setItems(R.array.render_type,
-            new DialogInterface.OnClickListener() {
-               public void onClick(DialogInterface dialoginterface,
-                     int i) {
-                  startGame(i);
-               }
-            })
-           .show();
-   }
-
    /** Start a new game with the given difficulty level */
-   private void startGame(int i) {
-	   	if (i != 0) return;
-	   	Log.d(TAG, "clicked on " + i);
+   private void startFractal() {
    		Intent intent = new Intent(this, FractalActivity.class);
-   		//intent.putExtra(Game.KEY_DIFFICULTY, i);
    		startActivity(intent);
    }
 }

@@ -25,6 +25,8 @@ public class FractalActivity extends Activity implements OnTouchListener {
    
    private int beforeDragX;
    private int beforeDragY;
+   
+   private boolean draggingFractal;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +108,12 @@ public boolean onTouch(View v, MotionEvent evt) {
 			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
 			return true;
 		case MotionEvent.ACTION_MOVE:
-			fractalView.pauseRendering = true;
+			if(!draggingFractal)
+			{
+				fractalView.startDragging();
+				draggingFractal = true;
+			}
+			
 			Log.d(TAG, "Dragging detected");
 			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
 			// If in real time mode, enable dragging.

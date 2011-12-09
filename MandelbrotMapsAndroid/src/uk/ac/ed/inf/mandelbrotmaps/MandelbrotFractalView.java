@@ -93,8 +93,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			// Detect rendering abortion.
 			if (
 				allowInterruption &&
-				renderThread.abortSignalled() &&
-				(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
+				renderThread.abortSignalled() //&&
+				//(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
 			) 
 				{
 					Log.d("MFV", "Returning based on interruption test");

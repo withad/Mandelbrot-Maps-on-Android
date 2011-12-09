@@ -32,9 +32,11 @@ abstract class AbstractFractalView extends View {
    // How much of a zoom, on each increment?
    public static final int zoomPercent = 20;
    
-   // Rendering queue (modified from a LinkedBlockingDeque
+   // Rendering queue (modified from a LinkedBlockingDeque in the original version)
    LinkedBlockingQueue<CanvasRendering> renderingQueue = new LinkedBlockingQueue<CanvasRendering>();	
    CanvasRenderThread renderThread = new CanvasRenderThread(this);
+   
+   //Handle on parent activity
    FractalActivity parentActivity;	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
@@ -62,18 +64,19 @@ abstract class AbstractFractalView extends View {
 	double[] graphArea;
 	double[] homeGraphArea;
 	
-	// Pixel colours
+	// Fractal image data
 	int[] fractalPixels;
 	Bitmap fractalBitmap;
 	Bitmap backgroundBitmap;
 	
+	// Where to draw the image onscreen
 	public int bitmapX = 0;
-	public int bitmapY = 0;
-	
+	public int bitmapY = 0;	
 	public int oldBitmapX = 0;
 	public int oldBitmapY = 0;
 	
 	boolean pauseRendering;
+	boolean draggingFractal = false;
 	
    
    public AbstractFractalView(Context context) {
@@ -83,12 +86,13 @@ abstract class AbstractFractalView extends View {
       setBackgroundColor(Color.BLACK);
       setId(0); 
       
+      parentActivity = (FractalActivity)context;
       setOnTouchListener((FractalActivity)context);
       
       renderThread.start();
    }
 
-   
+   /*Android life-cycle handling*/   
    @Override
    protected Parcelable onSaveInstanceState() { 
 	  super.onSaveInstanceState();
@@ -124,7 +128,7 @@ abstract class AbstractFractalView extends View {
 		updateDisplay();
 	}
 	
-	if(fractalBitmap != null)
+	if(fractalBitmap != null && !draggingFractal)
 	{
 		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		canvas.drawBitmap(fractalBitmap, bitmapX,bitmapY, new Paint());
@@ -134,40 +138,30 @@ abstract class AbstractFractalView extends View {
 	{
 		canvas.drawBitmap(backgroundBitmap, oldBitmapX, oldBitmapY, new Paint());
 	}
-	
-
    }
 	
+   
    // Called when we want to recompute everything
 	void updateDisplay() {		
 		// Abort future rendering queue. If in real-time mode, interrupt current rendering too
 		stopAllRendering();
 		
 		// If in real-time mode, schedule a crude rendering
-		if (needCrudeRendering()) 
-		{
-			Log.d(TAG, "Performing crude rending");
-			scheduleRendering(INITIAL_PIXEL_BLOCK);
-		}
+		if (needCrudeRendering()) scheduleRendering(INITIAL_PIXEL_BLOCK);
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(DEFAULT_PIXEL_SIZE);
 	}
    
 	
-	/* Utilities */
-	// Get a handle on Parent
-	public void setParentHandle(FractalActivity parentHandle) {
-		parentActivity = parentHandle;
+	/* Utilities */	
+	// Do we need a crude rendering? (Based on number of iterations)
+	boolean needCrudeRendering() {
+		return getMaxIterations() > 30;
 	}
 	
 	public double[] getGraphArea() {
 		return graphArea;
-	}
-	
-	// Do we need a crude rendering?
-	boolean needCrudeRendering() {
-		return getMaxIterations() > 30;
 	}
 	
 	public void stopPlannedRendering() {
@@ -311,6 +305,11 @@ abstract class AbstractFractalView extends View {
 		setGraphArea(newGraphArea);
 	}
 	
+	public void startDragging()
+	{
+		draggingFractal = true;
+	}
+	
 	public void dragCanvasImage(int dragDiffPixelsX, int dragDiffPixelsY) {		
 		// Adjust the Graph Area
 		bitmapX += dragDiffPixelsX;
@@ -319,13 +318,18 @@ abstract class AbstractFractalView extends View {
 		invalidate();
 	}
 	
+	public void stopDragging()
+	{
+		draggingFractal = false;
+	}
+	
 	public void resetImagePosition()
 	{
+		fractalPixels = new int[getWidth() * getHeight()];
 		oldBitmapX = bitmapX;
 		oldBitmapY = bitmapY;
 		bitmapX = 0;
 		bitmapY = 0;
-		
 		
 		backgroundBitmap = Bitmap.createBitmap(fractalBitmap);
 		fractalBitmap = null;
@@ -333,9 +337,9 @@ abstract class AbstractFractalView extends View {
 		invalidate();
 	}
 	
-	// Get the iteration scaling factor.
+	/* Get the iteration scaling factor.
 	// Log scale, with values ITERATIONSCALING_MIN .. ITERATIONSCALING_MAX
-	// represented by values in range 0..CONTRAST_SLIDER_SCALING
+	// represented by values in range 0..CONTRAST_SLIDER_SCALING*/
 	public int getScaledIterationCount() {
 		return (int)(
 			CONTRAST_SLIDER_SCALING *
@@ -344,9 +348,9 @@ abstract class AbstractFractalView extends View {
 		);
 	}
 	
-	// Set the iteration scaling factor.
+	/* Set the iteration scaling factor.
 	// Log scale, with values ITERATIONSCALING_MIN .. ITERATIONSCALING_MAX
-	// represented by values in range 0..CONTRAST_SLIDER_SCALING
+	// represented by values in range 0..CONTRAST_SLIDER_SCALING */
 	public void setScaledIterationCount(int scaledIterationCount) {
 		if (
 			(scaledIterationCount >= 0) &&
@@ -363,11 +367,11 @@ abstract class AbstractFractalView extends View {
 		}
 	}
 	
-	// How many iterations to perform?
+	/* How many iterations to perform?
 	// Empirically determined to be generally exponentially rising, as a function of x = |ln(pixelSize)|
 	// ie, maxIterations ~ a(b^x)
 	// a, b determined empirically for Mandelbrot/Julia curves
-	// The contrast slider allows adjustment of the magnitude of a, with a log scale.
+	// The contrast slider allows adjustment of the magnitude of a, with a log scale. */
 	int getMaxIterations() {
 		// How many iterations to perform?
 		double absLnPixelSize = Math.abs(Math.log(getPixelSize()));
@@ -395,7 +399,7 @@ abstract class AbstractFractalView extends View {
 			graphArea[0],
 			graphArea[1],
 			getPixelSize(),
-			false,
+			true,
 			10000
 		);
 		
