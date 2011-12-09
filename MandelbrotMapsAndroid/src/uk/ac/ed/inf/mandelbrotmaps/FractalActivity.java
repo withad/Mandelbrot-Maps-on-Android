@@ -78,10 +78,12 @@ public class FractalActivity extends Activity implements OnTouchListener {
     	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), -1);
     	  return true;
       case R.id.PanUp:
-    	  fractalView.moveFractal(0, -100);
+    	  //fractalView.moveFractal(0, -100);
+    	  fractalView.shiftPixels(0, -100);
     	  return true;
       case R.id.PanDown:
-    	  fractalView.moveFractal(0, 100);
+    	  //fractalView.moveFractal(0, 100);
+    	  fractalView.shiftPixels(0, 100);
     	  return true;
       case R.id.PanLeft:
     	  fractalView.moveFractal(100, 0);
@@ -98,6 +100,11 @@ public boolean onTouch(View v, MotionEvent evt) {
 	switch (evt.getActionMasked())
 	{
 		case MotionEvent.ACTION_DOWN:
+			Log.d(TAG, "Shifting pixels 100, 100");
+			fractalView.shiftPixels(100, 100);
+			fractalView.invalidate();
+			return true;
+			/*
 			// Remember mouse position
 			Log.d(TAG, "Remembering touch position");
 			dragLastX = (int) evt.getX();
@@ -138,6 +145,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 			Log.d(TAG, "Up detected");
 			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
 			return true;
+			*/
 	}
 	return false;
 }

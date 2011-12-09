@@ -72,8 +72,6 @@ abstract class AbstractFractalView extends View {
 	// Where to draw the image onscreen
 	public int bitmapX = 0;
 	public int bitmapY = 0;	
-	public int oldBitmapX = 0;
-	public int oldBitmapY = 0;
 	
 	boolean pauseRendering;
 	boolean draggingFractal = false;
@@ -137,7 +135,6 @@ abstract class AbstractFractalView extends View {
 	{
 		canvas.drawBitmap(fractalBitmap, bitmapX, bitmapY, new Paint());
 	}
-	
    }
 	
    
@@ -328,6 +325,38 @@ abstract class AbstractFractalView extends View {
 		moveFractal(bitmapX, bitmapY);
 		invalidate();
 	}
+	
+	public void shiftPixels(int shiftX, int shiftY)
+	{
+		int height = getHeight();
+		int width = getWidth();
+		int[] newPixels = new int[height * width];
+		
+		//Choose rows to copy from
+		int rowNum = height - Math.abs(shiftY);
+		int origStartRow = (shiftY < 0 ? Math.abs(shiftY) : 0);
+		
+		//Choose columns to copy from
+		int colNum = width - Math.abs(shiftX);
+		int origStartCol = (shiftX < 0 ? Math.abs(shiftX) : 0);
+		
+		//Choose columns to copy to
+		int destStartCol = (shiftX < 0 ? 0 : shiftX);
+		
+		//Copy useful parts into new array
+		for (int origY = origStartRow; origY < origStartRow + rowNum; origY++)
+		{
+			int destY = origY + shiftY;
+			System.arraycopy(fractalPixels, (origY * width) + origStartCol, 
+							 newPixels, (destY * width) + destStartCol,
+							 colNum);
+		}
+		
+		fractalPixels = newPixels;
+		
+		invalidate();
+	}
+	
 	
 	/* Get the iteration scaling factor.
 	// Log scale, with values ITERATIONSCALING_MIN .. ITERATIONSCALING_MAX
