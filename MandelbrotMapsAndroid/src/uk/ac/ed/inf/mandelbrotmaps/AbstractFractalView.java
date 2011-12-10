@@ -130,6 +130,7 @@ abstract class AbstractFractalView extends View {
 	{
 		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		canvas.drawBitmap(fractalBitmap, 0, 0, new Paint());
+		Log.d(TAG, "Drawing bitmap at (0.0)");
 	}
 	else if (draggingFractal)
 	{
