@@ -422,7 +422,7 @@ abstract class AbstractFractalView extends View {
 			graphArea[1],
 			getPixelSize(),
 			true,
-			10000
+			300
 		);
 		
 		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
