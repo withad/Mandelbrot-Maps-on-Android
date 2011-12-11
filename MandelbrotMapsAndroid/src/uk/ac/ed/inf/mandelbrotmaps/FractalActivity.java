@@ -78,12 +78,13 @@ public class FractalActivity extends Activity implements OnTouchListener {
     	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), -1);
     	  return true;
       case R.id.PanUp:
-    	  //fractalView.moveFractal(0, -100);
     	  fractalView.shiftPixels(0, -100);
+    	  fractalView.moveFractal(0, -100);
     	  return true;
       case R.id.PanDown:
-    	  //fractalView.moveFractal(0, 100);
     	  fractalView.shiftPixels(0, 100);
+    	  fractalView.moveFractal(0, 100);
+    	  //fractalView.updateDisplay();
     	  return true;
       case R.id.PanLeft:
     	  fractalView.moveFractal(100, 0);
