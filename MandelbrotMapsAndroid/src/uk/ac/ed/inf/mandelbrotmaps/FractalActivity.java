@@ -2,20 +2,25 @@ package uk.ac.ed.inf.mandelbrotmaps;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.view.Window;
-import android.widget.LinearLayout.LayoutParams;
+import android.view.WindowManager;
 
 public class FractalActivity extends Activity implements OnTouchListener {
    private static final String TAG = "MMaps";
+   
+   private enum ControlMode{
+	   PAN,
+	   ZOOM
+   }
+   
+   private ControlMode controlMode;
 
    private MandelbrotFractalView fractalView;
    private MandelbrotJuliaLocation mjLocation;
@@ -84,7 +89,6 @@ public class FractalActivity extends Activity implements OnTouchListener {
       case R.id.PanDown:
     	  fractalView.shiftPixels(0, 100);
     	  fractalView.moveFractal(0, 100);
-    	  //fractalView.updateDisplay();
     	  return true;
       case R.id.PanLeft:
     	  fractalView.moveFractal(100, 0);
@@ -100,12 +104,7 @@ public class FractalActivity extends Activity implements OnTouchListener {
 public boolean onTouch(View v, MotionEvent evt) {
 	switch (evt.getActionMasked())
 	{
-		case MotionEvent.ACTION_DOWN:
-			Log.d(TAG, "Shifting pixels 100, 100");
-			fractalView.shiftPixels(100, 100);
-			fractalView.invalidate();
-			return true;
-			/*
+		case MotionEvent.ACTION_DOWN:			
 			// Remember mouse position
 			Log.d(TAG, "Remembering touch position");
 			dragLastX = (int) evt.getX();
@@ -138,15 +137,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 		case MotionEvent.ACTION_UP:
 			draggingFractal = false;
 			fractalView.stopDragging();
-			
-			int postDragPosX = (int) (evt.getX() - beforeDragX);
-			int postDragPosY = (int) -(evt.getY() - beforeDragY);
-			
-			//fractalView.moveFractal(postDragPosX, postDragPosY);
-			Log.d(TAG, "Up detected");
-			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
 			return true;
-			*/
 	}
 	return false;
 }

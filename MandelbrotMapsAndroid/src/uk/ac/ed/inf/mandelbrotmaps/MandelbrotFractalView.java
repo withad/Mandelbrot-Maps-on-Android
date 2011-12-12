@@ -45,6 +45,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	// Iterate a rectangle of pixels, in range (xPixelMin, yPixelMin) to (xPixelMax, yPixelMax)
 	void computePixels(
 		int[] outputPixelArray,  // Where pixels are output
+		int[] currentPixelSizes,
 		int pixelBlockSize,  // Pixel "blockiness"
 		final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
 		final int xPixelMin,
@@ -55,7 +56,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final double yMax,
 		final double pixelSize,
 		final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-		final int millisBeforeSlowRenderBehaviour  // How many millis before show rendering progress, and (if allowInterruption) before listening for this.
+		final int millisBeforeSlowRenderBehaviour,  // How many millis before show rendering progress, and (if allowInterruption) before listening for this.
+		RenderMode renderMode
 	) {
 		int maxIterations = getMaxIterations();
 		int imgWidth = xPixelMax - xPixelMin;
@@ -108,6 +110,14 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			y0 = yMax - ( (double)yPixel * pixelSize );
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
+				//Check to see if this pixel is already iterated to the necessary block size
+				int size = pixelSizes[(imgWidth*yPixel) + xPixel];
+				if(renderMode == RenderMode.JUST_DRAGGED && 
+						size <= pixelBlockSize)
+				{
+					continue;
+				}
+				
 				// Set x0 (real part of c)
 				x0 = xMin + ( (double)xPixel * pixelSize);
 			
@@ -151,9 +161,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
 						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
+						currentPixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
 					}
 				}
-				//Log.d("MFV", "Reached end of x loop");
 			}
 			// Show thread's work in progress
 			if ((showRenderingProgress) && (yPixel % 3 == 0)

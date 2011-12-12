@@ -13,31 +13,39 @@ import android.view.View;
 
 abstract class AbstractFractalView extends View {
    
-   private static final String TAG = "FractalView";
+	private static final String TAG = "FractalView";
+	
+	public static enum RenderMode{
+		NEW,
+		JUST_DRAGGED,
+		JUST_ZOOMED
+	}
+	
+	private RenderMode renderMode = RenderMode.NEW;
 
-   private int WIDTH;
-   private int HEIGHT;
-   private int STRIDE;
+	private int WIDTH;
+	private int HEIGHT;
+	private int STRIDE;
    
-   // How many different, discrete zoom and contrast levels?
-   public static final int ZOOM_SLIDER_SCALING = 300;
-   public static final int CONTRAST_SLIDER_SCALING = 200;
+   	// How many different, discrete zoom and contrast levels?
+	public static final int ZOOM_SLIDER_SCALING = 300;
+	public static final int CONTRAST_SLIDER_SCALING = 200;
    
-   // Default "crude rendering" pixel block size?
-   int INITIAL_PIXEL_BLOCK = 3;
+	// Default "crude rendering" pixel block size?
+	int INITIAL_PIXEL_BLOCK = 3;
    
-   //Default pixel size
-   int DEFAULT_PIXEL_SIZE = 1;
+	//Default pixel size
+	int DEFAULT_PIXEL_SIZE = 1;
    
-   // How much of a zoom, on each increment?
-   public static final int zoomPercent = 20;
+   	// How much of a zoom, on each increment?
+	public static final int zoomPercent = 20;
    
-   // Rendering queue (modified from a LinkedBlockingDeque in the original version)
-   LinkedBlockingQueue<CanvasRendering> renderingQueue = new LinkedBlockingQueue<CanvasRendering>();	
-   CanvasRenderThread renderThread = new CanvasRenderThread(this);
+	// Rendering queue (modified from a LinkedBlockingDeque in the original version)
+	LinkedBlockingQueue<CanvasRendering> renderingQueue = new LinkedBlockingQueue<CanvasRendering>();	
+	CanvasRenderThread renderThread = new CanvasRenderThread(this);
    
-   //Handle on parent activity
-   FractalActivity parentActivity;	
+	//Handle on parent activity
+	FractalActivity parentActivity;	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
 	double MINZOOM_LN_PIXEL = -3;
@@ -66,6 +74,7 @@ abstract class AbstractFractalView extends View {
 	
 	// Fractal image data
 	int[] fractalPixels;
+	int[] pixelSizes;
 	Bitmap fractalBitmap;
 	Bitmap movingBitmap;
 	
@@ -77,7 +86,7 @@ abstract class AbstractFractalView extends View {
 	boolean draggingFractal = false;
 	
    
-   public AbstractFractalView(Context context) {
+	public AbstractFractalView(Context context) {
       super(context);
       setFocusable(true);
       setFocusableInTouchMode(true);
@@ -123,6 +132,7 @@ abstract class AbstractFractalView extends View {
 		(fractalPixels.length != getWidth()*getHeight())
 	) {
 		fractalPixels = new int[getWidth() * getHeight()];
+		clearPixelSizes();
 		updateDisplay();
 	}
 	
@@ -139,7 +149,17 @@ abstract class AbstractFractalView extends View {
    }
 	
    
-   // Called when we want to recompute everything
+   //Fill the pixel sizes array with a number larger than any reasonable block size
+   private void clearPixelSizes() {
+	  pixelSizes = new int[getWidth() * getHeight()];
+	
+	  for (int i = 0; i < pixelSizes.length; i++)
+	  {
+		  pixelSizes[i] = 1000;
+	  }
+}
+
+// Called when we want to recompute everything
 	void updateDisplay() {		
 		// Abort future rendering queue. If in real-time mode, interrupt current rendering too
 		stopAllRendering();
@@ -223,6 +243,8 @@ abstract class AbstractFractalView extends View {
 		
 	// Adjust zoom, centred on pixel (xPixel, yPixel)
 	public void zoomChange(int xPixel, int yPixel, int zoomAmount) {
+		renderMode = RenderMode.JUST_ZOOMED;
+		
 		double pixelSize = getPixelSize();
 		
 		double[] oldGraphArea = getGraphArea();
@@ -306,6 +328,7 @@ abstract class AbstractFractalView extends View {
 	
 	public void startDragging()
 	{
+		stopAllRendering();
 		movingBitmap = Bitmap.createBitmap(fractalBitmap);
 		bitmapX = 0;
 		bitmapY = 0;
@@ -322,7 +345,9 @@ abstract class AbstractFractalView extends View {
 	
 	public void stopDragging()
 	{
+		shiftPixels(bitmapX, bitmapY);
 		draggingFractal = false;
+		renderMode = RenderMode.JUST_DRAGGED;
 		moveFractal(bitmapX, bitmapY);
 		invalidate();
 	}
@@ -332,6 +357,8 @@ abstract class AbstractFractalView extends View {
 		int height = getHeight();
 		int width = getWidth();
 		int[] newPixels = new int[height * width];
+		int[] newSizes = new int[height * width];
+		for (int i = 0; i < newSizes.length; i++) newSizes[i] = 1000;
 		
 		//Choose rows to copy from
 		int rowNum = height - Math.abs(shiftY);
@@ -351,9 +378,13 @@ abstract class AbstractFractalView extends View {
 			System.arraycopy(fractalPixels, (origY * width) + origStartCol, 
 							 newPixels, (destY * width) + destStartCol,
 							 colNum);
+			System.arraycopy(pixelSizes, (origY * width) + origStartCol, 
+					 newSizes, (destY * width) + destStartCol,
+					 colNum);
 		}
 		
 		fractalPixels = newPixels;
+		pixelSizes = newSizes;
 		
 		invalidate();
 	}
@@ -412,6 +443,7 @@ abstract class AbstractFractalView extends View {
 		
 		computePixels(
 			fractalPixels,
+			pixelSizes,
 			pixelBlockSize,
 			true,
 			0,
@@ -422,7 +454,8 @@ abstract class AbstractFractalView extends View {
 			graphArea[1],
 			getPixelSize(),
 			true,
-			300
+			10000,
+			renderMode
 		);
 		
 		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
@@ -437,6 +470,7 @@ abstract class AbstractFractalView extends View {
 	abstract void loadLocation(MandelbrotJuliaLocation mjLocation);
 	abstract void computePixels(
 			int[] outputPixelArray,  // Where pixels are output
+			int[] pixelSizeArray, //The size of each pixel's associated block
 			int pixelBlockSize,  // Pixel "blockiness"
 			final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
 			final int xPixelMin,
@@ -447,7 +481,8 @@ abstract class AbstractFractalView extends View {
 			final double yMax,
 			final double pixelSize,
 			final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-			final int millisBeforeSlowRenderBehaviour  // How many millis before show rendering progress, and (if allowInterruption) before listening for this.
+			final int millisBeforeSlowRenderBehaviour,  // How many millis before show rendering progress, and (if allowInterruption) before listening for this.
+			RenderMode currentRenderMode
 		);
 }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -109,7 +110,14 @@ class BitmapDraggingView extends View {
 		fillBitmap();
 	}
 	if(bitmapPixels != null)
-		canvas.drawBitmap(bitmapPixels, bitmapX, bitmapY, new Paint()); 
+	{
+		Matrix matrix = new Matrix();
+		matrix.reset();
+		matrix.setScale(0.5f, 0.5f);
+		canvas.setMatrix(matrix);
+		canvas.drawBitmap(bitmapPixels, bitmapX, bitmapY, new Paint());
+	}
+		
    }
 	
    private void fillBitmap() {
