@@ -7,12 +7,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class FractalActivity extends Activity implements OnTouchListener {
+public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
    private static final String TAG = "MMaps";
    
    private enum ControlMode{
@@ -140,5 +142,23 @@ public boolean onTouch(View v, MotionEvent evt) {
 			return true;
 	}
 	return false;
+}
+
+
+public boolean onScale(ScaleGestureDetector detector) {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+
+public boolean onScaleBegin(ScaleGestureDetector detector) {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+
+public void onScaleEnd(ScaleGestureDetector detector) {
+	// TODO Auto-generated method stub
+	
 }
 }

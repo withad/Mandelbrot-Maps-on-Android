@@ -2,18 +2,18 @@ package uk.ac.ed.inf.mandelbrotmaps;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnTouchListener;
 
-public class BitmapActivity extends Activity implements OnTouchListener {
+public class BitmapActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
    private static final String TAG = "MMaps";
 
    private BitmapDraggingView bitmapView;
@@ -21,6 +21,8 @@ public class BitmapActivity extends Activity implements OnTouchListener {
    
    private int dragLastX;
    private int dragLastY;
+   
+   private ScaleGestureDetector gestureDetector;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,8 @@ public class BitmapActivity extends Activity implements OnTouchListener {
       bitmapView = new BitmapDraggingView(this);
       setContentView(bitmapView);
       bitmapView.requestFocus();
+      
+      gestureDetector = new ScaleGestureDetector(this, this);
    }
 
    
@@ -58,34 +62,10 @@ public class BitmapActivity extends Activity implements OnTouchListener {
       return true;
    }
 
-   @Override
-   public boolean onOptionsItemSelected(MenuItem item) {
-      switch (item.getItemId()) {
-      case R.id.ZoomOut:
-    	  bitmapView.zoomChange((int)(bitmapView.getWidth()/2), (int)(bitmapView.getHeight()/2), 1);
-    	  return true;
-      case R.id.ZoomIn:
-    	  bitmapView.zoomChange((int)(bitmapView.getWidth()/2), (int)(bitmapView.getHeight()/2), -1);
-    	  return true;
-      case R.id.PanUp:
-    	  bitmapView.dragCanvas(0, -100);
-    	  return true;
-      case R.id.PanDown:
-    	  bitmapView.dragCanvas(0, 100);
-    	  return true;
-      case R.id.PanLeft:
-    	  bitmapView.dragCanvas(100, 0);
-    	  return true;
-      case R.id.PanRight:
-    	  bitmapView.dragCanvas(-100, 0);
-    	  return true;
-      }
-      return false;
-   }
-
 
 public boolean onTouch(View v, MotionEvent evt) {
 	Log.d(TAG, "Event: " + evt.getActionMasked());
+	gestureDetector.onTouchEvent(evt);
 	switch (evt.getActionMasked())
 	{
 		case MotionEvent.ACTION_DOWN:
@@ -97,22 +77,25 @@ public boolean onTouch(View v, MotionEvent evt) {
 			return true;
 			
 		case MotionEvent.ACTION_MOVE:
-			Log.d(TAG, "Dragging detected");
-			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
-			// If in real time mode, enable dragging.
-			// How has the mouse moved? Vars should each be one of: {-1, 0, 1}
-			int dragDiffPixelsX = (int) (evt.getX() - dragLastX);
-			int dragDiffPixelsY = (int) (evt.getY() - dragLastY);
+			if(!gestureDetector.isInProgress())
+			{
+				Log.d(TAG, "Dragging detected");
+				Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
 	
-			// Move the canvas
-			bitmapView.dragCanvas(dragDiffPixelsX, dragDiffPixelsY);
-	
-			// Update last mouse position
-			dragLastX = (int) evt.getX();
-			dragLastY = (int) evt.getY();
+				int dragDiffPixelsX = (int) (evt.getX() - dragLastX);
+				int dragDiffPixelsY = (int) (evt.getY() - dragLastY);
+		
+				// Move the canvas
+				bitmapView.dragCanvas(dragDiffPixelsX, dragDiffPixelsY);
+		
+				// Update last mouse position
+				dragLastX = (int) evt.getX();
+				dragLastY = (int) evt.getY();
+				
+				Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
+				return true;
+			}
 			
-			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
-			return true;
 			
 		case MotionEvent.ACTION_UP:
 			Log.d(TAG, "Up detected");
@@ -120,5 +103,29 @@ public boolean onTouch(View v, MotionEvent evt) {
 			return true;
 	}
 	return false;
+}
+
+
+public boolean onScale(ScaleGestureDetector detector) {
+	Log.d(TAG, "This working?");
+	
+	bitmapView.midX = detector.getFocusX();
+	bitmapView.midY = detector.getFocusY();
+	
+	bitmapView.scaleFactor *= gestureDetector.getScaleFactor();
+	bitmapView.invalidate();
+	return true;
+}
+
+
+public boolean onScaleBegin(ScaleGestureDetector detector) {
+	Log.d(TAG, "On scale begin working?");
+	return true;
+}
+
+
+public void onScaleEnd(ScaleGestureDetector detector) {
+	// TODO Auto-generated method stub
+	
 }
 }
