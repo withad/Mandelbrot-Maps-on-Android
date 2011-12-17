@@ -97,13 +97,9 @@ public boolean onTouch(View v, MotionEvent evt) {
 			}
 			
 		case MotionEvent.ACTION_POINTER_UP:
-			// Extract the index of the pointer that left the touch sensor
+			// Extract the index of the pointer that came up
 	        final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 	        final int pointerId = evt.getPointerId(pointerIndex);
-	        
-	        Log.d(TAG, "Pointer ID: " + pointerId);
-	        Log.d(TAG, "Pointer index: " + pointerIndex);
-	        Log.d(TAG, "Drag ID " + dragID);
 	        
 	        if (pointerId == dragID) {
 	            Log.d(TAG, "Choosing new active pointer");
