@@ -2,6 +2,7 @@ package uk.ac.ed.inf.mandelbrotmaps;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -64,9 +65,16 @@ class BitmapDraggingView extends View {
 	int[] pixelIterations;
 	Bitmap bitmapPixels;
 	
+	Bitmap image;
+	float prevScaleFactor = 1.0f;
+	int prevX = 0;
+	int prevY = 0;
+	
 	public float scaleFactor = 1.0f;
 	public float midX = 0.0f;
 	public float midY = 0.0f;
+	
+	Matrix matrix;
 	
    
    public BitmapDraggingView(Context context) {
@@ -75,6 +83,12 @@ class BitmapDraggingView extends View {
       setFocusableInTouchMode(true);
       setBackgroundColor(Color.BLUE);
       setId(0); 
+      
+      image = BitmapFactory.decodeResource(getResources(), R.drawable.image);
+      image = Bitmap.createScaledBitmap(image, 1280, 800, true);
+      
+      matrix = new Matrix();
+      matrix.reset();
 
       setOnTouchListener((BitmapActivity)context);
    }
@@ -106,32 +120,31 @@ class BitmapDraggingView extends View {
    /* Graphics Stuff */
    @Override
    protected void onDraw(Canvas canvas) {	   
-	// (Re)create pixel grid, if not initialised - or if wrong size.
-	if (
-		(pixelIterations == null)
-	) {
-		pixelIterations = new int[200*200];
-		fillBitmap();
-	}
-	if(bitmapPixels != null)
+	if(image != null)
 	{
-		Matrix matrix = new Matrix();
-		matrix.reset();
-		matrix.postTranslate(bitmapX/scaleFactor, bitmapY/scaleFactor);
-		matrix.postScale(scaleFactor, scaleFactor, midX+bitmapX/scaleFactor, midY+bitmapY/scaleFactor);
-		canvas.drawBitmap(bitmapPixels, matrix, new Paint());
+		if(bitmapX != prevX)
+		{
+			matrix.postTranslate(bitmapX, 0);
+			prevX = bitmapX;
+		}
+		
+		if(bitmapY != prevY)
+		{
+			matrix.postTranslate(0, bitmapY);
+			prevY = bitmapY;
+		}
+		
+		if(scaleFactor != prevScaleFactor)
+		{
+			matrix.postScale(scaleFactor, scaleFactor, midX, midY);
+			prevScaleFactor = scaleFactor;
+		}
+				
+		
+		canvas.drawBitmap(image, matrix, new Paint());
 	}
 		
    }
-	
-   private void fillBitmap() {
-	   for (int i = 0; i < 200*200; i++)
-	   {
-		   pixelIterations[i] = Color.GREEN;
-	   }
-	   
-	   bitmapPixels = Bitmap.createBitmap(pixelIterations, 0, 200, 200, 200, Bitmap.Config.RGB_565);	
-}
 
 
 	
@@ -139,8 +152,8 @@ class BitmapDraggingView extends View {
 	// Shift the canvas x pixels right; y pixels up
 	public void dragCanvas(int dragDiffPixelsX, int dragDiffPixelsY) {
 		// Adjust the Graph Area
-		bitmapX += dragDiffPixelsX;
-		bitmapY += dragDiffPixelsY;
+		bitmapX = dragDiffPixelsX;
+		bitmapY = dragDiffPixelsY;
 		
 		invalidate();
 	}

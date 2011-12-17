@@ -112,7 +112,7 @@ public boolean onScale(ScaleGestureDetector detector) {
 	bitmapView.midX = detector.getFocusX();
 	bitmapView.midY = detector.getFocusY();
 	
-	bitmapView.scaleFactor *= gestureDetector.getScaleFactor();
+	bitmapView.scaleFactor = gestureDetector.getScaleFactor();
 	bitmapView.invalidate();
 	return true;
 }
