@@ -15,6 +15,7 @@ import android.view.WindowManager;
 
 public class BitmapActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
    private static final String TAG = "MMaps";
+   private static final int INVALID_POINTER_ID = -1;
 
    private BitmapDraggingView bitmapView;
    private MandelbrotJuliaLocation mjLocation;
@@ -23,6 +24,8 @@ public class BitmapActivity extends Activity implements OnTouchListener, OnScale
    private int dragLastY;
    
    private ScaleGestureDetector gestureDetector;
+   
+   private int dragID = INVALID_POINTER_ID;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -64,51 +67,58 @@ public class BitmapActivity extends Activity implements OnTouchListener, OnScale
 
 
 public boolean onTouch(View v, MotionEvent evt) {
-	Log.d(TAG, "Event: " + evt.getActionMasked());
 	gestureDetector.onTouchEvent(evt);
-	switch (evt.getActionMasked())
+	
+	switch (evt.getAction() & MotionEvent.ACTION_MASK)
 	{
 		case MotionEvent.ACTION_DOWN:
-			// Remember mouse position
-			Log.d(TAG, "Remembering touch position");
 			dragLastX = (int) evt.getX();
 			dragLastY = (int) evt.getY();
-			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
+			
+			dragID = evt.getPointerId(0);	
+			Log.d(TAG, "Initial dragID: " + dragID);
 			return true;
 			
 		case MotionEvent.ACTION_MOVE:
-			if(!gestureDetector.isInProgress())
+			if(!gestureDetector.isInProgress() && dragID != INVALID_POINTER_ID)
 			{
-				Log.d(TAG, "Dragging detected");
-				Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
-	
-				int dragDiffPixelsX = (int) (evt.getX() - dragLastX);
-				int dragDiffPixelsY = (int) (evt.getY() - dragLastY);
+				int pointerIndex = evt.findPointerIndex(dragID);
+				
+				int dragDiffPixelsX = (int) (evt.getX(pointerIndex) - dragLastX);
+				int dragDiffPixelsY = (int) (evt.getY(pointerIndex) - dragLastY);
 		
 				// Move the canvas
 				bitmapView.dragCanvas(dragDiffPixelsX, dragDiffPixelsY);
 		
 				// Update last mouse position
-				dragLastX = (int) evt.getX();
-				dragLastY = (int) evt.getY();
-				
-				Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
+				dragLastX = (int) evt.getX(pointerIndex);
+				dragLastY = (int) evt.getY(pointerIndex);
 				return true;
 			}
 			
-			
-		case MotionEvent.ACTION_UP:
-			Log.d(TAG, "Up detected");
-			Log.d(TAG, "X: " + evt.getX() + " Y: " + evt.getY());
-			return true;
+		case MotionEvent.ACTION_POINTER_UP:
+			// Extract the index of the pointer that left the touch sensor
+	        final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+	        final int pointerId = evt.getPointerId(pointerIndex);
+	        
+	        Log.d(TAG, "Pointer ID: " + pointerId);
+	        Log.d(TAG, "Pointer index: " + pointerIndex);
+	        Log.d(TAG, "Drag ID " + dragID);
+	        
+	        if (pointerId == dragID) {
+	            Log.d(TAG, "Choosing new active pointer");
+	            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+	            dragLastX = (int) evt.getX(newPointerIndex);
+				dragLastY = (int) evt.getY(newPointerIndex);
+	            dragID = evt.getPointerId(newPointerIndex);
+	        }
+	        break;
 	}
-	return false;
+	return true;
 }
 
 
 public boolean onScale(ScaleGestureDetector detector) {
-	Log.d(TAG, "This working?");
-	
 	bitmapView.midX = detector.getFocusX();
 	bitmapView.midY = detector.getFocusY();
 	
@@ -119,7 +129,6 @@ public boolean onScale(ScaleGestureDetector detector) {
 
 
 public boolean onScaleBegin(ScaleGestureDetector detector) {
-	Log.d(TAG, "On scale begin working?");
 	return true;
 }
 
