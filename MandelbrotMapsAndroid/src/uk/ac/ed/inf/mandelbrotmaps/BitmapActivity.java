@@ -18,7 +18,6 @@ public class BitmapActivity extends Activity implements OnTouchListener, OnScale
    private static final int INVALID_POINTER_ID = -1;
 
    private BitmapDraggingView bitmapView;
-   private MandelbrotJuliaLocation mjLocation;
    
    private int dragLastX;
    private int dragLastY;
@@ -115,6 +114,8 @@ public boolean onTouch(View v, MotionEvent evt) {
 
 
 public boolean onScale(ScaleGestureDetector detector) {
+	if(gestureDetector.getScaleFactor() == 0)
+		return false;
 	bitmapView.midX = detector.getFocusX();
 	bitmapView.midY = detector.getFocusY();
 	

@@ -121,7 +121,7 @@ class BitmapDraggingView extends View {
    @Override
    protected void onDraw(Canvas canvas) {	   
 	if(image != null)
-	{
+	{		
 		if(bitmapX != prevX)
 		{
 			matrix.postTranslate(bitmapX, 0);
@@ -140,8 +140,10 @@ class BitmapDraggingView extends View {
 			prevScaleFactor = scaleFactor;
 		}
 				
+		Bitmap newImage = Bitmap.createBitmap(image, 0, 0, getWidth(), getHeight(), matrix, true);
 		
 		canvas.drawBitmap(image, matrix, new Paint());
+		//canvas.drawBitmap(newImage, new Matrix, new Paint());
 	}
 		
    }

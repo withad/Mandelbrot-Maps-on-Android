@@ -272,6 +272,8 @@ abstract class AbstractFractalView extends View {
 		newGraphArea[1] = newMaxY;
 		newGraphArea[2] = oldGraphArea[2] - leftWidthDiff - rightWidthDiff;
 		
+		clearPixelSizes();
+		
 		setGraphArea(newGraphArea);
 	}
 
