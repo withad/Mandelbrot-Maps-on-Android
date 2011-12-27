@@ -84,8 +84,10 @@ class BitmapDraggingView extends View {
       setBackgroundColor(Color.BLUE);
       setId(0); 
       
+      setDrawingCacheEnabled(true);
+      
       image = BitmapFactory.decodeResource(getResources(), R.drawable.image);
-      image = Bitmap.createScaledBitmap(image, 1280, 800, true);
+      
       
       matrix = new Matrix();
       matrix.reset();
@@ -113,6 +115,8 @@ class BitmapDraggingView extends View {
       super.onSizeChanged(w, h, oldw, oldh);
       WIDTH = getWidth();
       HEIGHT = getHeight();
+      //image = Bitmap.createScaledBitmap(image, getWidth(), getHeight(), true);
+      Log.d(TAG, "onSizeChanged");
       STRIDE = WIDTH;
    }
    
@@ -140,10 +144,10 @@ class BitmapDraggingView extends View {
 			prevScaleFactor = scaleFactor;
 		}
 				
-		Bitmap newImage = Bitmap.createBitmap(image, 0, 0, getWidth(), getHeight(), matrix, true);
+		//Bitmap newImage = Bitmap.createBitmap(image, 0, 0, getWidth(), getHeight(), matrix, true);
 		
 		canvas.drawBitmap(image, matrix, new Paint());
-		//canvas.drawBitmap(newImage, new Matrix, new Paint());
+		//canvas.drawBitmap(newImage, new Matrix(), new Paint());
 	}
 		
    }
@@ -157,6 +161,19 @@ class BitmapDraggingView extends View {
 		bitmapX = dragDiffPixelsX;
 		bitmapY = dragDiffPixelsY;
 		
+		invalidate();
+	}
+	
+	
+	public void cropImage()
+	{
+		//Bitmap newImage = Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, false);
+		//image = newImage;
+		//matrix.reset();
+		//Log.d(TAG, "Testing" + newImage.getHeight());
+		
+		image = this.getDrawingCache();
+		setBackgroundColor(Color.GREEN);
 		invalidate();
 	}
 }

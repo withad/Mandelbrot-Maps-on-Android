@@ -5,15 +5,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class BitmapActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
+public class BitmapActivity extends Activity implements OnTouchListener, OnScaleGestureListener{
    private static final String TAG = "MMaps";
    private static final int INVALID_POINTER_ID = -1;
 
@@ -60,7 +62,7 @@ public class BitmapActivity extends Activity implements OnTouchListener, OnScale
    public boolean onCreateOptionsMenu(Menu menu) {
       super.onCreateOptionsMenu(menu);
       MenuInflater inflater = getMenuInflater();
-      inflater.inflate(R.menu.navigationmenu, menu);
+      inflater.inflate(R.menu.testmenu, menu);
       return true;
    }
 
@@ -133,5 +135,18 @@ public boolean onScaleBegin(ScaleGestureDetector detector) {
 public void onScaleEnd(ScaleGestureDetector detector) {
 	// TODO Auto-generated method stub
 	
+}
+
+
+public boolean onOptionsItemSelected(MenuItem item) {
+	Log.d(TAG, "Menu item clicked");
+	switch (item.getItemId())
+	{
+	case R.id.cropBitmap:
+		Log.d(TAG, "Crop button pressed");
+		bitmapView.cropImage();
+		return true;
+	}
+	return false;
 }
 }
