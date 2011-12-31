@@ -147,7 +147,7 @@ abstract class AbstractFractalView extends View {
 	
 	if(fractalBitmap != null && !draggingFractal)
 	{
-		if(bitmapX != prevX)
+		/*if(bitmapX != prevX)
 		{
 			matrix.postTranslate(bitmapX, 0);
 			prevX = bitmapX;
@@ -157,7 +157,7 @@ abstract class AbstractFractalView extends View {
 		{
 			matrix.postTranslate(0, bitmapY);
 			prevY = bitmapY;
-		}
+		}*/
 		
 /*		if(scaleFactor != prevScaleFactor)
 		{
