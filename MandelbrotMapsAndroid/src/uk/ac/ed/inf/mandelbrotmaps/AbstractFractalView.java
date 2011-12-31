@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -85,6 +86,11 @@ abstract class AbstractFractalView extends View {
 	boolean pauseRendering;
 	boolean draggingFractal = false;
 	
+	private int prevX = 0;
+	private int prevY = 0;
+	
+	private Matrix matrix;
+	
    
 	public AbstractFractalView(Context context) {
       super(context);
@@ -95,6 +101,9 @@ abstract class AbstractFractalView extends View {
       
       parentActivity = (FractalActivity)context;
       setOnTouchListener((FractalActivity)context);
+      
+      matrix = new Matrix();
+      matrix.reset();
       
       renderThread.start();
    }
@@ -138,6 +147,24 @@ abstract class AbstractFractalView extends View {
 	
 	if(fractalBitmap != null && !draggingFractal)
 	{
+		if(bitmapX != prevX)
+		{
+			matrix.postTranslate(bitmapX, 0);
+			prevX = bitmapX;
+		}
+		
+		if(bitmapY != prevY)
+		{
+			matrix.postTranslate(0, bitmapY);
+			prevY = bitmapY;
+		}
+		
+/*		if(scaleFactor != prevScaleFactor)
+		{
+			matrix.postScale(scaleFactor, scaleFactor, midX, midY);
+			prevScaleFactor = scaleFactor;
+		}*/
+		
 		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		canvas.drawBitmap(fractalBitmap, 0, 0, new Paint());
 		Log.d(TAG, "Drawing bitmap at (0.0)");

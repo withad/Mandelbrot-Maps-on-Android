@@ -16,6 +16,7 @@ import android.view.WindowManager;
 
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
    private static final String TAG = "MMaps";
+   private static final int INVALID_POINTER_ID = -1;
    
    private enum ControlMode{
 	   PAN,
@@ -30,10 +31,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    private int dragLastX;
    private int dragLastY;
    
-   private int beforeDragX;
-   private int beforeDragY;
+   private ScaleGestureDetector gestureDetector;
    
-   private boolean draggingFractal;
+   private boolean draggingFractal = false;
+   
+   private int dragID = INVALID_POINTER_ID;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +52,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       
       mjLocation = new MandelbrotJuliaLocation();
       fractalView.loadLocation(mjLocation);
+      
+      gestureDetector = new ScaleGestureDetector(this, this);
    }
 
    
@@ -104,16 +108,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 
 
 public boolean onTouch(View v, MotionEvent evt) {
-	switch (evt.getActionMasked())
+	gestureDetector.onTouchEvent(evt);
+	
+	switch (evt.getAction() & MotionEvent.ACTION_MASK)
 	{
-		case MotionEvent.ACTION_DOWN:			
-			// Remember mouse position
-			Log.d(TAG, "Remembering touch position");
+		case MotionEvent.ACTION_DOWN:
 			dragLastX = (int) evt.getX();
 			dragLastY = (int) evt.getY();
-			beforeDragX = (int) evt.getX();
-			beforeDragY = (int) evt.getY();
-			Log.d(TAG, "X: " + dragLastX + " Y: " + dragLastY);
+			
+			dragID = evt.getPointerId(0);	
+			Log.d(TAG, "Initial dragID: " + dragID);
 			return true;
 			
 		case MotionEvent.ACTION_MOVE:
@@ -123,37 +127,55 @@ public boolean onTouch(View v, MotionEvent evt) {
 				draggingFractal = true;
 				Log.d(TAG, "Started dragging");
 			}
-
-			int dragDiffPixelsX = (int) (evt.getX() - dragLastX);
-			int dragDiffPixelsY = (int) (evt.getY() - dragLastY);
-	
-			// Move the bitmap
-			fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
-	
-			// Update last mouse position
-			dragLastX = (int) evt.getX();
-			dragLastY = (int) evt.getY();
 			
-			return true;
+			if(!gestureDetector.isInProgress() && dragID != INVALID_POINTER_ID)
+			{
+				int pointerIndex = evt.findPointerIndex(dragID);
+				
+				int dragDiffPixelsX = (int) (evt.getX(pointerIndex) - dragLastX);
+				int dragDiffPixelsY = (int) (evt.getY(pointerIndex) - dragLastY);
+		
+				// Move the canvas
+				fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
+		
+				// Update last mouse position
+				dragLastX = (int) evt.getX(pointerIndex);
+				dragLastY = (int) evt.getY(pointerIndex);
+				return true;
+			}
 			
+		case MotionEvent.ACTION_POINTER_UP:
+			// Extract the index of the pointer that came up
+	        final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+	        final int pointerId = evt.getPointerId(pointerIndex);
+	        
+	        if (pointerId == dragID) {
+	            Log.d(TAG, "Choosing new active pointer");
+	            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+	            dragLastX = (int) evt.getX(newPointerIndex);
+				dragLastY = (int) evt.getY(newPointerIndex);
+	            dragID = evt.getPointerId(newPointerIndex);
+	        }
+	        break;
+	        
 		case MotionEvent.ACTION_UP:
 			draggingFractal = false;
 			fractalView.stopDragging();
-			return true;
+			break;
 	}
-	return false;
+	return true;
 }
 
 
 public boolean onScale(ScaleGestureDetector detector) {
-	// TODO Auto-generated method stub
-	return false;
+	Log.d(TAG, "Scaling");
+	return true;
 }
 
 
 public boolean onScaleBegin(ScaleGestureDetector detector) {
 	// TODO Auto-generated method stub
-	return false;
+	return true;
 }
 
 

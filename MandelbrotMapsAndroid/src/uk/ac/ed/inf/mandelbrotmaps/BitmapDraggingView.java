@@ -15,10 +15,6 @@ import android.view.View;
 class BitmapDraggingView extends View {
    
    private static final String TAG = "FractalView";
-
-   private int WIDTH;
-   private int HEIGHT;
-   private int STRIDE;
    
    // How many different, discrete zoom and contrast levels?
    public static final int ZOOM_SLIDER_SCALING = 300;
@@ -111,11 +107,6 @@ class BitmapDraggingView extends View {
    @Override
    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
       super.onSizeChanged(w, h, oldw, oldh);
-      WIDTH = getWidth();
-      HEIGHT = getHeight();
-      //image = Bitmap.createScaledBitmap(image, getWidth(), getHeight(), true);
-      Log.d(TAG, "onSizeChanged");
-      STRIDE = WIDTH;
    }
    
 
@@ -141,11 +132,8 @@ class BitmapDraggingView extends View {
 			matrix.postScale(scaleFactor, scaleFactor, midX, midY);
 			prevScaleFactor = scaleFactor;
 		}
-				
-		//Bitmap newImage = Bitmap.createBitmap(image, 0, 0, getWidth(), getHeight(), matrix, true);
 		
 		canvas.drawBitmap(image, matrix, new Paint());
-		//canvas.drawBitmap(newImage, new Matrix(), new Paint());
 	}
 		
    }
@@ -165,11 +153,6 @@ class BitmapDraggingView extends View {
 	
 	public void cropImage()
 	{
-		//Bitmap newImage = Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(), matrix, false);
-		//image = newImage;
-		//matrix.reset();
-		//Log.d(TAG, "Testing" + newImage.getHeight());
-		
 		setDrawingCacheEnabled(true);
 		
 		image = Bitmap.createBitmap(this.getDrawingCache());
