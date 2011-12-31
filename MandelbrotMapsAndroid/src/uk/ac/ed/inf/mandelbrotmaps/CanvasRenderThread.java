@@ -15,6 +15,10 @@ class CanvasRenderThread extends Thread {
 		abortThisRendering = true;
 	}
 	
+	public void allowRendering() {
+		abortThisRendering = false;
+	}
+	
 	public boolean abortSignalled() {
 		return abortThisRendering;
 	}
@@ -26,6 +30,7 @@ class CanvasRenderThread extends Thread {
 				mjCanvas.computeAllPixels(newRendering.getPixelBlockSize());
 				abortThisRendering = false;
 			} catch (InterruptedException e) {
+				abortThisRendering = false;
 				Log.d("Testing", "Caught exception");
 			}
 		}

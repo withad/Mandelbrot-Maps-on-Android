@@ -80,14 +80,17 @@ abstract class AbstractFractalView extends View {
 	Bitmap movingBitmap;
 	
 	// Where to draw the image onscreen
-	public int bitmapX = 0;
-	public int bitmapY = 0;	
+	public float bitmapX = 0;
+	public float bitmapY = 0;	
 	
-	boolean pauseRendering;
+	private float totalDragX = 0;
+	private float totalDragY = 0;
+	
+	boolean pauseRendering = false;
 	boolean draggingFractal = false;
 	
-	private int prevX = 0;
-	private int prevY = 0;
+	private float prevX = 0;
+	private float prevY = 0;
 	
 	private Matrix matrix;
 	
@@ -147,31 +150,17 @@ abstract class AbstractFractalView extends View {
 	
 	if(fractalBitmap != null && !draggingFractal)
 	{
-		/*if(bitmapX != prevX)
-		{
-			matrix.postTranslate(bitmapX, 0);
-			prevX = bitmapX;
-		}
-		
-		if(bitmapY != prevY)
-		{
-			matrix.postTranslate(0, bitmapY);
-			prevY = bitmapY;
-		}*/
-		
-/*		if(scaleFactor != prevScaleFactor)
-		{
-			matrix.postScale(scaleFactor, scaleFactor, midX, midY);
-			prevScaleFactor = scaleFactor;
-		}*/
-		
 		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		canvas.drawBitmap(fractalBitmap, 0, 0, new Paint());
-		Log.d(TAG, "Drawing bitmap at (0.0)");
 	}
 	else if (draggingFractal)
 	{
-		canvas.drawBitmap(fractalBitmap, bitmapX, bitmapY, new Paint());
+		matrix.postTranslate(bitmapX, bitmapY);
+		bitmapX = 0;
+		bitmapY = 0;
+		
+		//canvas.drawBitmap(fractalBitmap, totalDragX, totalDragY, new Paint());
+		canvas.drawBitmap(fractalBitmap, matrix, new Paint());
 	}
    }
 	
@@ -189,10 +178,14 @@ abstract class AbstractFractalView extends View {
 // Called when we want to recompute everything
 	void updateDisplay() {		
 		// Abort future rendering queue. If in real-time mode, interrupt current rendering too
-		stopAllRendering();
+		//stopAllRendering();
 		
 		// If in real-time mode, schedule a crude rendering
-		if (needCrudeRendering()) scheduleRendering(INITIAL_PIXEL_BLOCK);
+		if (needCrudeRendering()) 
+			{
+				scheduleRendering(INITIAL_PIXEL_BLOCK);
+				Log.d(TAG, "Scheduled crude rendering");
+			}
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(DEFAULT_PIXEL_SIZE);
@@ -219,6 +212,7 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	void scheduleRendering(int pixelBlockSize) {
+		renderThread.allowRendering();
 		renderingQueue.add( new CanvasRendering(pixelBlockSize) );
 	}
 	
@@ -271,6 +265,7 @@ abstract class AbstractFractalView extends View {
 	// Adjust zoom, centred on pixel (xPixel, yPixel)
 	public void zoomChange(int xPixel, int yPixel, int zoomAmount) {
 		renderMode = RenderMode.JUST_ZOOMED;
+		stopAllRendering();
 		
 		double pixelSize = getPixelSize();
 		
@@ -361,23 +356,31 @@ abstract class AbstractFractalView extends View {
 		movingBitmap = Bitmap.createBitmap(fractalBitmap);
 		bitmapX = 0;
 		bitmapY = 0;
+		totalDragX = 0;
+		totalDragY = 0;
 		draggingFractal = true;
 	}
 	
-	public void dragFractal(int dragDiffPixelsX, int dragDiffPixelsY) {		
+	public void dragFractal(float dragDiffPixelsX, float dragDiffPixelsY) {		
 		// Adjust the Graph Area
-		bitmapX += dragDiffPixelsX;
-		bitmapY += dragDiffPixelsY;
+		bitmapX = dragDiffPixelsX;
+		bitmapY = dragDiffPixelsY;
+		
+		totalDragX += dragDiffPixelsX;
+		totalDragY += dragDiffPixelsY;
 		
 		invalidate();
 	}
 	
 	public void stopDragging()
 	{
-		shiftPixels(bitmapX, bitmapY);
 		draggingFractal = false;
 		renderMode = RenderMode.JUST_DRAGGED;
-		moveFractal(bitmapX, bitmapY);
+		
+		shiftPixels((int)totalDragX, (int)totalDragY);
+		moveFractal((int)totalDragX, (int)totalDragY);
+		
+		matrix.reset();
 		invalidate();
 	}
 	
@@ -443,8 +446,6 @@ abstract class AbstractFractalView extends View {
 				(scaledIterationCount * (Math.log(ITERATIONSCALING_MAX) - Math.log(ITERATIONSCALING_MIN))) /
 				CONTRAST_SLIDER_SCALING)
 			);
-			Log.d(TAG, "iterationScaling = " + iterationScaling);
-			Log.d(TAG, "scaledIterationCount = " + scaledIterationCount);
 			updateDisplay();
 		}
 	}
@@ -459,7 +460,6 @@ abstract class AbstractFractalView extends View {
 		double absLnPixelSize = Math.abs(Math.log(getPixelSize()));
 		double dblIterations = iterationScaling * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
 		int iterationsToPerform = (int)dblIterations;
-		Log.d(TAG, "iterationsToPerform = " + iterationsToPerform);
 		return Math.max(iterationsToPerform, MIN_ITERATIONS);
 	}
 	
@@ -483,13 +483,11 @@ abstract class AbstractFractalView extends View {
 			graphArea[1],
 			getPixelSize(),
 			true,
-			10000,
+			300,
 			renderMode
 		);
 		
 		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
-		
-		Log.d(TAG, "Checking pixels");
 		
 		postInvalidate();
 	}

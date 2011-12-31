@@ -59,6 +59,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final int millisBeforeSlowRenderBehaviour,  // How many millis before show rendering progress, and (if allowInterruption) before listening for this.
 		RenderMode renderMode
 	) {
+		
+		if(pauseRendering) return;
+		
 		int maxIterations = getMaxIterations();
 		int imgWidth = xPixelMax - xPixelMin;
 		
@@ -95,14 +98,12 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			// Detect rendering abortion.
 			if (
 				allowInterruption &&
-				renderThread.abortSignalled() &&
-				(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
+				renderThread.abortSignalled() //&&
+				//(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
 			) 
 				{
 					Log.d("MFV", "Returning based on interruption test");
-					Log.d("MFV", "Time taken: " + (System.currentTimeMillis() - timeBegin));
-					Log.d("MFV", "In: " + Integer.toString(inCount));
-					Log.d("MFV", "Out: " + Integer.toString(outCount));
+					Log.d("MFV", "renderThread.abortSignalled() = " + renderThread.abortSignalled());
 					return;
 				}
 			

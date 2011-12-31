@@ -28,8 +28,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    private MandelbrotFractalView fractalView;
    private MandelbrotJuliaLocation mjLocation;
    
-   private int dragLastX;
-   private int dragLastY;
+   private float dragLastX;
+   private float dragLastY;
    
    private ScaleGestureDetector gestureDetector;
    
@@ -132,15 +132,15 @@ public boolean onTouch(View v, MotionEvent evt) {
 			{
 				int pointerIndex = evt.findPointerIndex(dragID);
 				
-				int dragDiffPixelsX = (int) (evt.getX(pointerIndex) - dragLastX);
-				int dragDiffPixelsY = (int) (evt.getY(pointerIndex) - dragLastY);
+				float dragDiffPixelsX = evt.getX(pointerIndex) - dragLastX;
+				float dragDiffPixelsY = evt.getY(pointerIndex) - dragLastY;
 		
 				// Move the canvas
 				fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
 		
 				// Update last mouse position
-				dragLastX = (int) evt.getX(pointerIndex);
-				dragLastY = (int) evt.getY(pointerIndex);
+				dragLastX = evt.getX(pointerIndex);
+				dragLastY = evt.getY(pointerIndex);
 				return true;
 			}
 			
