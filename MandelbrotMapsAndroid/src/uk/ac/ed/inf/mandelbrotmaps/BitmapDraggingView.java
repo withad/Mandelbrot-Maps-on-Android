@@ -84,8 +84,6 @@ class BitmapDraggingView extends View {
       setBackgroundColor(Color.BLUE);
       setId(0); 
       
-      setDrawingCacheEnabled(true);
-      
       image = BitmapFactory.decodeResource(getResources(), R.drawable.image);
       
       
@@ -172,9 +170,14 @@ class BitmapDraggingView extends View {
 		//matrix.reset();
 		//Log.d(TAG, "Testing" + newImage.getHeight());
 		
-		image = this.getDrawingCache();
+		setDrawingCacheEnabled(true);
+		
+		image = Bitmap.createBitmap(this.getDrawingCache());
 		setBackgroundColor(Color.GREEN);
+		matrix.reset();
 		invalidate();
+		
+		setDrawingCacheEnabled(false);
 	}
 }
 
