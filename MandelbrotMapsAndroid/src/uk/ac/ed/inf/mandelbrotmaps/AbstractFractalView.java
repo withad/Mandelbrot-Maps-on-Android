@@ -59,7 +59,7 @@ abstract class AbstractFractalView extends View {
 	double iterationScaling = 0.3;
 	double ITERATIONSCALING_MIN = 0.01;
 	double ITERATIONSCALING_MAX = 100;
-	double ITERATIONSCALING_DEFAULT = 1;
+	double ITERATIONSCALING_DEFAULT = 0.3;
 	
 	// Mouse dragging state.
 	int dragLastX = 0;
@@ -150,17 +150,7 @@ abstract class AbstractFractalView extends View {
    }
 	
    
-   //Fill the pixel sizes array with a number larger than any reasonable block size
-   private void clearPixelSizes() {
-	  pixelSizes = new int[getWidth() * getHeight()];
-	
-	  for (int i = 0; i < pixelSizes.length; i++)
-	  {
-		  pixelSizes[i] = 1000;
-	  }
-}
-
-// Called when we want to recompute everything
+   // Called when we want to recompute everything
 	void updateDisplay() {		
 		// Abort future rendering queue. If in real-time mode, interrupt current rendering too
 		//stopAllRendering();
@@ -177,8 +167,7 @@ abstract class AbstractFractalView extends View {
 	}
    
 	
-	/* Utilities */	
-	// Do we need a crude rendering? (Based on number of iterations)
+	/* Rendering functions */	
 	boolean needCrudeRendering() {
 		return getMaxIterations() > 30;
 	}
@@ -206,47 +195,34 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
-	void setGraphArea(double[] newGraphArea) {
-		// We have a predefined graphArea, so we can be picky with newGraphArea.
-		if (graphArea != null) {
-			double[] initialGraphArea = graphArea;
-			graphArea = newGraphArea;
-			
-			// Zoom level is sane - let's allow this!
-			if (saneZoomLevel()) {
-				updateDisplay();
-			// Zoom level is out of bounds; let's just roll back.
-			} else {
-				graphArea = initialGraphArea;
-			}
-		// There is no predefined graphArea; we'll have to accept whatever newGraphArea is.
-		} else {
-			graphArea = newGraphArea;
-			updateDisplay();
-		}
+	public void computeAllPixels(final int pixelBlockSize) {
+		// Nothing to do - stop if called before layout has been sanely set...
+		if (getWidth() <= 0 || graphArea == null || pauseRendering)
+			return;
+		
+		computePixels(
+			fractalPixels,
+			pixelSizes,
+			pixelBlockSize,
+			true,
+			0,
+			getWidth(),
+			0,
+			getHeight(),
+			graphArea[0],
+			graphArea[1],
+			getPixelSize(),
+			true,
+			renderMode
+		);
+		
+		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+		
+		postInvalidate();
 	}
 	
-	// On the complex plane, what is the current length of 1 pixel?
-	// Pixels are square, so 1D length completely categorises.
-	double getPixelSize() {
-		// Nothing to do - cannot compute a sane pixel size
-		if (getWidth() == 0) return 0.0;
-		if (graphArea == null) return 0.0;
-		// Return the pixel size
-		return (graphArea[2] / (double)getWidth());
-	}
 	
-	// Restore default canvas
-	public void canvasHome() {
-		// Default max iterations scaling
-		iterationScaling = ITERATIONSCALING_DEFAULT;
-		
-		// Default graph area
-		double[] newGraphArea = new double[homeGraphArea.length];
-		for (int i=0; i<homeGraphArea.length; i++) newGraphArea[i] = homeGraphArea[i];
-		setGraphArea(newGraphArea);
-	}
-		
+	/* Zooming */	
 	// Adjust zoom, centred on pixel (xPixel, yPixel)
 	public void zoomChange(int xPixel, int yPixel, int zoomAmount) {
 		renderMode = RenderMode.JUST_ZOOMED;
@@ -453,32 +429,59 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
-	// Compute entire pixel grid
-	public void computeAllPixels(final int pixelBlockSize) {
-		// Nothing to do - stop if called before layout has been sanely set...
-		if (getWidth() <= 0) return;
-		if (graphArea == null) return;
-		
-		computePixels(
-			fractalPixels,
-			pixelSizes,
-			pixelBlockSize,
-			true,
-			0,
-			getWidth(),
-			0,
-			getHeight(),
-			graphArea[0],
-			graphArea[1],
-			getPixelSize(),
-			true,
-			renderMode
-		);
-		
-		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
-		
-		postInvalidate();
+	/* Graph area utilities */
+	void setGraphArea(double[] newGraphArea) {
+		// We have a predefined graphArea, so we can be picky with newGraphArea.
+		if (graphArea != null) {
+			double[] initialGraphArea = graphArea;
+			graphArea = newGraphArea;
+			
+			// Zoom level is sane - let's allow this!
+			if (saneZoomLevel()) {
+				updateDisplay();
+			// Zoom level is out of bounds; let's just roll back.
+			} else {
+				graphArea = initialGraphArea;
+			}
+		// There is no predefined graphArea; we'll have to accept whatever newGraphArea is.
+		} else {
+			graphArea = newGraphArea;
+			updateDisplay();
+		}
 	}
+	
+	// On the complex plane, what is the current length of 1 pixel?
+	double getPixelSize() {
+		// Nothing to do - cannot compute a sane pixel size
+		if (getWidth() == 0) return 0.0;
+		if (graphArea == null) return 0.0;
+		// Return the pixel size
+		return (graphArea[2] / (double)getWidth());
+	}
+	
+	// Restore default canvas
+	public void canvasHome() {
+		// Default max iterations scaling
+		iterationScaling = ITERATIONSCALING_DEFAULT;
+		
+		// Default graph area
+		double[] newGraphArea = new double[homeGraphArea.length];
+		for (int i=0; i<homeGraphArea.length; i++) newGraphArea[i] = homeGraphArea[i];
+		setGraphArea(newGraphArea);
+	}
+	
+	
+	/*Utilities*/
+	
+	//Fill the pixel sizes array with a number larger than any reasonable block size
+	   private void clearPixelSizes() {
+		  pixelSizes = new int[getWidth() * getHeight()];
+		
+		  for (int i = 0; i < pixelSizes.length; i++)
+		  {
+			  pixelSizes[i] = 1000;
+		  }
+	   }
 	
 	
 	// Abstract methods

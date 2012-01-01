@@ -169,6 +169,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 
 public boolean onScale(ScaleGestureDetector detector) {
 	Log.d(TAG, "Scaling");
+	fractalView.pauseRendering = true;
 	return true;
 }
 
