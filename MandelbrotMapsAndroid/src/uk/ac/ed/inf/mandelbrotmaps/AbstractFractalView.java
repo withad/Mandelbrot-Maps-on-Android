@@ -23,10 +23,6 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	private RenderMode renderMode = RenderMode.NEW;
-
-	private int WIDTH;
-	private int HEIGHT;
-	private int STRIDE;
    
    	// How many different, discrete zoom and contrast levels?
 	public static final int ZOOM_SLIDER_SCALING = 300;
@@ -89,9 +85,6 @@ abstract class AbstractFractalView extends View {
 	boolean pauseRendering = false;
 	boolean draggingFractal = false;
 	
-	private float prevX = 0;
-	private float prevY = 0;
-	
 	private Matrix matrix;
 	
    
@@ -129,9 +122,6 @@ abstract class AbstractFractalView extends View {
    @Override
    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
       super.onSizeChanged(w, h, oldw, oldh);
-      WIDTH = getWidth();
-      HEIGHT = getHeight();
-      STRIDE = WIDTH;
    }
    
 
