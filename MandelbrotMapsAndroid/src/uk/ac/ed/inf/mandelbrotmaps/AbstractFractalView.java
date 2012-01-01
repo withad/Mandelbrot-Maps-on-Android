@@ -138,18 +138,13 @@ abstract class AbstractFractalView extends View {
 		updateDisplay();
 	}
 	
-	if(fractalBitmap != null && !draggingFractal)
-	{
-		fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
-		canvas.drawBitmap(fractalBitmap, 0, 0, new Paint());
-	}
-	else if (draggingFractal)
+	if(fractalBitmap != null)
 	{
 		matrix.postTranslate(bitmapX, bitmapY);
 		bitmapX = 0;
 		bitmapY = 0;
 		
-		//canvas.drawBitmap(fractalBitmap, totalDragX, totalDragY, new Paint());
+		if(!draggingFractal) fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		canvas.drawBitmap(fractalBitmap, matrix, new Paint());
 	}
    }
