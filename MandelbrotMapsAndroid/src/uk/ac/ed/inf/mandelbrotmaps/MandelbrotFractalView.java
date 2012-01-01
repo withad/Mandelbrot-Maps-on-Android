@@ -56,7 +56,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final double yMax,
 		final double pixelSize,
 		final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-		final int millisBeforeSlowRenderBehaviour,  // How many millis before show rendering progress, and (if allowInterruption) before listening for this.
 		RenderMode renderMode
 	) {
 		

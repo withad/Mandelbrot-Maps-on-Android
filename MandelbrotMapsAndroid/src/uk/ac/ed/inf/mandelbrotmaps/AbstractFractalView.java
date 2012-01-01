@@ -410,6 +410,7 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
+	/* Iteration variables */
 	/* Get the iteration scaling factor.
 	// Log scale, with values ITERATIONSCALING_MIN .. ITERATIONSCALING_MAX
 	// represented by values in range 0..CONTRAST_SLIDER_SCALING*/
@@ -471,7 +472,6 @@ abstract class AbstractFractalView extends View {
 			graphArea[1],
 			getPixelSize(),
 			true,
-			300,
 			renderMode
 		);
 		
@@ -496,7 +496,6 @@ abstract class AbstractFractalView extends View {
 			final double yMax,
 			final double pixelSize,
 			final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-			final int millisBeforeSlowRenderBehaviour,  // How many millis before show rendering progress, and (if allowInterruption) before listening for this.
 			RenderMode currentRenderMode
 		);
 }
