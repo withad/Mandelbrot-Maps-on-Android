@@ -370,6 +370,11 @@ abstract class AbstractFractalView extends View {
 		shiftPixels((int)totalDragX, (int)totalDragY);
 		moveFractal((int)totalDragX, (int)totalDragY);
 		
+		bitmapX = 0;
+		bitmapY = 0;
+		totalDragX = 0;
+		totalDragY = 0;
+		
 		matrix.reset();
 		invalidate();
 	}
@@ -407,8 +412,6 @@ abstract class AbstractFractalView extends View {
 		
 		fractalPixels = newPixels;
 		pixelSizes = newSizes;
-		
-		invalidate();
 	}
 	
 	
