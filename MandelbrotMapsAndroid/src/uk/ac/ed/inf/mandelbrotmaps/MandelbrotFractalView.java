@@ -157,6 +157,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				colourCodeHex = (0xFF<<24) + (colourCodeR<<16) + (colourCodeG<<8) + (colourCodeB);
 				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
+						if(outputPixelArray == null) return;
 						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 						currentPixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
 					}

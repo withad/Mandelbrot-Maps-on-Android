@@ -82,8 +82,13 @@ abstract class AbstractFractalView extends View {
 	private float totalDragX = 0;
 	private float totalDragY = 0;
 	
+	public float scaleFactor = 1.0f;
+	public float midX = 0.0f;
+	public float midY = 0.0f;
+	
 	boolean pauseRendering = false;
 	boolean draggingFractal = false;
+	boolean zoomingFractal = false;
 	
 	private Matrix matrix;
 	
@@ -144,7 +149,13 @@ abstract class AbstractFractalView extends View {
 		bitmapX = 0;
 		bitmapY = 0;
 		
-		if(!draggingFractal) fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+		matrix.postScale(scaleFactor, scaleFactor, midX, midY);
+		Log.d(TAG, "Scalefactor: " + scaleFactor);
+		scaleFactor = 1.0f;
+		midX = 0.0f;
+		midY = 0.0f;
+		
+		if(!draggingFractal && !zoomingFractal) fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		canvas.drawBitmap(fractalBitmap, matrix, new Paint());
 	}
    }
@@ -298,6 +309,15 @@ abstract class AbstractFractalView extends View {
 		setGraphArea(newGraphArea);
 	}
 	
+	public void stopZooming()
+	{
+		
+		setDrawingCacheEnabled(true);
+		fractalBitmap = Bitmap.createBitmap(getDrawingCache());
+		fractalBitmap.getPixels(fractalPixels, 0, getWidth(), 0, 0, getWidth(), getHeight());
+		setDrawingCacheEnabled(false);
+	}
+	
 	
 	/* Movement */
 	public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
@@ -314,7 +334,6 @@ abstract class AbstractFractalView extends View {
 	public void startDragging()
 	{
 		stopAllRendering();
-		movingBitmap = Bitmap.createBitmap(fractalBitmap);
 		bitmapX = 0;
 		bitmapY = 0;
 		totalDragX = 0;
@@ -474,7 +493,7 @@ abstract class AbstractFractalView extends View {
 	/*Utilities*/
 	
 	//Fill the pixel sizes array with a number larger than any reasonable block size
-	   private void clearPixelSizes() {
+	private void clearPixelSizes() {
 		  pixelSizes = new int[getWidth() * getHeight()];
 		
 		  for (int i = 0; i < pixelSizes.length; i++)
@@ -482,6 +501,18 @@ abstract class AbstractFractalView extends View {
 			  pixelSizes[i] = 1000;
 		  }
 	   }
+	
+	
+	public void reset(){
+		pauseRendering = false;
+		
+		stopAllRendering();
+		fractalPixels = new int[getWidth() * getHeight()];
+		clearPixelSizes();
+		canvasHome();
+		
+		postInvalidate();
+	}
 	
 	
 	// Abstract methods

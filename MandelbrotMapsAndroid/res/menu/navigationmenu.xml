@@ -8,5 +8,6 @@
     </item>
     <item android:id="@+id/ZoomOut" android:title="Zoom out" android:enabled="true" android:visible="true"></item>
     <item android:id="@+id/ZoomIn" android:enabled="true" android:title="Zoom in" android:visible="true"></item>
+    <item android:id="@+id/resetFractal" android:enabled="true" android:visible="true" android:title="Reset"></item>
     
 </menu>

@@ -36,6 +36,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    private boolean draggingFractal = false;
    
    private int dragID = INVALID_POINTER_ID;
+   
+   private boolean justZoomed = false;
+   
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +49,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
       fractalView = new MandelbrotFractalView(this);
-      //fractalView.setLayoutParams(new LinearLayout.LayoutParams(500, 500));
       setContentView(fractalView);
       fractalView.requestFocus();
       
@@ -67,6 +69,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    protected void onPause() {
       super.onPause();
+      finish();
       Log.d(TAG, "onPause");
    }
    
@@ -101,6 +104,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  return true;
       case R.id.PanRight:
     	  fractalView.moveFractal(-100, 0);
+    	  return true;
+      case R.id.resetFractal:
+    	  fractalView.reset();
     	  return true;
       }
       return false;
@@ -143,11 +149,14 @@ public boolean onTouch(View v, MotionEvent evt) {
 				dragLastY = evt.getY(pointerIndex);
 				return true;
 			}
+			return false;
 			
 		case MotionEvent.ACTION_POINTER_UP:
 			// Extract the index of the pointer that came up
 	        final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 	        final int pointerId = evt.getPointerId(pointerIndex);
+	        
+	        fractalView.stopZooming();
 	        
 	        if (pointerId == dragID) {
 	            Log.d(TAG, "Choosing new active pointer");
@@ -156,11 +165,15 @@ public boolean onTouch(View v, MotionEvent evt) {
 				dragLastY = (int) evt.getY(newPointerIndex);
 	            dragID = evt.getPointerId(newPointerIndex);
 	        }
+	        
 	        break;
 	        
 		case MotionEvent.ACTION_UP:
-			draggingFractal = false;
-			fractalView.stopDragging();
+			if(!gestureDetector.isInProgress())
+			{
+				draggingFractal = false;
+				fractalView.stopDragging();
+			}
 			break;
 	}
 	return true;
@@ -170,6 +183,15 @@ public boolean onTouch(View v, MotionEvent evt) {
 public boolean onScale(ScaleGestureDetector detector) {
 	Log.d(TAG, "Scaling");
 	fractalView.pauseRendering = true;
+	Log.d(TAG, "Midpoint: " + detector.getFocusX() + ", " + detector.getFocusY());
+	
+	if(gestureDetector.getScaleFactor() == 0)
+		return false;
+	fractalView.midX = detector.getFocusX();
+	fractalView.midY = detector.getFocusY();
+	
+	fractalView.scaleFactor = gestureDetector.getScaleFactor();
+	fractalView.invalidate();
 	return true;
 }
 
