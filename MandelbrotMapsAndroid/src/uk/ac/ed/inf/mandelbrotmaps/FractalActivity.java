@@ -17,13 +17,6 @@ import android.view.WindowManager;
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
    private static final String TAG = "MMaps";
    private static final int INVALID_POINTER_ID = -1;
-   
-   private enum ControlMode{
-	   PAN,
-	   ZOOM
-   }
-   
-   private ControlMode controlMode;
 
    private MandelbrotFractalView fractalView;
    private MandelbrotJuliaLocation mjLocation;
@@ -36,10 +29,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    private boolean draggingFractal = false;
    
    private int dragID = INVALID_POINTER_ID;
-   
-   private boolean justZoomed = false;
-   
-   private int totalPointers = 0;
    
 
    @Override
@@ -181,24 +170,21 @@ public boolean onTouch(View v, MotionEvent evt) {
 }
 
 
-public boolean onScale(ScaleGestureDetector detector) {
-	Log.d(TAG, "Scaling");
-	fractalView.pauseRendering = true;
-	Log.d(TAG, "Midpoint: " + detector.getFocusX() + ", " + detector.getFocusY());
-	
-	if(gestureDetector.getScaleFactor() == 0)
-		return false;
-	fractalView.midX = detector.getFocusX();
-	fractalView.midY = detector.getFocusY();
-	
-	fractalView.scaleFactor = gestureDetector.getScaleFactor();
-	fractalView.invalidate();
+public boolean onScaleBegin(ScaleGestureDetector detector) {
+	fractalView.startZooming();
 	return true;
 }
 
 
-public boolean onScaleBegin(ScaleGestureDetector detector) {
-	fractalView.startZooming();
+public boolean onScale(ScaleGestureDetector detector) {
+	//DEBUG CODE
+	fractalView.pauseRendering = true;
+	if(gestureDetector.getScaleFactor() == 0)
+		return false;
+	//DEBUG CODE
+	
+	fractalView.zoomImage(detector.getFocusX(), detector.getFocusY(), detector.getScaleFactor());
+	
 	return true;
 }
 

@@ -208,9 +208,10 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
-	/*-----------------------------------------------------------------------------------*/
-	/* Movement */
-	/*-----------------------------------------------------------------------------------*/
+	
+/*-----------------------------------------------------------------------------------*/
+/* Movement */
+/*-----------------------------------------------------------------------------------*/
 		
 		// Set new graph area
 		public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
@@ -323,6 +324,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 /* Zooming */	
 /*-----------------------------------------------------------------------------------*/
+		
 	// Adjust zoom, centred on pixel (xPixel, yPixel)
 	public void zoomChange(int xPixel, int yPixel, int zoomAmount) {
 		renderMode = RenderMode.JUST_ZOOMED;
@@ -402,6 +404,15 @@ abstract class AbstractFractalView extends View {
 	public void startZooming()
 	{
 		hasZoomed = true;
+	}
+	
+	
+	// Zoom in on the displayed bitmap
+	public void zoomImage(float focusX, float focusY, float newScaleFactor) {
+		midX = focusX;
+		midY = focusY;
+		scaleFactor = newScaleFactor;
+		invalidate();
 	}
 	
 	
