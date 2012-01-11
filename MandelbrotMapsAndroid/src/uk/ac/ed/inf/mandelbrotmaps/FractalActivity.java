@@ -39,6 +39,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    
    private boolean justZoomed = false;
    
+   private int totalPointers = 0;
+   
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +133,6 @@ public boolean onTouch(View v, MotionEvent evt) {
 			{
 				fractalView.startDragging();
 				draggingFractal = true;
-				Log.d(TAG, "Started dragging");
 			}
 			
 			if(!gestureDetector.isInProgress() && dragID != INVALID_POINTER_ID)

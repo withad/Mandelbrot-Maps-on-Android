@@ -83,19 +83,14 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		// newz = (newx) + (newy)i
 		// ... NB: newz = (z^2 + c)
 		double newx, newy;
-		
-		long timeBegin = System.currentTimeMillis();
-		
-		//TESTING CODE
-		int inCount = 0;
-		int outCount = 0;
 	
-		for (yPixel=yPixelMin; yPixel<yPixelMax+1-pixelBlockSize; yPixel+=pixelBlockSize) {
+		for (yPixel=yPixelMin; yPixel<yPixelMax+1-pixelBlockSize; yPixel+=pixelBlockSize) {			
 			// Detect rendering abortion.
+			//CanvasRenderThread.yield();
+			
 			if (
 				allowInterruption &&
-				renderThread.abortSignalled() //&&
-				//(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
+				renderThread.abortSignalled()
 			) 
 				{
 					Log.d("MFV", "Returning based on interruption test");
@@ -134,9 +129,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					if ( (x*x + y*y) > 4) break;
 				}
 				
-				if (iterationNr < maxIterations) outCount++;
-				else inCount++;
-				
 				// Percentage (0.0 -- 1.0)
 				colourCode = (double)iterationNr / (double)maxIterations;
 				
@@ -165,7 +157,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			}
 			// Show thread's work in progress
 			if ((showRenderingProgress) && (yPixel % 3 == 0)
-				//(System.currentTimeMillis() - timeBegin > millisBeforeSlowRenderBehaviour)
 			) 
 				{
 					postInvalidate();

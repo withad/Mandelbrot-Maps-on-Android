@@ -77,7 +77,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 			dragLastY = (int) evt.getY();
 			
 			dragID = evt.getPointerId(0);	
-			Log.d(TAG, "Initial dragID: " + dragID);
+			Log.d(TAG, "ACTION_DOWN");
 			return true;
 			
 		case MotionEvent.ACTION_MOVE:
@@ -98,6 +98,8 @@ public boolean onTouch(View v, MotionEvent evt) {
 			}
 			
 		case MotionEvent.ACTION_POINTER_UP:
+			Log.d(TAG, "POINTER_UP");
+			
 			// Extract the index of the pointer that came up
 	        final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 	        final int pointerId = evt.getPointerId(pointerIndex);
@@ -110,6 +112,14 @@ public boolean onTouch(View v, MotionEvent evt) {
 	            dragID = evt.getPointerId(newPointerIndex);
 	        }
 	        break;
+	        
+		case MotionEvent.ACTION_POINTER_DOWN:
+			Log.d(TAG, "POINTER_DOWN");
+			break;
+			
+		case MotionEvent.ACTION_UP:
+			Log.d(TAG, "ACTION_UP");
+			break;
 	}
 	return true;
 }
