@@ -198,7 +198,7 @@ public boolean onScale(ScaleGestureDetector detector) {
 
 
 public boolean onScaleBegin(ScaleGestureDetector detector) {
-	// TODO Auto-generated method stub
+	fractalView.startZooming();
 	return true;
 }
 
