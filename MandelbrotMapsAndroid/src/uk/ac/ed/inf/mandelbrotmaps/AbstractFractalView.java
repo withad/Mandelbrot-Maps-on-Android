@@ -155,6 +155,8 @@ abstract class AbstractFractalView extends View {
 	
 	//Scaling
 	matrix.postScale(scaleFactor, scaleFactor, midX, midY);
+	float[] matrixout = new float[9];
+	matrix.getValues(matrixout);
 	scaleFactor = 1.0f;
 	midX = 0.0f;
 	midY = 0.0f;
@@ -267,6 +269,8 @@ abstract class AbstractFractalView extends View {
 				renderMode = RenderMode.JUST_DRAGGED;
 				shiftPixels((int)totalDragX, (int)totalDragY);
 			}
+			else 
+				renderMode = RenderMode.NEW;
 			
 			//Set the new location for the fractals
 			moveFractal((int)totalDragX, (int)totalDragY);
@@ -276,6 +280,7 @@ abstract class AbstractFractalView extends View {
 			bitmapY = 0;
 			totalDragX = 0;
 			totalDragY = 0;
+			scaleFactor = 1.0f;
 			matrix.reset();
 			
 			invalidate();
@@ -404,6 +409,7 @@ abstract class AbstractFractalView extends View {
 	public void startZooming()
 	{
 		hasZoomed = true;
+		clearPixelSizes();
 	}
 	
 	
@@ -418,11 +424,17 @@ abstract class AbstractFractalView extends View {
 	
 	// After pinch gesture stops, crop bitmap to image on screen
 	public void stopZooming()
-	{
+	{		
 		setDrawingCacheEnabled(true);
 		fractalBitmap = Bitmap.createBitmap(getDrawingCache());
 		fractalBitmap.getPixels(fractalPixels, 0, getWidth(), 0, 0, getWidth(), getHeight());
 		setDrawingCacheEnabled(false);
+		
+		bitmapX = 0;
+		bitmapY = 0;
+		totalDragX = 0;
+		totalDragY = 0;
+		matrix.reset();
 	}
 	
 	

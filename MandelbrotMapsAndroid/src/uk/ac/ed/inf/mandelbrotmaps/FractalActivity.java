@@ -117,15 +117,18 @@ public boolean onTouch(View v, MotionEvent evt) {
 			Log.d(TAG, "Initial dragID: " + dragID);
 			return true;
 			
-		case MotionEvent.ACTION_MOVE:
+		case MotionEvent.ACTION_MOVE:		
 			if(!draggingFractal)
 			{
+				Log.d(TAG, "In the dragging fractal bit");
 				fractalView.startDragging();
 				draggingFractal = true;
 			}
 			
+			
 			if(!gestureDetector.isInProgress() && dragID != INVALID_POINTER_ID)
 			{
+				
 				int pointerIndex = evt.findPointerIndex(dragID);
 				
 				float dragDiffPixelsX = evt.getX(pointerIndex) - dragLastX;
@@ -133,6 +136,8 @@ public boolean onTouch(View v, MotionEvent evt) {
 		
 				// Move the canvas
 				fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
+				
+				Log.d(TAG, "Diff pixels X: " + dragDiffPixelsX);
 		
 				// Update last mouse position
 				dragLastX = evt.getX(pointerIndex);
@@ -142,6 +147,9 @@ public boolean onTouch(View v, MotionEvent evt) {
 			return false;
 			
 		case MotionEvent.ACTION_POINTER_UP:
+			Log.d(TAG, "Pointer count: " + evt.getPointerCount());
+			if(evt.getPointerCount() == 1) break;
+			
 			// Extract the index of the pointer that came up
 	        final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 	        final int pointerId = evt.getPointerId(pointerIndex);
@@ -179,7 +187,7 @@ public boolean onScaleBegin(ScaleGestureDetector detector) {
 public boolean onScale(ScaleGestureDetector detector) {
 	//DEBUG CODE
 	fractalView.pauseRendering = true;
-	if(gestureDetector.getScaleFactor() == 0)
+	if(gestureDetector.getScaleFactor() == 0 || gestureDetector.getScaleFactor() == 1)
 		return false;
 	//DEBUG CODE
 	
