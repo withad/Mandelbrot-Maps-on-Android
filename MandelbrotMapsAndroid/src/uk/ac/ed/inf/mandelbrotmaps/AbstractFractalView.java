@@ -231,6 +231,8 @@ abstract class AbstractFractalView extends View {
 		// Begin translating the image relative to the users finger
 		public void startDragging()
 		{
+			Log.d(TAG, "Start of dragging");
+			
 			//Stop current rendering (to not render areas that are offscreen afterwards)
 			stopAllRendering();
 			
@@ -240,7 +242,7 @@ abstract class AbstractFractalView extends View {
 			totalDragX = 0;
 			totalDragY = 0;
 			
-			hasZoomed = false;
+			//hasZoomed = false;
 			draggingFractal = true;
 		}
 		
@@ -262,6 +264,8 @@ abstract class AbstractFractalView extends View {
 		{
 			draggingFractal = false;
 			
+			Log.d(TAG, "Has zoomed? " + hasZoomed);
+			
 			// If no zooming's occured, keep the remaining pixels
 			if(!hasZoomed) 
 			{
@@ -272,16 +276,18 @@ abstract class AbstractFractalView extends View {
 			else 
 				renderMode = RenderMode.NEW;
 			
+			//hasZoomed = false;
+			
 			//Set the new location for the fractals
 			moveFractal((int)totalDragX, (int)totalDragY);
 			
 			// Reset all the variables (possibly paranoid)
-			bitmapX = 0;
+			/*bitmapX = 0;
 			bitmapY = 0;
 			totalDragX = 0;
 			totalDragY = 0;
-			scaleFactor = 1.0f;
-			matrix.reset();
+			scaleFactor = 1.0f;*/
+			if(!hasZoomed) matrix.reset();
 			
 			invalidate();
 		}
@@ -430,10 +436,10 @@ abstract class AbstractFractalView extends View {
 		fractalBitmap.getPixels(fractalPixels, 0, getWidth(), 0, 0, getWidth(), getHeight());
 		setDrawingCacheEnabled(false);
 		
-		bitmapX = 0;
+		/*bitmapX = 0;
 		bitmapY = 0;
 		totalDragX = 0;
-		totalDragY = 0;
+		totalDragY = 0;*/
 		matrix.reset();
 	}
 	
@@ -553,6 +559,7 @@ abstract class AbstractFractalView extends View {
 	public void reset(){
 		pauseRendering = false;
 		
+		matrix.reset();
 		stopAllRendering();
 		fractalPixels = new int[getWidth() * getHeight()];
 		clearPixelSizes();

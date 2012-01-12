@@ -120,7 +120,6 @@ public boolean onTouch(View v, MotionEvent evt) {
 		case MotionEvent.ACTION_MOVE:		
 			if(!draggingFractal)
 			{
-				Log.d(TAG, "In the dragging fractal bit");
 				fractalView.startDragging();
 				draggingFractal = true;
 			}
@@ -128,14 +127,14 @@ public boolean onTouch(View v, MotionEvent evt) {
 			
 			if(!gestureDetector.isInProgress() && dragID != INVALID_POINTER_ID)
 			{
-				
 				int pointerIndex = evt.findPointerIndex(dragID);
 				
 				float dragDiffPixelsX = evt.getX(pointerIndex) - dragLastX;
 				float dragDiffPixelsY = evt.getY(pointerIndex) - dragLastY;
 		
 				// Move the canvas
-				fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
+				if (dragDiffPixelsX != 0.0f && dragDiffPixelsY != 0.0f)
+					fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
 				
 				Log.d(TAG, "Diff pixels X: " + dragDiffPixelsX);
 		
@@ -156,6 +155,9 @@ public boolean onTouch(View v, MotionEvent evt) {
 	        
 	        fractalView.stopZooming();
 	        
+	        dragLastX = (int) evt.getX(dragID);
+			dragLastY = (int) evt.getY(dragID);
+	        
 	        if (pointerId == dragID) {
 	            Log.d(TAG, "Choosing new active pointer");
 	            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
@@ -167,7 +169,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 	        break;
 	        
 		case MotionEvent.ACTION_UP:
-			if(!gestureDetector.isInProgress())
+			//if(!gestureDetector.isInProgress())
 			{
 				draggingFractal = false;
 				fractalView.stopDragging();
@@ -179,6 +181,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 
 
 public boolean onScaleBegin(ScaleGestureDetector detector) {
+	Log.d(TAG, "Start of zoom");
 	fractalView.startZooming();
 	return true;
 }

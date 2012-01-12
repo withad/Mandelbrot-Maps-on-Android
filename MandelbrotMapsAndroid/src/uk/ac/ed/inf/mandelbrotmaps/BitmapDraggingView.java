@@ -50,8 +50,8 @@ class BitmapDraggingView extends View {
 	int dragLastX = 0;
 	int dragLastY = 0;
 	
-	public int bitmapX = 0;
-	public int bitmapY = 0;
+	public float bitmapX = 0;
+	public float bitmapY = 0;
 	
 	// Graph Area on the Complex Plane? new double[] {x_min, y_max, width}
 	double[] graphArea;
@@ -63,8 +63,8 @@ class BitmapDraggingView extends View {
 	
 	Bitmap image;
 	float prevScaleFactor = 1.0f;
-	int prevX = 0;
-	int prevY = 0;
+	float prevX = 0;
+	float prevY = 0;
 	
 	public float scaleFactor = 1.0f;
 	public float midX = 0.0f;
