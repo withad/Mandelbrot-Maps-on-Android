@@ -169,6 +169,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 	        break;
 	        
 		case MotionEvent.ACTION_UP:
+			Log.d(TAG, "ACTION_UP");
 			//if(!gestureDetector.isInProgress())
 			{
 				draggingFractal = false;
@@ -189,7 +190,7 @@ public boolean onScaleBegin(ScaleGestureDetector detector) {
 
 public boolean onScale(ScaleGestureDetector detector) {
 	//DEBUG CODE
-	fractalView.pauseRendering = true;
+	//fractalView.pauseRendering = true;
 	if(gestureDetector.getScaleFactor() == 0 || gestureDetector.getScaleFactor() == 1)
 		return false;
 	//DEBUG CODE

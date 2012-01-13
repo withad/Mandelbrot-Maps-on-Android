@@ -268,11 +268,7 @@ abstract class AbstractFractalView extends View {
 		
 		// Stop moving the image around, calculate new area. Run when finger lifted.
 		public void stopDragging()
-		{
-			draggingFractal = false;
-			
-			Log.d(TAG, "Has zoomed? " + hasZoomed);
-			
+		{			
 			// If no zooming's occured, keep the remaining pixels
 			if(!hasZoomed) 
 			{
@@ -290,6 +286,9 @@ abstract class AbstractFractalView extends View {
 			
 			// Reset all the variables (possibly paranoid)
 			if(!hasZoomed) matrix.reset();
+			
+			draggingFractal = false;
+			hasZoomed = false;
 			
 			invalidate();
 		}
@@ -438,10 +437,10 @@ abstract class AbstractFractalView extends View {
 		fractalBitmap.getPixels(fractalPixels, 0, getWidth(), 0, 0, getWidth(), getHeight());
 		setDrawingCacheEnabled(false);
 		
-		/*bitmapX = 0;
+		bitmapX = 0;
 		bitmapY = 0;
 		totalDragX = 0;
-		totalDragY = 0;*/
+		totalDragY = 0;
 		matrix.reset();
 	}
 	
