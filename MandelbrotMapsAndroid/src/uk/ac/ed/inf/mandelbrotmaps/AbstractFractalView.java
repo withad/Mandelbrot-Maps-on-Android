@@ -93,46 +93,53 @@ abstract class AbstractFractalView extends View {
 	
 	private Matrix matrix;
 	
-   
-	//Constructor
+	
+	
+/*-----------------------------------------------------------------------------------*/
+/*Constructor*/
+/*-----------------------------------------------------------------------------------*/
 	public AbstractFractalView(Context context) {
-      super(context);
-      setFocusable(true);
-      setFocusableInTouchMode(true);
-      setBackgroundColor(Color.BLACK);
-      setId(0); 
+		super(context);
+		setFocusable(true);
+		setFocusableInTouchMode(true);
+		setBackgroundColor(Color.BLACK);
+      	setId(0); 
       
-      parentActivity = (FractalActivity)context;
-      setOnTouchListener((FractalActivity)context);
+      	parentActivity = (FractalActivity)context;
+      	setOnTouchListener((FractalActivity)context);
       
-      matrix = new Matrix();
-      matrix.reset();
+      	matrix = new Matrix();
+      	matrix.reset();
       
-      renderThread.start();
+      	renderThread.start();
    }
 
+	
+	
 /*-----------------------------------------------------------------------------------*/
 /*Android life-cycle handling*/   
 /*-----------------------------------------------------------------------------------*/
 	
    @Override
    protected Parcelable onSaveInstanceState() { 
-	  super.onSaveInstanceState();
-      Log.d(TAG, "onSaveInstanceState");
-      Bundle bundle = new Bundle();
-      return bundle;
+	   super.onSaveInstanceState();
+	   Log.d(TAG, "onSaveInstanceState");
+	   Bundle bundle = new Bundle();
+	   return bundle;
    }
     
    @Override
    protected void onRestoreInstanceState(Parcelable state) { 
-      Log.d(TAG, "onRestoreInstanceState");
-      super.onRestoreInstanceState(state);
+	   Log.d(TAG, "onRestoreInstanceState");
+	   super.onRestoreInstanceState(state);
    }
      
    @Override
    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-      super.onSizeChanged(w, h, oldw, oldh);
+	   super.onSizeChanged(w, h, oldw, oldh);
    }
+   
+   
    
 /*-----------------------------------------------------------------------------------*/
 /* Graphics */
@@ -282,11 +289,6 @@ abstract class AbstractFractalView extends View {
 			moveFractal((int)totalDragX, (int)totalDragY);
 			
 			// Reset all the variables (possibly paranoid)
-			/*bitmapX = 0;
-			bitmapY = 0;
-			totalDragX = 0;
-			totalDragY = 0;
-			scaleFactor = 1.0f;*/
 			if(!hasZoomed) matrix.reset();
 			
 			invalidate();
