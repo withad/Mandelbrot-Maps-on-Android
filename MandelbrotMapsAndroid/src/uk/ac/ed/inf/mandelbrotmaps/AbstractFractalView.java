@@ -35,7 +35,7 @@ abstract class AbstractFractalView extends View {
 	int DEFAULT_PIXEL_SIZE = 1;
    
    	// How much of a zoom, on each increment?
-	public static final int zoomPercent = 20;
+	public static final int zoomPercent = 1;
    
 	// Rendering queue (modified from a LinkedBlockingDeque in the original version)
 	LinkedBlockingQueue<CanvasRendering> renderingQueue = new LinkedBlockingQueue<CanvasRendering>();	
@@ -93,6 +93,10 @@ abstract class AbstractFractalView extends View {
 	
 	private Matrix matrix;
 	
+	private float totalScaling; 
+	private float averageMidX;
+	private float averageMidY;
+	private int scaleEventCount;
 	
 	
 /*-----------------------------------------------------------------------------------*/
@@ -182,7 +186,7 @@ abstract class AbstractFractalView extends View {
 		stopAllRendering();
 		
 		//Schedule a crude rendering
-		scheduleRendering(INITIAL_PIXEL_BLOCK);
+		//scheduleRendering(INITIAL_PIXEL_BLOCK);
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(DEFAULT_PIXEL_SIZE);
@@ -231,7 +235,7 @@ abstract class AbstractFractalView extends View {
 			double[] newGraphArea = getGraphArea();
 			newGraphArea[0] -= (dragDiffPixelsX * pixelSize);
 			newGraphArea[1] -= -(dragDiffPixelsY * pixelSize);
-			setGraphArea(newGraphArea);
+			setGraphArea(newGraphArea, true);
 		}
 		
 		
@@ -272,14 +276,11 @@ abstract class AbstractFractalView extends View {
 			// If no zooming's occured, keep the remaining pixels
 			if(!hasZoomed) 
 			{
-				Log.d(TAG, "No zooming");
 				renderMode = RenderMode.JUST_DRAGGED;
 				shiftPixels((int)totalDragX, (int)totalDragY);
 			}
 			else 
 				renderMode = RenderMode.NEW;
-			
-			//hasZoomed = false;
 			
 			//Set the new location for the fractals
 			moveFractal((int)totalDragX, (int)totalDragY);
@@ -338,7 +339,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 		
 	// Adjust zoom, centred on pixel (xPixel, yPixel)
-	public void zoomChange(int xPixel, int yPixel, int zoomAmount) {
+	public void zoomChange(int xPixel, int yPixel, float scale) { //int zoomAmount) {
 		renderMode = RenderMode.JUST_ZOOMED;
 		stopAllRendering();
 		
@@ -347,7 +348,8 @@ abstract class AbstractFractalView extends View {
 		double[] oldGraphArea = getGraphArea();
 		double[] newGraphArea = new double[3];
 		
-		double zoomPercentChange = (double)(100 + (zoomPercent*zoomAmount)) / 100;
+		double zoomPercentChange = (double)scale; //= (double)(100 + (zoomAmount)) / 100;
+		Log.d(TAG, "Zoom percent change: " + zoomPercentChange);
 		
 		// What is the zoom centre?
 		double mousedOverX = oldGraphArea[0] + ( (double)xPixel * pixelSize );
@@ -371,7 +373,7 @@ abstract class AbstractFractalView extends View {
 		
 		clearPixelSizes();
 		
-		setGraphArea(newGraphArea);
+		setGraphArea(newGraphArea, false);
 	}
 
 	// Returns zoom level, in range 0..ZOOM_SLIDER_SCALING	(logarithmic scale)
@@ -409,14 +411,18 @@ abstract class AbstractFractalView extends View {
 		newGraphArea[1] = centerY + (getWidth() * newPixelSize * 0.5);
 		newGraphArea[2] = newPixelSize * getWidth();
 		
-		setGraphArea(newGraphArea);
+		setGraphArea(newGraphArea, true);
 	}
 	
 	
-	public void startZooming()
+	public void startZooming(float initialMidX, float initialMidY)
 	{
 		hasZoomed = true;
 		clearPixelSizes();
+		totalScaling = 1.0f;
+		averageMidX = initialMidX;
+		averageMidY = initialMidY;
+		scaleEventCount = 0;
 	}
 	
 	
@@ -425,6 +431,17 @@ abstract class AbstractFractalView extends View {
 		midX = focusX;
 		midY = focusY;
 		scaleFactor = newScaleFactor;
+		//Log.d(TAG, "Scalefactor: "+ scaleFactor);
+		Log.d(TAG, "X: " + focusX);
+		Log.d(TAG, "Y: " + focusY);
+		
+		totalScaling*=scaleFactor;
+		scaleEventCount++;
+		averageMidX = ((averageMidX*(scaleEventCount-1)) + focusX)/scaleEventCount;
+		averageMidY = ((averageMidY*(scaleEventCount-1)) + focusY)/scaleEventCount;
+		
+		zoomChange((int)focusX, (int)focusY, 1/newScaleFactor);
+		
 		invalidate();
 	}
 	
@@ -437,20 +454,32 @@ abstract class AbstractFractalView extends View {
 		fractalBitmap.getPixels(fractalPixels, 0, getWidth(), 0, 0, getWidth(), getHeight());
 		setDrawingCacheEnabled(false);
 		
+		Log.d(TAG, "Average X: " + averageMidX);
+		Log.d(TAG, "Average Y: " + averageMidY);
+		
 		bitmapX = 0;
 		bitmapY = 0;
 		totalDragX = 0;
 		totalDragY = 0;
 		matrix.reset();
+		
+		//zoomChange((int)averageMidX, (int)averageMidY, 1/totalScaling);
+		
+		Log.d(TAG, "Total scaling: " + totalScaling);
 	}
 	
+	
+	private int zoomPercentage(float scalingValue) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 	
 
 /*-----------------------------------------------------------------------------------*/
 /* Iteration variables */
 /*-----------------------------------------------------------------------------------*/
-	
+
 	/* Get the iteration scaling factor.
 	// Log scale, with values ITERATIONSCALING_MIN .. ITERATIONSCALING_MAX
 	// represented by values in range 0..CONTRAST_SLIDER_SCALING*/
@@ -499,7 +528,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 	
 	//Set a new graph area, or 
-	void setGraphArea(double[] newGraphArea) {
+	void setGraphArea(double[] newGraphArea, boolean newRender) {
 		// We have a predefined graphArea, so we can be picky with newGraphArea.
 		if (graphArea != null) {
 			double[] initialGraphArea = graphArea;
@@ -515,7 +544,8 @@ abstract class AbstractFractalView extends View {
 		// There is no predefined graphArea; we'll have to accept whatever newGraphArea is.
 		} else {
 			graphArea = newGraphArea;
-			scheduleNewRenders();
+			if(newRender)
+				scheduleNewRenders();
 		}
 	}
 	

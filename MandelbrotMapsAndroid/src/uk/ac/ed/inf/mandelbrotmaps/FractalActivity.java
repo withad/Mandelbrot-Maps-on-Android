@@ -77,10 +77,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
       case R.id.ZoomOut:
-    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 1);
+    	  float scaleOut = 0.5f;
+    	  fractalView.zoomImage((float)(fractalView.getWidth()/2), (float)(fractalView.getHeight()/2), scaleOut);
+    	  fractalView.stopZooming();
+    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 1/scaleOut);
     	  return true;
       case R.id.ZoomIn:
-    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), -1);
+    	  float scale = 2.0f;
+    	  fractalView.zoomImage((float)(fractalView.getWidth()/2), (float)(fractalView.getHeight()/2), scale);
+    	  fractalView.stopZooming();
+    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 1/scale);
     	  return true;
       case R.id.PanUp:
     	  fractalView.shiftPixels(0, -100);
@@ -183,7 +189,7 @@ public boolean onTouch(View v, MotionEvent evt) {
 
 public boolean onScaleBegin(ScaleGestureDetector detector) {
 	Log.d(TAG, "Start of zoom");
-	fractalView.startZooming();
+	fractalView.startZooming(detector.getFocusX(), detector.getFocusY());
 	return true;
 }
 
