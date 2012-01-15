@@ -233,7 +233,7 @@ abstract class AbstractFractalView extends View {
 			double[] newGraphArea = getGraphArea();
 			newGraphArea[0] -= (dragDiffPixelsX * pixelSize);
 			newGraphArea[1] -= -(dragDiffPixelsY * pixelSize);
-			setGraphArea(newGraphArea, true);
+			setGraphArea(newGraphArea, false);
 		}
 		
 		
@@ -274,7 +274,7 @@ abstract class AbstractFractalView extends View {
 		
 		
 		// Stop moving the image around, calculate new area. Run when finger lifted.
-		public void stopDragging()
+		public void stopDragging(boolean stoppedOnZoom)
 		{			
 			// If no zooming's occured, keep the remaining pixels
 			if(!hasZoomed) 
@@ -288,7 +288,7 @@ abstract class AbstractFractalView extends View {
 			//Set the new location for the fractals
 			moveFractal((int)totalDragX, (int)totalDragY);
 			
-			//scheduleNewRenders();
+			scheduleNewRenders();
 			
 			// Reset all the variables (possibly paranoid)
 			if(!hasZoomed) matrix.reset();
@@ -422,8 +422,6 @@ abstract class AbstractFractalView extends View {
 	
 	public void startZooming(float initialMidX, float initialMidY)
 	{
-		//stopAllRendering();
-		
 		hasZoomed = true;
 		clearPixelSizes();
 	}
@@ -520,7 +518,7 @@ abstract class AbstractFractalView extends View {
 			
 			// Zoom level is sane - let's allow this!
 			if (saneZoomLevel()) {
-				scheduleNewRenders();
+				if(newRender)scheduleNewRenders();
 			// Zoom level is out of bounds; let's just roll back.
 			} else {
 				graphArea = initialGraphArea;
@@ -528,8 +526,7 @@ abstract class AbstractFractalView extends View {
 		// There is no predefined graphArea; we'll have to accept whatever newGraphArea is.
 		} else {
 			graphArea = newGraphArea;
-			if(newRender)
-				scheduleNewRenders();
+			if(newRender) scheduleNewRenders();
 		}
 	}
 	

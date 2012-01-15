@@ -24,7 +24,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private ControlMode controlmode = ControlMode.STATIC;
 	
 	private static final String TAG = "MMaps";
-	private static final int INVALID_POINTER_ID = -1;
 	
 	private MandelbrotFractalView fractalView;
 	private MandelbrotJuliaLocation mjLocation;
@@ -34,9 +33,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   
 	private ScaleGestureDetector gestureDetector;
 	   
-	//private boolean draggingFractal = false;
-	   
-	private int dragID = INVALID_POINTER_ID;
+	private int dragID = -1;
    
 
    @Override
@@ -133,7 +130,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				return true;
 				
 			case MotionEvent.ACTION_MOVE:						
-				if(!gestureDetector.isInProgress() && dragID != INVALID_POINTER_ID)
+				if(controlmode == ControlMode.DRAGGING)//!gestureDetector.isInProgress())
 				{
 					int pointerIndex = evt.findPointerIndex(dragID);
 					
@@ -178,7 +175,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		        
 			case MotionEvent.ACTION_UP:
 				controlmode = ControlMode.STATIC;
-				fractalView.stopDragging();
+				fractalView.stopDragging(false);
 				break;
 		}
 		return true;
@@ -186,7 +183,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	
    public boolean onScaleBegin(ScaleGestureDetector detector) {
-		Log.d(TAG, "Start of zoom");
+		controlmode = ControlMode.ZOOMING;
+		//fractalView.stopDragging(true);
 		fractalView.startZooming(detector.getFocusX(), detector.getFocusY());
 		return true;
 	}
