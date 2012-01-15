@@ -15,20 +15,28 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
-   private static final String TAG = "MMaps";
-   private static final int INVALID_POINTER_ID = -1;
-
-   private MandelbrotFractalView fractalView;
-   private MandelbrotJuliaLocation mjLocation;
-   
-   private float dragLastX;
-   private float dragLastY;
-   
-   private ScaleGestureDetector gestureDetector;
-   
-   private boolean draggingFractal = false;
-   
-   private int dragID = INVALID_POINTER_ID;
+	private enum ControlMode {
+		ZOOMING,
+		DRAGGING,
+		STATIC
+	}
+	
+	private ControlMode controlmode = ControlMode.STATIC;
+	
+	private static final String TAG = "MMaps";
+	private static final int INVALID_POINTER_ID = -1;
+	
+	private MandelbrotFractalView fractalView;
+	private MandelbrotJuliaLocation mjLocation;
+	   
+	private float dragLastX;
+	private float dragLastY;
+	   
+	private ScaleGestureDetector gestureDetector;
+	   
+	//private boolean draggingFractal = false;
+	   
+	private int dragID = INVALID_POINTER_ID;
    
 
    @Override
@@ -110,105 +118,94 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    }
 
 
-public boolean onTouch(View v, MotionEvent evt) {
-	gestureDetector.onTouchEvent(evt);
-	
-	switch (evt.getAction() & MotionEvent.ACTION_MASK)
-	{
-		case MotionEvent.ACTION_DOWN:
-			dragLastX = (int) evt.getX();
-			dragLastY = (int) evt.getY();
-			
-			dragID = evt.getPointerId(0);	
-			Log.d(TAG, "Initial dragID: " + dragID);
-			return true;
-			
-		case MotionEvent.ACTION_MOVE:		
-			if(!draggingFractal)
-			{
+   public boolean onTouch(View v, MotionEvent evt) {
+		gestureDetector.onTouchEvent(evt);
+		
+		switch (evt.getAction() & MotionEvent.ACTION_MASK)
+		{
+			case MotionEvent.ACTION_DOWN:
+				dragLastX = (int) evt.getX();
+				dragLastY = (int) evt.getY();
+				dragID = evt.getPointerId(0);	
+				
 				fractalView.startDragging();
-				draggingFractal = true;
-			}
-			
-			
-			if(!gestureDetector.isInProgress() && dragID != INVALID_POINTER_ID)
-			{
-				int pointerIndex = evt.findPointerIndex(dragID);
-				
-				float dragDiffPixelsX = evt.getX(pointerIndex) - dragLastX;
-				float dragDiffPixelsY = evt.getY(pointerIndex) - dragLastY;
-		
-				// Move the canvas
-				if (dragDiffPixelsX != 0.0f && dragDiffPixelsY != 0.0f)
-					fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
-				
-				Log.d(TAG, "Diff pixels X: " + dragDiffPixelsX);
-		
-				// Update last mouse position
-				dragLastX = evt.getX(pointerIndex);
-				dragLastY = evt.getY(pointerIndex);
+				controlmode = ControlMode.DRAGGING;
 				return true;
-			}
-			return false;
+				
+			case MotionEvent.ACTION_MOVE:						
+				if(!gestureDetector.isInProgress() && dragID != INVALID_POINTER_ID)
+				{
+					int pointerIndex = evt.findPointerIndex(dragID);
+					
+					float dragDiffPixelsX = evt.getX(pointerIndex) - dragLastX;
+					float dragDiffPixelsY = evt.getY(pointerIndex) - dragLastY;
 			
-		case MotionEvent.ACTION_POINTER_UP:
-			Log.d(TAG, "Pointer count: " + evt.getPointerCount());
-			if(evt.getPointerCount() == 1) break;
+					// Move the canvas
+					if (dragDiffPixelsX != 0.0f && dragDiffPixelsY != 0.0f)
+						fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
+					
+					Log.d(TAG, "Diff pixels X: " + dragDiffPixelsX);
 			
-			// Extract the index of the pointer that came up
-	        final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-	        final int pointerId = evt.getPointerId(pointerIndex);
-	        
-	        fractalView.stopZooming();
-	        
-	        dragLastX = (int) evt.getX(dragID);
-			dragLastY = (int) evt.getY(dragID);
-	        
-	        if (pointerId == dragID) {
-	            Log.d(TAG, "Choosing new active pointer");
-	            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-	            dragLastX = (int) evt.getX(newPointerIndex);
-				dragLastY = (int) evt.getY(newPointerIndex);
-	            dragID = evt.getPointerId(newPointerIndex);
-	        }
-	        
-	        break;
-	        
-		case MotionEvent.ACTION_UP:
-			Log.d(TAG, "ACTION_UP");
-			//if(!gestureDetector.isInProgress())
-			{
-				draggingFractal = false;
+					// Update last mouse position
+					dragLastX = evt.getX(pointerIndex);
+					dragLastY = evt.getY(pointerIndex);
+					return true;
+				}
+				return false;
+				
+			case MotionEvent.ACTION_POINTER_UP:
+				Log.d(TAG, "Pointer count: " + evt.getPointerCount());
+				if(evt.getPointerCount() == 1) break;
+				
+				// Extract the index of the pointer that came up
+		        final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+		        final int pointerId = evt.getPointerId(pointerIndex);
+		        
+		        fractalView.stopZooming();
+		        
+		        dragLastX = (int) evt.getX(dragID);
+				dragLastY = (int) evt.getY(dragID);
+		        
+		        if (pointerId == dragID) {
+		            Log.d(TAG, "Choosing new active pointer");
+		            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+		            dragLastX = (int) evt.getX(newPointerIndex);
+					dragLastY = (int) evt.getY(newPointerIndex);
+		            dragID = evt.getPointerId(newPointerIndex);
+		        }
+		        
+		        break;
+		        
+			case MotionEvent.ACTION_UP:
+				controlmode = ControlMode.STATIC;
 				fractalView.stopDragging();
-			}
-			break;
+				break;
+		}
+		return true;
 	}
-	return true;
-}
-
-
-public boolean onScaleBegin(ScaleGestureDetector detector) {
-	Log.d(TAG, "Start of zoom");
-	fractalView.startZooming(detector.getFocusX(), detector.getFocusY());
-	return true;
-}
-
-
-public boolean onScale(ScaleGestureDetector detector) {
-	//DEBUG CODE
-	//fractalView.pauseRendering = true;
-	if(gestureDetector.getScaleFactor() == 0 || gestureDetector.getScaleFactor() == 1)
-		return false;
-	//DEBUG CODE
 	
-	fractalView.zoomImage(detector.getFocusX(), detector.getFocusY(), detector.getScaleFactor());
 	
-	return true;
-}
-
-
-public void onScaleEnd(ScaleGestureDetector detector) {
-	// TODO Auto-generated method stub
+   public boolean onScaleBegin(ScaleGestureDetector detector) {
+		Log.d(TAG, "Start of zoom");
+		fractalView.startZooming(detector.getFocusX(), detector.getFocusY());
+		return true;
+	}
 	
-}
+	
+   public boolean onScale(ScaleGestureDetector detector) {
+		//DEBUG CODE
+		//fractalView.pauseRendering = true;
+		if(gestureDetector.getScaleFactor() == 0 || gestureDetector.getScaleFactor() == 1)
+			return false;
+		//DEBUG CODE
+		
+		fractalView.zoomImage(detector.getFocusX(), detector.getFocusY(), detector.getScaleFactor());
+		
+		return true;
+	}
+	
+	
+   public void onScaleEnd(ScaleGestureDetector detector) {
+		// TODO Auto-generated method stub
+	}
 }
