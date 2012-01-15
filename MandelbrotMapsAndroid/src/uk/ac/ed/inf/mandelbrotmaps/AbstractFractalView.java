@@ -23,6 +23,16 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	private RenderMode renderMode = RenderMode.NEW;
+	
+	
+	public enum ControlMode {
+		ZOOMING,
+		DRAGGING,
+		STATIC
+	}
+	
+	private ControlMode controlmode = ControlMode.STATIC;
+	
    
    	// How many different, discrete zoom and contrast levels?
 	public static final int ZOOM_SLIDER_SCALING = 300;
@@ -90,7 +100,7 @@ abstract class AbstractFractalView extends View {
 	public float midY = 0.0f;
 	
 	boolean pauseRendering = false;
-	boolean draggingFractal = false;
+	//boolean draggingFractal = false;
 	boolean zoomingFractal = false;
 	boolean hasZoomed = false;
 	
@@ -158,20 +168,25 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	//Translation
-	matrix.postTranslate(bitmapX, bitmapY);
-	bitmapX = 0;
-	bitmapY = 0;
+	if (controlmode == ControlMode.DRAGGING)
+	{
+		matrix.postTranslate(bitmapX, bitmapY);
+		bitmapX = 0;
+		bitmapY = 0;
+	}
 	
 	//Scaling
 	matrix.postScale(scaleFactor, scaleFactor, midX, midY);
-	float[] matrixout = new float[9];
-	matrix.getValues(matrixout);
 	scaleFactor = 1.0f;
 	midX = 0.0f;
 	midY = 0.0f;
 	
 	//Create new image only if not dragging or zooming
-	if(!draggingFractal && !zoomingFractal) fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+	if(controlmode == ControlMode.STATIC) 
+		{
+			Log.d(TAG, "Create a new bitmap!");
+			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
+		}
 	
 	//Draw image on screen
 	canvas.drawBitmap(fractalBitmap, matrix, new Paint());
@@ -180,6 +195,8 @@ abstract class AbstractFractalView extends View {
    
    // Adds renders to the queue for processing by render thread
 	void scheduleNewRenders() {		
+		Log.d(TAG, "scheduleNewRenders");
+		
 		//Abort future rendering queue.
 		stopAllRendering();
 		
@@ -226,6 +243,8 @@ abstract class AbstractFractalView extends View {
 		
 		// Set new graph area
 		public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
+			Log.d(TAG, "moveFractal()");
+			
 			// What does each pixel correspond to, on the complex plane?
 			double pixelSize = getPixelSize();
 			
@@ -239,8 +258,8 @@ abstract class AbstractFractalView extends View {
 		
 		// Begin translating the image relative to the users finger
 		public void startDragging()
-		{
-			Log.d(TAG, "Start of dragging");
+		{			
+			controlmode = ControlMode.DRAGGING;
 			
 			//Stop current rendering (to not render areas that are offscreen afterwards)
 			stopAllRendering();
@@ -251,8 +270,7 @@ abstract class AbstractFractalView extends View {
 			totalDragX = 0;
 			totalDragY = 0;
 			
-			//hasZoomed = false;
-			draggingFractal = true;
+			hasZoomed = false;
 		}
 		
 		
@@ -267,17 +285,17 @@ abstract class AbstractFractalView extends View {
 			totalDragXInt += (int)dragDiffPixelsX;
 			totalDragYInt += (int)dragDiffPixelsY;
 			
-			//moveFractal((int)dragDiffPixelsX, (int)dragDiffPixelsY);
-			
 			invalidate();
 		}
 		
 		
 		// Stop moving the image around, calculate new area. Run when finger lifted.
 		public void stopDragging(boolean stoppedOnZoom)
-		{			
+		{		
+			Log.d(TAG, "Stopped on zoom: " + stoppedOnZoom);
+			
 			// If no zooming's occured, keep the remaining pixels
-			if(!hasZoomed) 
+			if(!hasZoomed && !stoppedOnZoom) 
 			{
 				renderMode = RenderMode.JUST_DRAGGED;
 				shiftPixels((int)totalDragX, (int)totalDragY);
@@ -288,12 +306,12 @@ abstract class AbstractFractalView extends View {
 			//Set the new location for the fractals
 			moveFractal((int)totalDragX, (int)totalDragY);
 			
-			scheduleNewRenders();
+			if(!stoppedOnZoom) scheduleNewRenders();
 			
 			// Reset all the variables (possibly paranoid)
-			if(!hasZoomed) matrix.reset();
+			if(!hasZoomed && !stoppedOnZoom) matrix.reset();
 			
-			draggingFractal = false;
+			controlmode = ControlMode.STATIC;
 			hasZoomed = false;
 			
 			invalidate();
@@ -303,6 +321,8 @@ abstract class AbstractFractalView extends View {
 		// Take the current pixel value array and adjust it to keep pixels that have already been calculated
 		public void shiftPixels(int shiftX, int shiftY)
 		{
+			Log.d(TAG, "Shifting pixels");
+			
 			int height = getHeight();
 			int width = getWidth();
 			int[] newPixels = new int[height * width];
@@ -354,7 +374,6 @@ abstract class AbstractFractalView extends View {
 		double[] newGraphArea = new double[3];
 		
 		double zoomPercentChange = (double)scale; //= (double)(100 + (zoomAmount)) / 100;
-		Log.d(TAG, "Zoom percent change: " + zoomPercentChange);
 		
 		// What is the zoom centre?
 		double mousedOverX = oldGraphArea[0] + ( (double)xPixel * pixelSize );
