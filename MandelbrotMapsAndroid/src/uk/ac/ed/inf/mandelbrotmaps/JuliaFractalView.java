@@ -1,34 +1,53 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 
-public class MandelbrotFractalView extends AbstractFractalView{
+public class JuliaFractalView extends AbstractFractalView{
 
-	private static final String TAG = "MandelbrotFractalView";
+	private static final String TAG = "JuliaFractalView";
+	
+	// Point paramaterising this Julia set
+	private double juliaX = 0;
+	private double juliaY = 0;
 	
 	
-	public MandelbrotFractalView(Context context) {
+	public JuliaFractalView(Context context) {
 		super(context);
 
 		// Set the "maximum iteration" calculation constants
-		// Empirically determined values for Mandelbrot set.
-		ITERATION_BASE = 1.24;
-		ITERATION_CONSTANT_FACTOR = 54;
+		// Empirically determined values for Julia sets.
+		ITERATION_BASE = 1.58;
+		ITERATION_CONSTANT_FACTOR = 6.46;
 		
 		// Set home area
-		homeGraphArea = new MandelbrotJuliaLocation().getMandelbrotGraphArea();
+		homeGraphArea = new MandelbrotJuliaLocation().getJuliaGraphArea();
 		
 		// How deep a zoom do we allow?
-		MAXZOOM_LN_PIXEL = -31; // Beyond -31, "double"s break down(!).
+		MAXZOOM_LN_PIXEL = -20; // Beyond -21, "double"s break down(!).
 	}
 		
 		
+	public void setJuliaParameter(double newJuliaX, double newJuliaY) {
+		juliaX = newJuliaX;
+		juliaY = newJuliaY;
+		//TODO!!!     parentPanel.refreshCurrentLocation();
+		scheduleNewRenders();
+	}
+	
+	public double[] getJuliaParam() {
+		double[] juliaParam = new double[2];
+		juliaParam[0] = juliaX;
+		juliaParam[1] = juliaY;
+		return juliaParam;
+	}
+	
 	// Load a location
 	void loadLocation(MandelbrotJuliaLocation mjLocation) {
-		setScaledIterationCount(mjLocation.getMandelbrotContrast());
-		setGraphArea(mjLocation.getMandelbrotGraphArea(), true);
+		setScaledIterationCount(mjLocation.getJuliaContrast());
+		double[] juliaParam = mjLocation.getJuliaParam();
+		setGraphArea(mjLocation.getJuliaGraphArea(), true);
+		setJuliaParameter(juliaParam[0], juliaParam[1]);
 	}
 	
 	// Iterate a rectangle of pixels, in range (xPixelMin, yPixelMin) to (xPixelMax, yPixelMax)
@@ -63,20 +82,16 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		int colourCodeR, colourCodeG, colourCodeB, colourCodeHex;
 		int pixelBlockA, pixelBlockB;
 	
-		// c = (x0) + (y0)i
-		double x0, y0;
-	
-		// z = (x) + (y)i
 		double x, y;
-	
-		// newz = (newx) + (newy)i
-		// ... NB: newz = (z^2 + c)
 		double newx, newy;
+		
+		// We don't want the Julia parameter to change under our feet...
+		double myJuliaX = juliaX;
+		double myJuliaY = juliaY;
+		
 	
 		for (yPixel=yPixelMin; yPixel<yPixelMax+1-pixelBlockSize; yPixel+=pixelBlockSize) {			
-			// Detect rendering abortion.
-			//CanvasRenderThread.yield();
-			
+			// Detect rendering abortion.			
 			if (
 				allowInterruption &&
 				renderThread.abortSignalled()
@@ -86,30 +101,16 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					Log.d("MFV", "renderThread.abortSignalled() = " + renderThread.abortSignalled());
 					return;
 				}
-			
-			// Set y0 (im part of c)
-			y0 = yMax - ( (double)yPixel * pixelSize );
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
-				//Check to see if this pixel is already iterated to the necessary block size
-				int size = pixelSizes[(imgWidth*yPixel) + xPixel];
-				if(renderMode == RenderMode.JUST_DRAGGED && 
-						size <= pixelBlockSize)
-				{
-					continue;
-				}
-				
-				// Set x0 (real part of c)
-				x0 = xMin + ( (double)xPixel * pixelSize);
-			
-				// Start at x0, y0
-				x = x0;
-				y = y0;
+				// Initial coordinates
+				x = xMin + ( (double)xPixel * pixelSize);
+				y = yMax - ( (double)yPixel * pixelSize);
 			
 				for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
 					// z^2 + c
-					newx = (x*x) - (y*y) + x0;
-					newy = (2 * x * y) + y0;
+					newx = (x*x) - (y*y) + myJuliaX;
+					newy = (2 * x * y) + myJuliaY;
 				
 					x = newx;
 					y = newy;
@@ -122,7 +123,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				colourCode = (double)iterationNr / (double)maxIterations;
 				
 				// Red
-				colourCodeR = Math.min((int)(255 * 6*colourCode), 255);
+				colourCodeR = Math.min((int)(255 * 2*colourCode), 255);
 				
 				// Green
 				colourCodeG = (int)(255*colourCode);
@@ -130,7 +131,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				// Blue
 				colourCodeB = (int)(
 					127.5 - 127.5*Math.cos(
-						7 * Math.PI * colourCode
+						3 * Math.PI * colourCode
 					)
 				);
 				

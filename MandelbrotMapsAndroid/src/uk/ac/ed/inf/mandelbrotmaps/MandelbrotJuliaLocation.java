@@ -12,7 +12,7 @@ class MandelbrotJuliaLocation {
 	// Constructor. Defaults - some semi-arbitrary, pretty values
 	public MandelbrotJuliaLocation() {
 		mandelbrotGraphArea = new double[] {-2.8, 1.45, 5};
-		juliaGraphArea = new double[] {-1.8, 1.45, 3.6};
+		juliaGraphArea = new double[] {-2.1, 1.3, 4.3};
 		juliaParam = new double[] {0.152, 0.584};
 	}
 	

@@ -22,7 +22,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	private static final String TAG = "MMaps";
 	
-	private MandelbrotFractalView fractalView;
+//	private MandelbrotFractalView fractalView;
+	private JuliaFractalView fractalView;
 	private MandelbrotJuliaLocation mjLocation;
 	   
 	private float dragLastX;
@@ -41,7 +42,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-      fractalView = new MandelbrotFractalView(this);
+      //fractalView = new MandelbrotFractalView(this);
+      fractalView = new JuliaFractalView(this);
       setContentView(fractalView);
       fractalView.requestFocus();
       
