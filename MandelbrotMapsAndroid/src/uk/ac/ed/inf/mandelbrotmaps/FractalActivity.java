@@ -1,5 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.ControlMode;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,12 +17,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
-	private enum ControlMode {
-		ZOOMING,
-		DRAGGING,
-		STATIC
-	}
-	
+
 	private ControlMode controlmode = ControlMode.STATIC;
 	
 	private static final String TAG = "MMaps";
@@ -179,8 +176,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	
    public boolean onScaleBegin(ScaleGestureDetector detector) {
+	   fractalView.stopDragging(true);
 	   fractalView.startZooming(detector.getFocusX(), detector.getFocusY());
-	   	if (controlmode == ControlMode.DRAGGING) fractalView.stopDragging(true);
+	   	 
 		controlmode = ControlMode.ZOOMING;
 		return true;
 	}

@@ -230,8 +230,6 @@ abstract class AbstractFractalView extends View {
 			renderMode
 		);
 		
-		//fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
-		
 		postInvalidate();
 	}
 	
@@ -292,6 +290,8 @@ abstract class AbstractFractalView extends View {
 		// Stop moving the image around, calculate new area. Run when finger lifted.
 		public void stopDragging(boolean stoppedOnZoom)
 		{		
+			controlmode = ControlMode.STATIC;
+			
 			Log.d(TAG, "Stopped on zoom: " + stoppedOnZoom);
 			
 			// If no zooming's occured, keep the remaining pixels
@@ -311,7 +311,7 @@ abstract class AbstractFractalView extends View {
 			// Reset all the variables (possibly paranoid)
 			if(!hasZoomed && !stoppedOnZoom) matrix.reset();
 			
-			controlmode = ControlMode.STATIC;
+			
 			hasZoomed = false;
 			
 			invalidate();
@@ -441,6 +441,7 @@ abstract class AbstractFractalView extends View {
 	
 	public void startZooming(float initialMidX, float initialMidY)
 	{
+		controlmode = ControlMode.ZOOMING;
 		hasZoomed = true;
 		clearPixelSizes();
 	}
@@ -461,6 +462,8 @@ abstract class AbstractFractalView extends View {
 	// After pinch gesture stops, crop bitmap to image on screen
 	public void stopZooming()
 	{		
+		controlmode = ControlMode.DRAGGING;
+		
 		stopAllRendering();
 		
 		setDrawingCacheEnabled(true);
