@@ -31,7 +31,6 @@ public class JuliaFractalView extends AbstractFractalView{
 	public void setJuliaParameter(double newJuliaX, double newJuliaY) {
 		juliaX = newJuliaX;
 		juliaY = newJuliaY;
-		//TODO!!!     parentPanel.refreshCurrentLocation();
 		scheduleNewRenders();
 	}
 	

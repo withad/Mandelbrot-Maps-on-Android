@@ -18,12 +18,21 @@ import android.view.WindowManager;
 
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
 
-	private ControlMode controlmode = ControlMode.STATIC;
+	private boolean currentlyDragging = false;
+	
+	private enum DisplayMode{
+		MANDELBROT,
+		ABOUT_TO_JULIA,
+		JULIA
+	}
+	
+	private DisplayMode displaymode = DisplayMode.MANDELBROT;
 	
 	private static final String TAG = "MMaps";
 	
 //	private MandelbrotFractalView fractalView;
-	private JuliaFractalView fractalView;
+//	private JuliaFractalView fractalView;
+	private AbstractFractalView fractalView;
 	private MandelbrotJuliaLocation mjLocation;
 	   
 	private float dragLastX;
@@ -42,8 +51,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-      //fractalView = new MandelbrotFractalView(this);
-      fractalView = new JuliaFractalView(this);
+      fractalView = new MandelbrotFractalView(this);
+      //fractalView = new JuliaFractalView(this);
       setContentView(fractalView);
       fractalView.requestFocus();
       
@@ -92,19 +101,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  fractalView.stopZooming();
     	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 1/scale);
     	  return true;
-      case R.id.PanUp:
-    	  fractalView.shiftPixels(0, -100);
-    	  fractalView.moveFractal(0, -100);
-    	  return true;
-      case R.id.PanDown:
-    	  fractalView.shiftPixels(0, 100);
-    	  fractalView.moveFractal(0, 100);
-    	  return true;
-      case R.id.PanLeft:
-    	  fractalView.moveFractal(100, 0);
-    	  return true;
-      case R.id.PanRight:
-    	  fractalView.moveFractal(-100, 0);
+      case R.id.juliamode:
+    	  displaymode = DisplayMode.ABOUT_TO_JULIA;
     	  return true;
       case R.id.resetFractal:
     	  fractalView.reset();
@@ -120,16 +118,23 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		switch (evt.getAction() & MotionEvent.ACTION_MASK)
 		{
 			case MotionEvent.ACTION_DOWN:
-				dragLastX = (int) evt.getX();
-				dragLastY = (int) evt.getY();
-				dragID = evt.getPointerId(0);	
-				
-				fractalView.startDragging();
-				controlmode = ControlMode.DRAGGING;
+				if (displaymode == DisplayMode.ABOUT_TO_JULIA)
+				{
+					fractalView = new JuliaFractalView(this);
+				}
+				else
+				{
+					dragLastX = (int) evt.getX();
+					dragLastY = (int) evt.getY();
+					dragID = evt.getPointerId(0);	
+					
+					fractalView.startDragging();
+					currentlyDragging = true;	
+				}
 				return true;
 				
 			case MotionEvent.ACTION_MOVE:						
-				if(controlmode == ControlMode.DRAGGING)//!gestureDetector.isInProgress())
+				if(currentlyDragging)//!gestureDetector.isInProgress())
 				{
 					int pointerIndex = evt.findPointerIndex(dragID);
 					
@@ -169,7 +174,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		        break;
 		        
 			case MotionEvent.ACTION_UP:
-				controlmode = ControlMode.STATIC;
+				currentlyDragging = false;
 				fractalView.stopDragging(false);
 				break;
 		}
@@ -181,8 +186,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   fractalView.stopDragging(true);
 	   fractalView.startZooming(detector.getFocusX(), detector.getFocusY());
 	   	 
-		controlmode = ControlMode.ZOOMING;
-		return true;
+	   currentlyDragging = false;
+	   return true;
 	}
 	
 	
@@ -194,7 +199,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
    public void onScaleEnd(ScaleGestureDetector detector) {
 	   fractalView.stopZooming();
-	   controlmode = ControlMode.DRAGGING;
+	   currentlyDragging = true;
 	   fractalView.startDragging();
 	}
 }

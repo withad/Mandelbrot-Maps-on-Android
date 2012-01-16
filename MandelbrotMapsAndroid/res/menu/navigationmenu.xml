@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/Panning" android:enabled="true" android:title="Panning" android:visible="true">
-	<menu>
-        <item android:id="@+id/PanUp" android:enabled="true" android:visible="true" android:title="Up"></item><item android:enabled="true" android:visible="true" android:id="@+id/PanDown" android:title="Down"></item><item android:enabled="true" android:visible="true" android:id="@+id/PanLeft" android:title="Left"></item><item android:enabled="true" android:visible="true" android:id="@+id/PanRight" android:title="Right"></item>
-    </menu>
-    </item>
     <item android:id="@+id/ZoomOut" android:title="Zoom out" android:enabled="true" android:visible="true"></item>
     <item android:id="@+id/ZoomIn" android:enabled="true" android:title="Zoom in" android:visible="true"></item>
     <item android:id="@+id/resetFractal" android:enabled="true" android:visible="true" android:title="Reset"></item>
+    <item android:checkable="true" android:title="Julia" android:checked="false" android:id="@+id/juliamode" android:visible="true"></item>
     
 </menu>
