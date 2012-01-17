@@ -75,6 +75,9 @@ public class LauncherActivity extends Activity implements OnClickListener {
    /** Start a new game with the given difficulty level */
    private void startFractal() {
    		Intent intent = new Intent(this, FractalActivity.class);
+   		Bundle bundle = new Bundle();
+   		bundle.putInt("FRACTAL", 0);
+   		intent.putExtras(bundle);
    		startActivity(intent);
    }
 }

@@ -3,6 +3,7 @@ package uk.ac.ed.inf.mandelbrotmaps;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.ControlMode;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -51,8 +52,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-      fractalView = new MandelbrotFractalView(this);
-      //fractalView = new JuliaFractalView(this);
+      Bundle bundle = getIntent().getExtras();
+      int fractaltype = bundle.getInt("FRACTAL");
+      
+      if (fractaltype == 0)
+    	  fractalView = new MandelbrotFractalView(this);
+      else
+    	  fractalView = new JuliaFractalView(this);
       setContentView(fractalView);
       fractalView.requestFocus();
       
@@ -73,7 +79,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    protected void onPause() {
       super.onPause();
-      finish();
       Log.d(TAG, "onPause");
    }
    
@@ -120,7 +125,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			case MotionEvent.ACTION_DOWN:
 				if (displaymode == DisplayMode.ABOUT_TO_JULIA)
 				{
-					fractalView = new JuliaFractalView(this);
+					Intent intent = new Intent(this, FractalActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putInt("FRACTAL", 1);
+					intent.putExtras(bundle);
+			   		startActivity(intent);
 				}
 				else
 				{

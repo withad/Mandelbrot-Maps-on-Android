@@ -633,6 +633,13 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
+	public void killRenderThread()
+	{
+		renderThread.interrupt();
+		renderThread = null;
+	}
+	
+	
 	// Abstract methods
 	abstract void loadLocation(MandelbrotJuliaLocation mjLocation);
 	abstract void computePixels(
