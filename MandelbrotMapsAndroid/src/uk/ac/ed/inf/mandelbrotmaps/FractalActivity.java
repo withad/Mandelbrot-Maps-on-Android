@@ -87,6 +87,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    protected void onStop() {
       super.onStop();
+      //fractalView.fractalBitmap = null;
+      //fractalView.movingBitmap = null;
+      //fractalView.pixelSizes = null;
       Log.d(TAG, "onStop");
    }
    
