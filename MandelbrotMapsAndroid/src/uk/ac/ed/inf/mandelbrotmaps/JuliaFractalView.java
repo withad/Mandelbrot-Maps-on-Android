@@ -1,5 +1,6 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderMode;
 import android.content.Context;
 import android.util.Log;
 
@@ -102,6 +103,14 @@ public class JuliaFractalView extends AbstractFractalView{
 				}
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
+				//Check to see if this pixel is already iterated to the necessary block size
+				int size = pixelSizes[(imgWidth*yPixel) + xPixel];
+				if(renderMode == RenderMode.JUST_DRAGGED && 
+						size <= pixelBlockSize)
+				{
+					continue;
+				}
+				
 				// Initial coordinates
 				x = xMin + ( (double)xPixel * pixelSize);
 				y = yMax - ( (double)yPixel * pixelSize);
