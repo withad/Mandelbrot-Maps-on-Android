@@ -154,6 +154,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		postInvalidate();
 		Log.d("MFV", "Reached end of computation loop");
 	}
+	
+	
+	
 
 
 	
@@ -192,5 +195,5 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
 	*/
-
+	
 }
