@@ -28,6 +28,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	private FractalType fractalType = FractalType.MANDELBROT;
 	
+	
 	private enum DisplayMode{
 		MANDELBROT,
 		ABOUT_TO_JULIA,
@@ -37,9 +38,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private DisplayMode displaymode = DisplayMode.MANDELBROT;
 	
 	private static final String TAG = "MMaps";
-	
-//	private JuliaFractalView fractalView;
-//	private MandelbrotFractalView fractalView;
+
 	private AbstractFractalView fractalView;
 	private MandelbrotJuliaLocation mjLocation;
 	   
@@ -82,10 +81,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
           double juliaY = bundle.getDouble("JULIA_Y");
           
           ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);
-      }
-      else
-      {
-    	  
       }
       
       gestureDetector = new ScaleGestureDetector(this, this);
