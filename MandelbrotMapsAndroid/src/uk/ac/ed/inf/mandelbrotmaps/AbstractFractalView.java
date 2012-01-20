@@ -52,7 +52,7 @@ abstract class AbstractFractalView extends View {
 	CanvasRenderThread renderThread = new CanvasRenderThread(this);
    
 	//Handle on parent activity
-	FractalActivity parentActivity;	
+	JuliaFractalActivity parentActivity;	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
 	double MINZOOM_LN_PIXEL = -3;
@@ -106,6 +106,8 @@ abstract class AbstractFractalView extends View {
 	
 	private Matrix matrix;
 	
+	boolean crudeRendering = false;
+	
 	
 /*-----------------------------------------------------------------------------------*/
 /*Constructor*/
@@ -117,8 +119,16 @@ abstract class AbstractFractalView extends View {
 		setBackgroundColor(Color.BLACK);
       	setId(0); 
       
-      	parentActivity = (FractalActivity)context;
-      	setOnTouchListener((FractalActivity)context);
+      	try
+      	{
+      		//parentActivity = (JuliaFractalActivity)context;
+          	setOnTouchListener((JuliaFractalActivity)context);
+      	}
+      	catch (Exception e)
+      	{
+      		//parentActivity = (FractalActivity)context;
+          	setOnTouchListener((FractalActivity)context);
+      	}
       
       	matrix = new Matrix();
       	matrix.reset();
@@ -201,7 +211,8 @@ abstract class AbstractFractalView extends View {
 		stopAllRendering();
 		
 		//Schedule a crude rendering
-		//scheduleRendering(INITIAL_PIXEL_BLOCK);
+		if(crudeRendering)
+			scheduleRendering(INITIAL_PIXEL_BLOCK);
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(DEFAULT_PIXEL_SIZE);

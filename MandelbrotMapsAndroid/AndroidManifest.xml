@@ -29,6 +29,11 @@
               android:screenOrientation="landscape"
               android:configChanges="orientation"/>
               
+        <activity android:name=".JuliaFractalActivity"
+              android:label="JuliaFractal"
+              android:screenOrientation="landscape"
+              android:configChanges="orientation"/>
+              
         <activity android:name = ".UIMockup"
         		android:label="UIMockup"
         		android:screenOrientation="landscape"
