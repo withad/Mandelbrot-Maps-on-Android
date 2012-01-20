@@ -73,6 +73,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       setContentView(fractalView);
       fractalView.requestFocus();
       
+      mjLocation = new MandelbrotJuliaLocation();
+      fractalView.loadLocation(mjLocation);
+      
       if (fractalType == FractalType.JULIA)
       {
     	  double juliaX = bundle.getDouble("JULIA_X");
@@ -82,8 +85,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       }
       else
       {
-    	  mjLocation = new MandelbrotJuliaLocation();
-          fractalView.loadLocation(mjLocation);
+    	  
       }
       
       gestureDetector = new ScaleGestureDetector(this, this);
@@ -157,7 +159,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			case MotionEvent.ACTION_DOWN:
 				if (displaymode == DisplayMode.ABOUT_TO_JULIA)
 				{
-					Intent intent = new Intent(this, JuliaFractalActivity.class);
+					Intent intent = new Intent(this, FractalActivity.class);
 					Bundle bundle = new Bundle();
 					bundle.putInt("FRACTAL", 1);
 					

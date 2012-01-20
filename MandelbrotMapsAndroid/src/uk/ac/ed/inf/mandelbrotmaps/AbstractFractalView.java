@@ -50,9 +50,6 @@ abstract class AbstractFractalView extends View {
 	// Rendering queue (modified from a LinkedBlockingDeque in the original version)
 	LinkedBlockingQueue<CanvasRendering> renderingQueue = new LinkedBlockingQueue<CanvasRendering>();	
 	CanvasRenderThread renderThread = new CanvasRenderThread(this);
-   
-	//Handle on parent activity
-	JuliaFractalActivity parentActivity;	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
 	double MINZOOM_LN_PIXEL = -3;
@@ -119,16 +116,8 @@ abstract class AbstractFractalView extends View {
 		setBackgroundColor(Color.BLACK);
       	setId(0); 
       
-      	try
-      	{
-      		//parentActivity = (JuliaFractalActivity)context;
-          	setOnTouchListener((JuliaFractalActivity)context);
-      	}
-      	catch (Exception e)
-      	{
       		//parentActivity = (FractalActivity)context;
-          	setOnTouchListener((FractalActivity)context);
-      	}
+      	setOnTouchListener((FractalActivity)context);
       
       	matrix = new Matrix();
       	matrix.reset();
