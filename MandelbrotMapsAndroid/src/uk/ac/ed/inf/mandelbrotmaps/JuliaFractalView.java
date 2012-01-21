@@ -95,11 +95,10 @@ public class JuliaFractalView extends AbstractFractalView{
 			// Detect rendering abortion.			
 			if (
 				allowInterruption &&
-				renderThread.abortSignalled()
+				upperRenderThread.abortSignalled()
 			) 
 				{
-					Log.d("MFV", "Returning based on interruption test");
-					Log.d("MFV", "renderThread.abortSignalled() = " + renderThread.abortSignalled());
+					Log.d("JFV", "Returning based on interruption test");
 					return;
 				}
 		

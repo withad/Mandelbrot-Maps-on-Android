@@ -50,8 +50,8 @@ abstract class AbstractFractalView extends View {
 	public static final int zoomPercent = 1;
    
 	// Rendering queue (modified from a LinkedBlockingDeque in the original version)
-	LinkedBlockingQueue<Rendering> renderingQueue = new LinkedBlockingQueue<Rendering>();	
-	RenderThread renderThread = new RenderThread(this, FractalSection.ALL);
+	//LinkedBlockingQueue<Rendering> renderingQueue = new LinkedBlockingQueue<Rendering>();	
+	//RenderThread renderThread = new RenderThread(this, FractalSection.ALL);
 	
 	//Upper and lower half rendering queues/threads
 	LinkedBlockingQueue<Rendering> upperRenderQueue = new LinkedBlockingQueue<Rendering>();	
@@ -129,7 +129,8 @@ abstract class AbstractFractalView extends View {
       	matrix = new Matrix();
       	matrix.reset();
       
-      	renderThread.start();
+      	upperRenderThread.start();
+      	lowerRenderThread.start();
    }
 
 	
@@ -630,23 +631,34 @@ abstract class AbstractFractalView extends View {
 	//Stop all rendering, including planned and current
 	void stopAllRendering() {
 		//Stop planned renders
-		renderingQueue.clear();
+		//renderingQueue.clear();
+		upperRenderQueue.clear();
+		lowerRenderQueue.clear();
+		
 		
 		//Stop current render
-		renderThread.abortRendering();
+		upperRenderThread.abortRendering();
+		lowerRenderThread.abortRendering();
 	}
 	
 	
 	//Add a rendering of a particular pixel size to the queue
 	void scheduleRendering(int pixelBlockSize) {
-		renderThread.allowRendering();
-		renderingQueue.add( new Rendering(pixelBlockSize) );
+		upperRenderThread.allowRendering();
+		lowerRenderThread.allowRendering();
+		upperRenderQueue.add( new Rendering(pixelBlockSize) );
+		lowerRenderQueue.add( new Rendering(pixelBlockSize) );
 	}
 	
 	
 	//Retrieve the next rendering from the queue (used by render thread)
-	public Rendering getNextRendering() throws InterruptedException {
-		return renderingQueue.take();
+	public Rendering getNextRendering(FractalSection section) throws InterruptedException {
+		if (section == FractalSection.UPPER)
+			return upperRenderQueue.take();
+		else //if (section == FractalSection.LOWER)
+			return lowerRenderQueue.take();
+		//else
+			//return renderingQueue.take();
 	}
 	
 	

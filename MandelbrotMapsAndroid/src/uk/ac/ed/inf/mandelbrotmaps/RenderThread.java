@@ -35,7 +35,7 @@ class RenderThread extends Thread {
 	public void run() {
 		while(true) {
 			try {
-				Rendering newRendering = mjCanvas.getNextRendering();
+				Rendering newRendering = mjCanvas.getNextRendering(fractalSection);
 				mjCanvas.computeAllPixels(newRendering.getPixelBlockSize(), fractalSection);
 				abortThisRendering = false;
 			} catch (InterruptedException e) {

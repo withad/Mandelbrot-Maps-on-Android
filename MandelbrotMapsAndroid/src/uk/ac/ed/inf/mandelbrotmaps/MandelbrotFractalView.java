@@ -79,11 +79,10 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			
 			if (
 				allowInterruption &&
-				renderThread.abortSignalled()
+				upperRenderThread.abortSignalled()
 			) 
 				{
 					Log.d("MFV", "Returning based on interruption test");
-					Log.d("MFV", "renderThread.abortSignalled() = " + renderThread.abortSignalled());
 					return;
 				}
 			
