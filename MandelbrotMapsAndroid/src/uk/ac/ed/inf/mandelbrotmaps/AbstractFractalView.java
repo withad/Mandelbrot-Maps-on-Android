@@ -112,6 +112,8 @@ abstract class AbstractFractalView extends View {
 	
 	boolean crudeRendering = false;
 	
+	int bitmapCreations = 0;
+	
 	
 /*-----------------------------------------------------------------------------------*/
 /*Constructor*/
@@ -191,7 +193,8 @@ abstract class AbstractFractalView extends View {
 	//Create new image only if not dragging or zooming
 	if(controlmode == ControlMode.STATIC) 
 		{
-			Log.d(TAG, "Create a new bitmap!");
+			bitmapCreations++;
+			Log.d(TAG, "Create a new bitmap! " + bitmapCreations);
 			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		}
 	
@@ -612,6 +615,8 @@ abstract class AbstractFractalView extends View {
 	//Stop current rendering and return to "home"
 	public void reset(){
 		pauseRendering = false;
+		
+		bitmapCreations = 0;
 		
 		matrix.reset();
 		stopAllRendering();
