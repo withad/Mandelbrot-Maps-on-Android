@@ -3,17 +3,19 @@ package uk.ac.ed.inf.mandelbrotmaps;
 import android.util.Log;
 
 class RenderThread extends Thread {
-	public enum FractalHalf {
+	public enum FractalSection {
+		ALL,
 		UPPER,
 		LOWER
 	}
 	
+	private final FractalSection fractalSection;
+	
 	private AbstractFractalView mjCanvas;
 	private volatile boolean abortThisRendering = false;
-	private final boolean isPrimary;
 	
-	public RenderThread(AbstractFractalView mjCanvasHandle, boolean primary) {
-		isPrimary = primary;
+	public RenderThread(AbstractFractalView mjCanvasHandle, FractalSection section) {
+		fractalSection = section;
 		mjCanvas = mjCanvasHandle;
 		setPriority(Thread.MIN_PRIORITY);
 	}
@@ -34,7 +36,7 @@ class RenderThread extends Thread {
 		while(true) {
 			try {
 				Rendering newRendering = mjCanvas.getNextRendering();
-				mjCanvas.computeAllPixels(newRendering.getPixelBlockSize(), FractalHalf.UPPER);
+				mjCanvas.computeAllPixels(newRendering.getPixelBlockSize(), fractalSection);
 				abortThisRendering = false;
 			} catch (InterruptedException e) {
 				abortThisRendering = false;

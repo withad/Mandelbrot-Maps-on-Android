@@ -1,7 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalHalf;
+import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -51,7 +51,15 @@ abstract class AbstractFractalView extends View {
    
 	// Rendering queue (modified from a LinkedBlockingDeque in the original version)
 	LinkedBlockingQueue<Rendering> renderingQueue = new LinkedBlockingQueue<Rendering>();	
-	RenderThread renderThread = new RenderThread(this, true);
+	RenderThread renderThread = new RenderThread(this, FractalSection.ALL);
+	
+	//Upper and lower half rendering queues/threads
+	LinkedBlockingQueue<Rendering> upperRenderQueue = new LinkedBlockingQueue<Rendering>();	
+	RenderThread upperRenderThread = new RenderThread(this, FractalSection.UPPER);
+	
+	LinkedBlockingQueue<Rendering> lowerRenderQueue = new LinkedBlockingQueue<Rendering>();	
+	RenderThread lowerRenderThread = new RenderThread(this, FractalSection.LOWER);
+	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
 	double MINZOOM_LN_PIXEL = -3;
@@ -208,7 +216,7 @@ abstract class AbstractFractalView extends View {
 	
 	
 	// Computes all necessary pixels (run by render thread)
-	public void computeAllPixels(final int pixelBlockSize, final FractalHalf half) {
+	public void computeAllPixels(final int pixelBlockSize, final FractalSection half) {
 		// Nothing to do - stop if called before layout has been sanely set...
 		if (getWidth() <= 0 || graphArea == null || pauseRendering)
 			return;
@@ -216,12 +224,12 @@ abstract class AbstractFractalView extends View {
 		int yStart = 0;
 		int yEnd = getHeight();
 		
-		if (half == FractalHalf.UPPER)
+		if (half == FractalSection.UPPER)
 		{
 			yStart = 0;
 			yEnd = getHeight()/2;
 		}
-		else if (half == FractalHalf.LOWER)
+		else if (half == FractalSection.LOWER)
 		{
 			yStart = getHeight()/2;
 			yEnd = getHeight();
