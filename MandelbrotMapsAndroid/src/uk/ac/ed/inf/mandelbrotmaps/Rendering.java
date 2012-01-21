@@ -1,9 +1,9 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-class CanvasRendering {
+class Rendering {
 	private int pixelBlockSize;
 	
-	public CanvasRendering(int newPixelBlockSize) {
+	public Rendering(int newPixelBlockSize) {
 		pixelBlockSize = newPixelBlockSize;
 	}
 	

@@ -2,11 +2,11 @@ package uk.ac.ed.inf.mandelbrotmaps;
 
 import android.util.Log;
 
-class CanvasRenderThread extends Thread {
+class RenderThread extends Thread {
 	private AbstractFractalView mjCanvas;
 	private volatile boolean abortThisRendering = false;
 	
-	public CanvasRenderThread(AbstractFractalView mjCanvasHandle) {
+	public RenderThread(AbstractFractalView mjCanvasHandle) {
 		mjCanvas = mjCanvasHandle;
 		setPriority(Thread.MIN_PRIORITY);
 	}
@@ -26,7 +26,7 @@ class CanvasRenderThread extends Thread {
 	public void run() {
 		while(true) {
 			try {
-				CanvasRendering newRendering = mjCanvas.getNextRendering();
+				Rendering newRendering = mjCanvas.getNextRendering();
 				mjCanvas.computeAllPixels(newRendering.getPixelBlockSize());
 				abortThisRendering = false;
 			} catch (InterruptedException e) {

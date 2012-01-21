@@ -48,8 +48,8 @@ abstract class AbstractFractalView extends View {
 	public static final int zoomPercent = 1;
    
 	// Rendering queue (modified from a LinkedBlockingDeque in the original version)
-	LinkedBlockingQueue<CanvasRendering> renderingQueue = new LinkedBlockingQueue<CanvasRendering>();	
-	CanvasRenderThread renderThread = new CanvasRenderThread(this);
+	LinkedBlockingQueue<Rendering> renderingQueue = new LinkedBlockingQueue<Rendering>();	
+	RenderThread renderThread = new RenderThread(this);
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
 	double MINZOOM_LN_PIXEL = -3;
@@ -623,12 +623,12 @@ abstract class AbstractFractalView extends View {
 	//Add a rendering of a particular pixel size to the queue
 	void scheduleRendering(int pixelBlockSize) {
 		renderThread.allowRendering();
-		renderingQueue.add( new CanvasRendering(pixelBlockSize) );
+		renderingQueue.add( new Rendering(pixelBlockSize) );
 	}
 	
 	
 	//Retrieve the next rendering from the queue (used by render thread)
-	public CanvasRendering getNextRendering() throws InterruptedException {
+	public Rendering getNextRendering() throws InterruptedException {
 		return renderingQueue.take();
 	}
 	
