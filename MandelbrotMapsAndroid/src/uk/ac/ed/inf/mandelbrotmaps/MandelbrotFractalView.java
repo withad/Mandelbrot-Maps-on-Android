@@ -152,7 +152,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				}
 			}
 			// Show thread's work in progress
-			if ((showRenderingProgress) && (yPixel % 3 == 0)) 
+			if ((showRenderingProgress) && (yPixel % 10 == 0)) 
 				{
 					postInvalidate();
 				}

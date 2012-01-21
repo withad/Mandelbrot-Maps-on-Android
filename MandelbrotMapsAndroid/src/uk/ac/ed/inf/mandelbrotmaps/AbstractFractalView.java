@@ -110,7 +110,7 @@ abstract class AbstractFractalView extends View {
 	
 	private Matrix matrix;
 	
-	boolean crudeRendering = false;
+	boolean crudeRendering = true;
 	
 	int bitmapCreations = 0;
 	
