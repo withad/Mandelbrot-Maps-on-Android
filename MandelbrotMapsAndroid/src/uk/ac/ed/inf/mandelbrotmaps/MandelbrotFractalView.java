@@ -72,6 +72,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		// newz = (newx) + (newy)i
 		// ... NB: newz = (z^2 + c)
 		double newx, newy;
+		
+		long initialMillis = System.currentTimeMillis();
+		Log.d(TAG, "Initial time: " + initialMillis);
 	
 		for (yPixel=yPixelMin; yPixel<yPixelMax+1-pixelBlockSize; yPixel+=pixelBlockSize) {			
 			// Detect rendering abortion.
@@ -153,6 +156,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		}
 		postInvalidate();
 		Log.d("MFV", "Reached end of computation loop");
+		Log.d(TAG, "Time elapsed: " + (System.currentTimeMillis() - initialMillis));
 	}
 	
 	
