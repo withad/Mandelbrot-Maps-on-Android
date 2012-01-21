@@ -99,12 +99,12 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 				//Check to see if this pixel is already iterated to the necessary block size
-/*				int size = pixelSizes[(imgWidth*yPixel) + xPixel];
+				int size = pixelSizes[(imgWidth*yPixel) + xPixel];
 				if(renderMode == RenderMode.JUST_DRAGGED && 
 						size <= pixelBlockSize)
 				{
 					continue;
-				}*/
+				}
 				
 				// Set x0 (real part of c)
 				x0 = xMin + ( (double)xPixel * pixelSize);
@@ -146,8 +146,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
 						if(outputPixelArray == null) return;
-						//outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
-						//currentPixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
+						currentPixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
 					}
 				}
 			}
