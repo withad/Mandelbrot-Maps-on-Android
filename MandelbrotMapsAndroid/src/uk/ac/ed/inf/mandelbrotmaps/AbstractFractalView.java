@@ -224,6 +224,7 @@ abstract class AbstractFractalView extends View {
 		
 		int yStart = 0;
 		int yEnd = getHeight();
+		boolean showRenderProgress = true;
 		
 		if (half == FractalSection.UPPER) {
 			yStart = 0;
@@ -232,13 +233,14 @@ abstract class AbstractFractalView extends View {
 		else if (half == FractalSection.LOWER) {
 			yStart = getHeight()/2;
 			yEnd = getHeight();
+			showRenderProgress = false;
 		}
 		
 		computePixels(
 			fractalPixels,
 			pixelSizes,
 			pixelBlockSize,
-			true,
+			showRenderProgress,
 			0,
 			getWidth(),
 			yStart,
