@@ -1,6 +1,8 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalHalf;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -49,7 +51,7 @@ abstract class AbstractFractalView extends View {
    
 	// Rendering queue (modified from a LinkedBlockingDeque in the original version)
 	LinkedBlockingQueue<Rendering> renderingQueue = new LinkedBlockingQueue<Rendering>();	
-	RenderThread renderThread = new RenderThread(this);
+	RenderThread renderThread = new RenderThread(this, true);
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
 	double MINZOOM_LN_PIXEL = -3;
@@ -88,9 +90,6 @@ abstract class AbstractFractalView extends View {
 	
 	private float totalDragX = 0;
 	private float totalDragY = 0;
-	
-	private int totalDragXInt = 0;
-	private int totalDragYInt = 0;
 	
 	public float scaleFactor = 1.0f;
 	public float midX = 0.0f;
@@ -209,10 +208,24 @@ abstract class AbstractFractalView extends View {
 	
 	
 	// Computes all necessary pixels (run by render thread)
-	public void computeAllPixels(final int pixelBlockSize) {
+	public void computeAllPixels(final int pixelBlockSize, final FractalHalf half) {
 		// Nothing to do - stop if called before layout has been sanely set...
 		if (getWidth() <= 0 || graphArea == null || pauseRendering)
 			return;
+		
+		int yStart = 0;
+		int yEnd = getHeight();
+		
+		if (half == FractalHalf.UPPER)
+		{
+			yStart = 0;
+			yEnd = getHeight()/2;
+		}
+		else if (half == FractalHalf.LOWER)
+		{
+			yStart = getHeight()/2;
+			yEnd = getHeight();
+		}
 		
 		computePixels(
 			fractalPixels,
@@ -221,8 +234,8 @@ abstract class AbstractFractalView extends View {
 			true,
 			0,
 			getWidth(),
-			0,
-			getHeight(),
+			yStart,
+			yEnd,
 			graphArea[0],
 			graphArea[1],
 			getPixelSize(),
@@ -279,9 +292,6 @@ abstract class AbstractFractalView extends View {
 			
 			totalDragX += dragDiffPixelsX;
 			totalDragY += dragDiffPixelsY;
-			
-			totalDragXInt += (int)dragDiffPixelsX;
-			totalDragYInt += (int)dragDiffPixelsY;
 			
 			invalidate();
 		}
@@ -611,7 +621,6 @@ abstract class AbstractFractalView extends View {
 	
 	//Stop all rendering, including planned and current
 	void stopAllRendering() {
-		//renderThread.interrupt();
 		//Stop planned renders
 		renderingQueue.clear();
 		
@@ -630,13 +639,6 @@ abstract class AbstractFractalView extends View {
 	//Retrieve the next rendering from the queue (used by render thread)
 	public Rendering getNextRendering() throws InterruptedException {
 		return renderingQueue.take();
-	}
-	
-	
-	public void killRenderThread()
-	{
-		renderThread.interrupt();
-		renderThread = null;
 	}
 	
 	
