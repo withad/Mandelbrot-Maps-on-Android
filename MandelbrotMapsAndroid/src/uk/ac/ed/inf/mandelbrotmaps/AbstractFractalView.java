@@ -636,7 +636,6 @@ abstract class AbstractFractalView extends View {
 		upperRenderQueue.clear();
 		lowerRenderQueue.clear();
 		
-		
 		//Stop current render
 		upperRenderThread.abortRendering();
 		lowerRenderThread.abortRendering();
