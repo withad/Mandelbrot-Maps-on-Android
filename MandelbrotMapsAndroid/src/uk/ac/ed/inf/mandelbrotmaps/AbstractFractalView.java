@@ -225,13 +225,11 @@ abstract class AbstractFractalView extends View {
 		int yStart = 0;
 		int yEnd = getHeight();
 		
-		if (half == FractalSection.UPPER)
-		{
+		if (half == FractalSection.UPPER) {
 			yStart = 0;
 			yEnd = getHeight()/2;
 		}
-		else if (half == FractalSection.LOWER)
-		{
+		else if (half == FractalSection.LOWER) {
 			yStart = getHeight()/2;
 			yEnd = getHeight();
 		}
@@ -249,7 +247,8 @@ abstract class AbstractFractalView extends View {
 			graphArea[1],
 			getPixelSize(),
 			true,
-			renderMode
+			renderMode,
+			half
 		);
 		
 		postInvalidate();
@@ -692,7 +691,8 @@ abstract class AbstractFractalView extends View {
 			final double yMax,
 			final double pixelSize,
 			final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-			RenderMode currentRenderMode
+			RenderMode currentRenderMode,
+			FractalSection section
 		);
 }
 

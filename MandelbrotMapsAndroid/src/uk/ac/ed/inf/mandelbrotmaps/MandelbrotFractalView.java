@@ -1,5 +1,6 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -45,7 +46,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final double yMax,
 		final double pixelSize,
 		final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-		RenderMode renderMode
+		RenderMode renderMode,
+		FractalSection section
 	) {				
 		int maxIterations = getMaxIterations();
 		int imgWidth = xPixelMax - xPixelMin;
@@ -58,7 +60,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			pixelBlockSize * (maxIterations/5000)
 		);
 		
-		int xPixel, yPixel, iterationNr;
+		int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
 		double colourCode;
 		int colourCodeR, colourCodeG, colourCodeB, colourCodeHex;
 		int pixelBlockA, pixelBlockB;
@@ -73,9 +75,12 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		// ... NB: newz = (z^2 + c)
 		double newx, newy;
 	
-		for (yPixel=yPixelMin; yPixel<yPixelMax+1-pixelBlockSize; yPixel+=pixelBlockSize) {			
-			// Detect rendering abortion.
-			//CanvasRenderThread.yield();
+		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+=pixelBlockSize) {			
+			//Work backwards on upper half
+			if (section == FractalSection.UPPER)
+				yPixel = yPixelMax - yIncrement;
+			else 
+				yPixel = yIncrement;
 			
 			if (
 				allowInterruption &&
