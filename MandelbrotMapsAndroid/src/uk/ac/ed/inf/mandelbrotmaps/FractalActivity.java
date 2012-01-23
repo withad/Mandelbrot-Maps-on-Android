@@ -158,7 +158,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					Bundle bundle = new Bundle();
 					bundle.putInt("FRACTAL", 1);
 					
-					double[] juliaParams = fractalView.getJuliaParams(evt.getX(), evt.getY());
+					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					bundle.putDouble("JULIA_X", juliaParams[0]);
 					bundle.putDouble("JULIA_Y", juliaParams[1]);
 					

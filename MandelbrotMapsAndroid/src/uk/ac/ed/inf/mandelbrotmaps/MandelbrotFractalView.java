@@ -163,8 +163,21 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	}
 	
 	
+	public double[] getJuliaParams(float touchX, float touchY)
+	{
+		double[] mandelbrotGraphArea = getGraphArea();
+		double pixelSize = getPixelSize();
 	
+		double[] juliaParams = new double[2];
+		
+		// Mouse position, on the complex plane (translated from pixels)
+		juliaParams[0] = mandelbrotGraphArea[0] + ( (double)touchX * pixelSize );
+		juliaParams[1] = mandelbrotGraphArea[1] - ( (double)touchY * pixelSize );
+		
+		return juliaParams;
+	}
 
+	
 
 	
 	/* Mouse events
