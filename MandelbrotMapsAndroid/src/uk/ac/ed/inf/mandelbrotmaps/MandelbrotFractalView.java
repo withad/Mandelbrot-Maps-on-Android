@@ -157,6 +157,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					postInvalidate();
 				}
 		}
+		
 		postInvalidate();
 		Log.d("MFV", "Reached end of computation loop");
 		Log.d(TAG, "Time elapsed: " + (System.currentTimeMillis() - initialMillis));
