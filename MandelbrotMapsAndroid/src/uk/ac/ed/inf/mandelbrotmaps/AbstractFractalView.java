@@ -603,12 +603,13 @@ abstract class AbstractFractalView extends View {
 	
 	//Fill the pixel sizes array with a number larger than any reasonable block size
 	private void clearPixelSizes() {
-		  pixelSizes = new int[getWidth() * getHeight()];
+		Log.d(TAG, "Clearing pixel sizes");
+		pixelSizes = new int[getWidth() * getHeight()];
 		
-		  for (int i = 0; i < pixelSizes.length; i++)
-		  {
-			  pixelSizes[i] = 1000;
-		  }
+		for (int i = 0; i < pixelSizes.length; i++)
+		{
+			pixelSizes[i] = 1000;
+		}
 	   }
 	
 	
