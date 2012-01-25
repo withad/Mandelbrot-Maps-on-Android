@@ -218,9 +218,9 @@ abstract class AbstractFractalView extends View {
 		
 		computePixels(
 			fractalPixels,
-			pixelSizes,
+			new int[getWidth() * getHeight()],//pixelSizes,
 			pixelBlockSize,
-			true,
+			false,//true,
 			0,
 			getWidth(),
 			0,
