@@ -147,14 +147,14 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
 						if(outputPixelArray == null) return;
 						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
-						currentPixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+						//currentPixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
 					}
 				}
 			}
 			// Show thread's work in progress
 			if ((showRenderingProgress) && (yPixel % 60 == 0)) 
 				{
-					//Log.d(TAG, "Should be creating new Bitmap...");
+					Log.d(TAG, "Should be creating new Bitmap... " + yPixel);
 					postInvalidate();
 				}
 		}
