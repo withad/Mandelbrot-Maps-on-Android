@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class JuliaFractalView extends AbstractFractalView{
 
-	private static final String TAG = "JuliaFractalView";
+	private static final String TAG = "MMaps";
 	
 	// Point paramaterising this Julia set
 	private double juliaX = 0;

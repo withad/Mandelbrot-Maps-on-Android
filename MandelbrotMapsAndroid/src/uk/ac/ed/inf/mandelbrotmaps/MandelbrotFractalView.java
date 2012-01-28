@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
 
-	private static final String TAG = "MandelbrotFractalView";
+	private static final String TAG = "MMaps";
 	
 	
 	public MandelbrotFractalView(Context context) {
@@ -77,8 +77,10 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 		long initialMillis = System.currentTimeMillis();
 		Log.d(TAG, "Initial time: " + initialMillis);
+		
+		int pixelIncrement = 2 * pixelBlockSize;
 	
-		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+=pixelBlockSize) {			
+		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
 			//Work backwards on upper half
 			if (section == FractalSection.UPPER)
 				yPixel = yPixelMax - yIncrement - 1;
@@ -152,7 +154,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				}
 			}
 			// Show thread's work in progress
-			if ((showRenderingProgress) && (yPixel % 30 == 0)) 
+			if ((showRenderingProgress) && (yPixel % 60 == 0)) 
 				{
 					Log.d(TAG, "Should be creating new Bitmap... " + yPixel);
 					postInvalidate();
