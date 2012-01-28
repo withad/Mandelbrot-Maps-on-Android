@@ -243,7 +243,7 @@ abstract class AbstractFractalView extends View {
 			fractalPixels,
 			pixelSizes,
 			pixelBlockSize,
-			true,//showRenderProgress,
+			false,//showRenderProgress,
 			0,
 			getWidth(),
 			yStart,
