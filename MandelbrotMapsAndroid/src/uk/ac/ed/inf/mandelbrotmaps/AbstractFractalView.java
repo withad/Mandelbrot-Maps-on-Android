@@ -241,9 +241,9 @@ abstract class AbstractFractalView extends View {
 		
 		computePixels(
 			fractalPixels,
-			new int[getWidth() * getHeight()], //pixelSizes,
+			pixelSizes,
 			pixelBlockSize,
-			false,//showRenderProgress,
+			showRenderProgress,
 			0,
 			getWidth(),
 			yStart,
@@ -665,6 +665,20 @@ abstract class AbstractFractalView extends View {
 			return lowerRenderQueue.take();
 		//else
 			//return renderingQueue.take();
+	}
+	
+	
+	public void setToBookmark()
+	{
+		double[] bookmark = new double[3];
+		
+		bookmark[0] = -1.631509065569354;
+		bookmark[1] = 0.0008548063308817164;
+		bookmark[2] = 0.0027763525271276013;
+		
+		Log.d(TAG, "Jumping to bookmark");
+		
+		setGraphArea(bookmark, true);
 	}
 	
 	

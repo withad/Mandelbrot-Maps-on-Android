@@ -120,17 +120,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
-      case R.id.ZoomOut:
-    	  float scaleOut = 0.5f;
-    	  fractalView.zoomImage((float)(fractalView.getWidth()/2), (float)(fractalView.getHeight()/2), scaleOut);
-    	  fractalView.stopZooming();
-    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 1/scaleOut);
-    	  return true;
-      case R.id.ZoomIn:
-    	  float scale = 2.0f;
-    	  fractalView.zoomImage((float)(fractalView.getWidth()/2), (float)(fractalView.getHeight()/2), scale);
-    	  fractalView.stopZooming();
-    	  fractalView.zoomChange((int)(fractalView.getWidth()/2), (int)(fractalView.getHeight()/2), 1/scale);
+      case R.id.settobookmark:
+    	  fractalView.setToBookmark();
     	  return true;
       case R.id.juliamode:
     	  displaymode = DisplayMode.ABOUT_TO_JULIA;
