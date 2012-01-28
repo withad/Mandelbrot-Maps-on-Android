@@ -241,7 +241,7 @@ abstract class AbstractFractalView extends View {
 		
 		computePixels(
 			fractalPixels,
-			new int[getWidth() * getHeight()],//pixelSizes,
+			pixelSizes,
 			pixelBlockSize,
 			showRenderProgress,
 			0,
@@ -624,6 +624,8 @@ abstract class AbstractFractalView extends View {
 		fractalPixels = new int[getWidth() * getHeight()];
 		clearPixelSizes();
 		canvasHome();
+		
+		renderMode = RenderMode.NEW;
 		
 		postInvalidate();
 	}

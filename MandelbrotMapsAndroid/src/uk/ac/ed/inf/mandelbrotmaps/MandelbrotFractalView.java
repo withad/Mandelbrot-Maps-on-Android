@@ -156,7 +156,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			// Show thread's work in progress
 			if ((showRenderingProgress) && (yPixel % 30 == 0)) 
 				{
-					Log.d(TAG, "Should be creating new Bitmap... " + yPixel);
+					//Log.d(TAG, "Should be creating new Bitmap... " + yPixel);
 					postInvalidate();
 				}
 		}
