@@ -625,6 +625,8 @@ abstract class AbstractFractalView extends View {
 		clearPixelSizes();
 		canvasHome();
 		
+		renderMode = RenderMode.NEW;
+		
 		postInvalidate();
 	}
 	
