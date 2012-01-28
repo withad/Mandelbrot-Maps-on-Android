@@ -6,7 +6,7 @@ import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
 
-	private static final String TAG = "MandelbrotFractalView";
+	private static final String TAG = "MMaps";
 	
 	
 	public MandelbrotFractalView(Context context) {
@@ -148,7 +148,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				}
 			}
 			// Show thread's work in progress
-			if ((showRenderingProgress) && (yPixel % 10 == 0)
+			if ((showRenderingProgress) && (yPixel % 1 == 0)
 			) 
 				{
 					//Log.d(TAG, "Should be making a new Bitmap...");

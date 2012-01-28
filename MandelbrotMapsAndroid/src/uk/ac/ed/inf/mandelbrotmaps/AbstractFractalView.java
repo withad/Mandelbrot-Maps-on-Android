@@ -14,7 +14,7 @@ import android.view.View;
 
 abstract class AbstractFractalView extends View {
    
-	private static final String TAG = "FractalView";
+	private static final String TAG = "MMaps";
 	
 	public static enum RenderMode{
 		NEW,
@@ -220,7 +220,7 @@ abstract class AbstractFractalView extends View {
 			fractalPixels,
 			new int[getWidth() * getHeight()],//pixelSizes,
 			pixelBlockSize,
-			false,//true,
+			true,
 			0,
 			getWidth(),
 			0,
