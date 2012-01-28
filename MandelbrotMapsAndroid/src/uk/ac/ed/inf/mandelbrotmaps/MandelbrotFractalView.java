@@ -82,9 +82,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
 			//Work backwards on upper half
-			if (section == FractalSection.UPPER)
+/*			if (section == FractalSection.UPPER)
 				yPixel = yPixelMax - yIncrement - 1;
-			else 
+			else */
 				yPixel = yIncrement;
 			
 			if (
@@ -163,7 +163,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 		postInvalidate();
 		Log.d("MFV", "Reached end of computation loop");
-		Log.d(TAG, "Time elapsed: " + (System.currentTimeMillis() - initialMillis));
+		Log.d(TAG, section.name() + ". Time elapsed: " + (System.currentTimeMillis() - initialMillis));
 	}
 	
 	
