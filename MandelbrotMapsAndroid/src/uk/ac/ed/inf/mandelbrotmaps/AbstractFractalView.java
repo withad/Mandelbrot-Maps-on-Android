@@ -110,7 +110,7 @@ abstract class AbstractFractalView extends View {
 	
 	private Matrix matrix;
 	
-	boolean crudeRendering = true;
+	boolean crudeRendering = false;
 	
 	int bitmapCreations = 0;
 	
@@ -240,8 +240,8 @@ abstract class AbstractFractalView extends View {
 		}
 		
 		computePixels(
-				new int[getWidth() * getHeight()],//fractalPixels,
-			new int[getWidth() * getHeight()],//pixelSizes,
+			fractalPixels,
+			pixelSizes,
 			pixelBlockSize,
 			showRenderProgress,
 			0,
