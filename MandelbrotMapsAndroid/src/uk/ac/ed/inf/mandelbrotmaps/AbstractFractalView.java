@@ -671,7 +671,11 @@ abstract class AbstractFractalView extends View {
 	
 	
 	public void setToBookmark()
-	{
+	{	
+		stopAllRendering();
+		
+		clearPixelSizes();
+		
 		double[] bookmark = new double[3];
 		
 		bookmark[0] = -1.631509065569354;
