@@ -41,7 +41,7 @@ abstract class AbstractFractalView extends View {
 	public static final int CONTRAST_SLIDER_SCALING = 200;
    
 	// Default "crude rendering" pixel block size?
-	int INITIAL_PIXEL_BLOCK = 3;
+	int INITIAL_PIXEL_BLOCK = 2;
    
 	//Default pixel size
 	int DEFAULT_PIXEL_SIZE = 1;
@@ -665,6 +665,17 @@ abstract class AbstractFractalView extends View {
 			return lowerRenderQueue.take();
 		//else
 			//return renderingQueue.take();
+	}
+	
+	
+	public void setToBookmark()
+	{
+		double[] bookmark = new double[3];
+		bookmark[0] = -1.631509065569354;
+		bookmark[1] = 0.0008548063308817164;
+		bookmark[2] = 0.0027763525271276013;
+		
+		setGraphArea(bookmark, true);
 	}
 	
 	

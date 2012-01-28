@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/ZoomOut" android:title="Zoom out" android:enabled="true" android:visible="true"></item>
-    <item android:id="@+id/ZoomIn" android:enabled="true" android:title="Zoom in" android:visible="true"></item>
     <item android:id="@+id/resetFractal" android:enabled="true" android:visible="true" android:title="Reset"></item>
     <item android:checkable="true" android:title="Julia" android:checked="false" android:id="@+id/juliamode" android:visible="true"></item>
     <item android:visible="true" android:id="@+id/toggleCrude" android:enabled="true" android:title="Toggle crude"></item>
+    <item android:checkable="false" android:title="Print location" android:id="@+id/printLocation" android:visible="true" android:enabled="true" android:checked="false"></item>
+    <item android:title="Set to bookmark" android:id="@+id/settobookmark"></item>
     
 </menu>
