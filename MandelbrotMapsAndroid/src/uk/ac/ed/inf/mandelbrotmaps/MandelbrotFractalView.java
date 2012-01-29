@@ -99,9 +99,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 				//Check to see if this pixel is already iterated to the necessary block size
-				int size = pixelSizes[(imgWidth*yPixel) + xPixel];
+				//int size = pixelSizes[(imgWidth*yPixel) + xPixel];
 				if(renderMode == RenderMode.JUST_DRAGGED && 
-						size <= pixelBlockSize)
+						pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize)
 				{
 					continue;
 				}
