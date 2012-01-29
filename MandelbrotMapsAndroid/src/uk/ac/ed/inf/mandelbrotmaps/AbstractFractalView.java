@@ -218,7 +218,7 @@ abstract class AbstractFractalView extends View {
 		
 		computePixels(
 			fractalPixels,
-			new int[getWidth() * getHeight()],//pixelSizes,
+			pixelSizes,
 			pixelBlockSize,
 			true,
 			0,
@@ -661,6 +661,8 @@ abstract class AbstractFractalView extends View {
 	
 	public void setToBookmark()
 	{
+		clearPixelSizes();
+		
 		double[] bookmark = new double[3];
 		bookmark[0] = -1.631509065569354;
 		bookmark[1] = 0.0008548063308817164;
