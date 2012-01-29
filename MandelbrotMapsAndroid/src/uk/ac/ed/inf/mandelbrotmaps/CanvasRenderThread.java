@@ -8,7 +8,7 @@ class CanvasRenderThread extends Thread {
 	
 	public CanvasRenderThread(AbstractFractalView mjCanvasHandle) {
 		mjCanvas = mjCanvasHandle;
-		setPriority(Thread.MIN_PRIORITY);
+		setPriority(Thread.MAX_PRIORITY);
 	}
 	
 	public void abortRendering() {
