@@ -80,7 +80,7 @@ public class JuliaFractalView extends AbstractFractalView{
 			pixelBlockSize * (maxIterations/5000)
 		);
 		
-		int xPixel, yPixel, iterationNr;
+		int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
 		double colourCode;
 		int colourCodeR, colourCodeG, colourCodeB, colourCodeHex;
 		int pixelBlockA, pixelBlockB;
@@ -92,8 +92,15 @@ public class JuliaFractalView extends AbstractFractalView{
 		double myJuliaX = juliaX;
 		double myJuliaY = juliaY;
 		
-	
-		for (yPixel=yPixelMin; yPixel<yPixelMax+1-pixelBlockSize; yPixel+=pixelBlockSize) {			
+		int pixelIncrement = 2 * pixelBlockSize;
+		
+		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
+			//Work backwards on upper half
+			if (section == FractalSection.UPPER)
+				yPixel = yPixelMax - yIncrement - 1;
+			else 
+				yPixel = yIncrement;
+			
 			// Detect rendering abortion.			
 			if (
 				allowInterruption &&
