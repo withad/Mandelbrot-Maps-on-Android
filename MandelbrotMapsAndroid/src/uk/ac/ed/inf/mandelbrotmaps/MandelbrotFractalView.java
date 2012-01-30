@@ -1,5 +1,6 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -45,7 +46,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final double yMax,
 		final double pixelSize,
 		final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-		RenderMode renderMode
+		RenderMode renderMode,
+		FractalSection section
 	) {				
 		int maxIterations = getMaxIterations();
 		int imgWidth = xPixelMax - xPixelMin;
@@ -58,7 +60,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			pixelBlockSize * (maxIterations/5000)
 		);
 		
-		int xPixel, yPixel, iterationNr;
+		int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
 		double colourCode;
 		int colourCodeR, colourCodeG, colourCodeB, colourCodeHex;
 		int pixelBlockA, pixelBlockB;
@@ -76,28 +78,30 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		long initialMillis = System.currentTimeMillis();
 		Log.d(TAG, "Initial time: " + initialMillis);
 	
-		for (yPixel=yPixelMin; yPixel<yPixelMax+1-pixelBlockSize; yPixel+=pixelBlockSize) {			
-			// Detect rendering abortion.
-			//CanvasRenderThread.yield();
+		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+=pixelBlockSize) {			
+			//Work backwards on upper half
+			if (section == FractalSection.UPPER)
+				yPixel = yPixelMax - yIncrement - 1;
+			else 
+				yPixel = yIncrement;
 			
 			if (
 				allowInterruption &&
-				renderThread.abortSignalled()
+				upperRenderThread.abortSignalled()
 			) 
 				{
 					Log.d("MFV", "Returning based on interruption test");
-					Log.d("MFV", "renderThread.abortSignalled() = " + renderThread.abortSignalled());
 					return;
 				}
 			
 			// Set y0 (im part of c)
-			y0 = yMax - ( (double)yPixel * pixelSize );
+			y0 = yMax - ( (double)yPixel * pixelSize );			
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 				//Check to see if this pixel is already iterated to the necessary block size
-				int size = pixelSizes[(imgWidth*yPixel) + xPixel];
+				//int size = pixelSizes[(imgWidth*yPixel) + xPixel];
 				if(renderMode == RenderMode.JUST_DRAGGED && 
-						size <= pixelBlockSize)
+						pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize)
 				{
 					continue;
 				}
@@ -148,21 +152,33 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				}
 			}
 			// Show thread's work in progress
-			if ((showRenderingProgress) && (yPixel % 30 == 0)
-			) 
+			if ((showRenderingProgress) && (yPixel % 30 == 0))
 				{
-					//Log.d(TAG, "Should be making a new Bitmap...");
 					postInvalidate();
 				}
 		}
+		
 		postInvalidate();
 		Log.d("MFV", "Reached end of computation loop");
 		Log.d(TAG, "Time elapsed: " + (System.currentTimeMillis() - initialMillis));
 	}
 	
 	
+	public double[] getJuliaParams(float touchX, float touchY)
+	{
+		double[] mandelbrotGraphArea = getGraphArea();
+		double pixelSize = getPixelSize();
 	
+		double[] juliaParams = new double[2];
+		
+		// Mouse position, on the complex plane (translated from pixels)
+		juliaParams[0] = mandelbrotGraphArea[0] + ( (double)touchX * pixelSize );
+		juliaParams[1] = mandelbrotGraphArea[1] - ( (double)touchY * pixelSize );
+		
+		return juliaParams;
+	}
 
+	
 
 	
 	/* Mouse events

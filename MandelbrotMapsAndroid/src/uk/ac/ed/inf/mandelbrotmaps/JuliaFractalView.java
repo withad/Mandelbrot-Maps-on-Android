@@ -1,6 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderMode;
+import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 import android.content.Context;
 import android.util.Log;
 
@@ -65,7 +66,8 @@ public class JuliaFractalView extends AbstractFractalView{
 		final double yMax,
 		final double pixelSize,
 		final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-		RenderMode renderMode
+		RenderMode renderMode,
+		FractalSection section
 	) {		
 		int maxIterations = getMaxIterations();
 		int imgWidth = xPixelMax - xPixelMin;
@@ -95,11 +97,10 @@ public class JuliaFractalView extends AbstractFractalView{
 			// Detect rendering abortion.			
 			if (
 				allowInterruption &&
-				renderThread.abortSignalled()
+				upperRenderThread.abortSignalled()
 			) 
 				{
-					Log.d("MFV", "Returning based on interruption test");
-					Log.d("MFV", "renderThread.abortSignalled() = " + renderThread.abortSignalled());
+					Log.d("JFV", "Returning based on interruption test");
 					return;
 				}
 		

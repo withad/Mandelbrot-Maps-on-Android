@@ -1,6 +1,8 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -48,8 +50,16 @@ abstract class AbstractFractalView extends View {
 	public static final int zoomPercent = 1;
    
 	// Rendering queue (modified from a LinkedBlockingDeque in the original version)
-	LinkedBlockingQueue<CanvasRendering> renderingQueue = new LinkedBlockingQueue<CanvasRendering>();	
-	CanvasRenderThread renderThread = new CanvasRenderThread(this);
+	//LinkedBlockingQueue<Rendering> renderingQueue = new LinkedBlockingQueue<Rendering>();	
+	//RenderThread renderThread = new RenderThread(this, FractalSection.ALL);
+	
+	//Upper and lower half rendering queues/threads
+	LinkedBlockingQueue<Rendering> upperRenderQueue = new LinkedBlockingQueue<Rendering>();	
+	RenderThread upperRenderThread = new RenderThread(this, FractalSection.UPPER);
+	
+	LinkedBlockingQueue<Rendering> lowerRenderQueue = new LinkedBlockingQueue<Rendering>();	
+	RenderThread lowerRenderThread = new RenderThread(this, FractalSection.LOWER);
+	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
 	double MINZOOM_LN_PIXEL = -3;
@@ -89,9 +99,6 @@ abstract class AbstractFractalView extends View {
 	private float totalDragX = 0;
 	private float totalDragY = 0;
 	
-	private int totalDragXInt = 0;
-	private int totalDragYInt = 0;
-	
 	public float scaleFactor = 1.0f;
 	public float midX = 0.0f;
 	public float midY = 0.0f;
@@ -104,6 +111,9 @@ abstract class AbstractFractalView extends View {
 	private Matrix matrix;
 	
 	boolean crudeRendering = false;
+	
+	int bitmapCreations = 0;
+	
 	
 	int bitmapCount = 0;
 	
@@ -123,7 +133,8 @@ abstract class AbstractFractalView extends View {
       	matrix = new Matrix();
       	matrix.reset();
       
-      	renderThread.start();
+      	upperRenderThread.start();
+      	lowerRenderThread.start();
    }
 
 	
@@ -184,8 +195,8 @@ abstract class AbstractFractalView extends View {
 	//Create new image only if not dragging or zooming
 	if(controlmode == ControlMode.STATIC) 
 		{
-			bitmapCount++;
-			Log.d(TAG, "Create a new bitmap! " + bitmapCount);
+			bitmapCreations++;
+			Log.d(TAG, "Create a new bitmap! " + bitmapCreations);
 			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		}
 	
@@ -211,25 +222,40 @@ abstract class AbstractFractalView extends View {
 	
 	
 	// Computes all necessary pixels (run by render thread)
-	public void computeAllPixels(final int pixelBlockSize) {
+	public void computeAllPixels(final int pixelBlockSize, final FractalSection half) {
 		// Nothing to do - stop if called before layout has been sanely set...
 		if (getWidth() <= 0 || graphArea == null || pauseRendering)
 			return;
 		
+		int yStart = 0;
+		int yEnd = getHeight();
+		boolean showRenderProgress = true;
+		
+		if (half == FractalSection.UPPER) {
+			yStart = 0;
+			yEnd = getHeight()/2;
+		}
+		else if (half == FractalSection.LOWER) {
+			yStart = getHeight()/2;
+			yEnd = getHeight();
+			showRenderProgress = false;
+		}
+		
 		computePixels(
 			fractalPixels,
-			pixelSizes,
+			pixelSizes, 
 			pixelBlockSize,
-			true,
+			showRenderProgress,
 			0,
 			getWidth(),
-			0,
-			getHeight(),
+			yStart,
+			yEnd,
 			graphArea[0],
 			graphArea[1],
 			getPixelSize(),
 			true,
-			renderMode
+			renderMode,
+			half
 		);
 		
 		postInvalidate();
@@ -281,9 +307,6 @@ abstract class AbstractFractalView extends View {
 			
 			totalDragX += dragDiffPixelsX;
 			totalDragY += dragDiffPixelsY;
-			
-			totalDragXInt += (int)dragDiffPixelsX;
-			totalDragYInt += (int)dragDiffPixelsY;
 			
 			invalidate();
 		}
@@ -582,12 +605,13 @@ abstract class AbstractFractalView extends View {
 	
 	//Fill the pixel sizes array with a number larger than any reasonable block size
 	private void clearPixelSizes() {
-		  pixelSizes = new int[getWidth() * getHeight()];
+		Log.d(TAG, "Clearing pixel sizes");
+		pixelSizes = new int[getWidth() * getHeight()];
 		
-		  for (int i = 0; i < pixelSizes.length; i++)
-		  {
-			  pixelSizes[i] = 1000;
-		  }
+		for (int i = 0; i < pixelSizes.length; i++)
+		{
+			pixelSizes[i] = 1000;
+		}
 	   }
 	
 	
@@ -595,13 +619,15 @@ abstract class AbstractFractalView extends View {
 	public void reset(){
 		pauseRendering = false;
 		
-		bitmapCount = 0;
-		
+		bitmapCreations = 0;
+
 		matrix.reset();
 		stopAllRendering();
 		fractalPixels = new int[getWidth() * getHeight()];
 		clearPixelSizes();
 		canvasHome();
+		
+		renderMode = RenderMode.NEW;
 		
 		postInvalidate();
 	}
@@ -615,58 +641,50 @@ abstract class AbstractFractalView extends View {
 	
 	//Stop all rendering, including planned and current
 	void stopAllRendering() {
-		//renderThread.interrupt();
 		//Stop planned renders
-		renderingQueue.clear();
+		//renderingQueue.clear();
+		upperRenderQueue.clear();
+		lowerRenderQueue.clear();
 		
 		//Stop current render
-		renderThread.abortRendering();
+		upperRenderThread.abortRendering();
+		lowerRenderThread.abortRendering();
 	}
 	
 	
 	//Add a rendering of a particular pixel size to the queue
 	void scheduleRendering(int pixelBlockSize) {
-		renderThread.allowRendering();
-		renderingQueue.add( new CanvasRendering(pixelBlockSize) );
+		upperRenderThread.allowRendering();
+		lowerRenderThread.allowRendering();
+		upperRenderQueue.add( new Rendering(pixelBlockSize) );
+		lowerRenderQueue.add( new Rendering(pixelBlockSize) );
 	}
 	
 	
 	//Retrieve the next rendering from the queue (used by render thread)
-	public CanvasRendering getNextRendering() throws InterruptedException {
-		return renderingQueue.take();
-	}
-	
-	
-	public void killRenderThread()
-	{
-		renderThread.interrupt();
-		renderThread = null;
-	}
-	
-	
-	public double[] getJuliaParams(float touchX, float touchY)
-	{
-		double[] mandelbrotGraphArea = getGraphArea();
-		double pixelSize = getPixelSize();
-	
-		double[] juliaParams = new double[2];
-		
-		// Mouse position, on the complex plane (translated from pixels)
-		juliaParams[0] = mandelbrotGraphArea[0] + ( (double)touchX * pixelSize );
-		juliaParams[1] = mandelbrotGraphArea[1] - ( (double)touchY * pixelSize );
-		
-		return juliaParams;
+	public Rendering getNextRendering(FractalSection section) throws InterruptedException {
+		if (section == FractalSection.UPPER)
+			return upperRenderQueue.take();
+		else //if (section == FractalSection.LOWER)
+			return lowerRenderQueue.take();
+		//else
+			//return renderingQueue.take();
 	}
 	
 	
 	public void setToBookmark()
-	{
+	{	
+		stopAllRendering();
+		
 		clearPixelSizes();
 		
 		double[] bookmark = new double[3];
+		
 		bookmark[0] = -1.631509065569354;
 		bookmark[1] = 0.0008548063308817164;
 		bookmark[2] = 0.0027763525271276013;
+		
+		Log.d(TAG, "Jumping to bookmark");
 		
 		setGraphArea(bookmark, true);
 	}
@@ -687,7 +705,8 @@ abstract class AbstractFractalView extends View {
 			final double yMax,
 			final double pixelSize,
 			final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-			RenderMode currentRenderMode
+			RenderMode currentRenderMode,
+			FractalSection section
 		);
 }
 
