@@ -234,7 +234,7 @@ abstract class AbstractFractalView extends View {
 		else if (half == FractalSection.LOWER) {
 			yStart = 1;
 			yEnd = getHeight();
-			//showRenderProgress = false;
+			showRenderProgress = false;
 		}
 		
 		computePixels(
