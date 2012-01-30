@@ -27,7 +27,7 @@ abstract class AbstractFractalView extends View {
 	private RenderMode renderMode = RenderMode.NEW;
 	
 	
-	public enum ControlMode {
+	public static enum ControlMode {
 		ZOOMING,
 		DRAGGING,
 		STATIC
@@ -104,7 +104,6 @@ abstract class AbstractFractalView extends View {
 	public float midY = 0.0f;
 	
 	boolean pauseRendering = false;
-	//boolean draggingFractal = false;
 	boolean zoomingFractal = false;
 	boolean hasZoomed = false;
 	
@@ -113,9 +112,6 @@ abstract class AbstractFractalView extends View {
 	boolean crudeRendering = false;
 	
 	int bitmapCreations = 0;
-	
-	
-	int bitmapCount = 0;
 	
 /*-----------------------------------------------------------------------------------*/
 /*Constructor*/
