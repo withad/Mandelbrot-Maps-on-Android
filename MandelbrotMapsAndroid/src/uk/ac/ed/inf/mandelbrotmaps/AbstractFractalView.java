@@ -35,7 +35,8 @@ abstract class AbstractFractalView extends View {
 	
 	private ControlMode controlmode = ControlMode.STATIC;
 	
-   
+	public static final int LINES_TO_DRAW_AFTER = 60;
+	
    	// How many different, discrete zoom and contrast levels?
 	public static final int ZOOM_SLIDER_SCALING = 300;
 	public static final int CONTRAST_SLIDER_SCALING = 200;

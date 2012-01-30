@@ -82,9 +82,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
 			//Work backwards on upper half
-			if (section == FractalSection.UPPER)
+/*			if (section == FractalSection.UPPER)
 				yPixel = yPixelMax - yIncrement - 1;
-			else 
+			else */
 				yPixel = yIncrement;
 			
 			if (
@@ -153,7 +153,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				}
 			}
 			// Show thread's work in progress
-			if ((showRenderingProgress) && (yPixel % 20 == 0)) 
+			if ((showRenderingProgress) && (yPixel % LINES_TO_DRAW_AFTER == 0)) 
 				{
 					postInvalidate();
 				}
