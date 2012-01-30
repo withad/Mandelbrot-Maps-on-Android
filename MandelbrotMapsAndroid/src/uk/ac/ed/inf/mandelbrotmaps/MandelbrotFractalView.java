@@ -77,12 +77,14 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 		long initialMillis = System.currentTimeMillis();
 		Log.d(TAG, "Initial time: " + initialMillis);
+		
+		int pixelIncrement = 2 * pixelBlockSize;
 	
-		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+=pixelBlockSize) {			
+		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
 			//Work backwards on upper half
-			if (section == FractalSection.UPPER)
+/*			if (section == FractalSection.UPPER)
 				yPixel = yPixelMax - yIncrement - 1;
-			else 
+			else */
 				yPixel = yIncrement;
 			
 			if (
@@ -99,7 +101,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 				//Check to see if this pixel is already iterated to the necessary block size
-				//int size = pixelSizes[(imgWidth*yPixel) + xPixel];
 				if(renderMode == RenderMode.JUST_DRAGGED && 
 						pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize)
 				{
@@ -152,7 +153,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				}
 			}
 			// Show thread's work in progress
-			if ((showRenderingProgress) && (yPixel % 30 == 0))
+			if ((showRenderingProgress) && (yPixel % 10 == 0)) 
 				{
 					postInvalidate();
 				}
@@ -160,7 +161,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 		postInvalidate();
 		Log.d("MFV", "Reached end of computation loop");
-		Log.d(TAG, "Time elapsed: " + (System.currentTimeMillis() - initialMillis));
+		Log.d(TAG, section.name() + ". Time elapsed: " + (System.currentTimeMillis() - initialMillis));
 	}
 	
 	

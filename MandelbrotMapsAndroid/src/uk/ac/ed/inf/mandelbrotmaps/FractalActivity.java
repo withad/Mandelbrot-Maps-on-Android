@@ -120,6 +120,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
+      case R.id.printLocation:
+    	  double[] current_area = fractalView.getGraphArea();
+    	  Log.d(TAG, "X: " + current_area[0] + " Y: " + current_area[1] + " Width: " + current_area[2]);
+    	  return true;
       case R.id.settobookmark:
     	  fractalView.setToBookmark();
     	  return true;

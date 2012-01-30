@@ -41,7 +41,7 @@ abstract class AbstractFractalView extends View {
 	public static final int CONTRAST_SLIDER_SCALING = 200;
    
 	// Default "crude rendering" pixel block size?
-	int INITIAL_PIXEL_BLOCK = 3;
+	int INITIAL_PIXEL_BLOCK = 2;
    
 	//Default pixel size
 	int DEFAULT_PIXEL_SIZE = 1;
@@ -229,10 +229,10 @@ abstract class AbstractFractalView extends View {
 		
 		if (half == FractalSection.UPPER) {
 			yStart = 0;
-			yEnd = getHeight()/2;
+			yEnd = getHeight() - 1;
 		}
 		else if (half == FractalSection.LOWER) {
-			yStart = getHeight()/2;
+			yStart = 1;
 			yEnd = getHeight();
 			showRenderProgress = false;
 		}
@@ -242,7 +242,7 @@ abstract class AbstractFractalView extends View {
 			pixelSizes, 
 			pixelBlockSize,
 			showRenderProgress,
-			0,
+			0, 
 			getWidth(),
 			yStart,
 			yEnd,
