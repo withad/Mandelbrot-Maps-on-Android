@@ -1,6 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.ControlMode;
+import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -62,12 +63,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       Bundle bundle = getIntent().getExtras();
       
       fractalType = (bundle.getInt("FRACTAL") == 0 ? FractalType.MANDELBROT : FractalType.JULIA);
+      RenderStyle style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
       
       if (fractalType == FractalType.MANDELBROT)
-    	  fractalView = new MandelbrotFractalView(this);
+    	  fractalView = new MandelbrotFractalView(this, style);
       else if (fractalType == FractalType.JULIA)
       {
-    	  fractalView = new JuliaFractalView(this);
+    	  fractalView = new JuliaFractalView(this, style);
       }
       
       setContentView(fractalView);

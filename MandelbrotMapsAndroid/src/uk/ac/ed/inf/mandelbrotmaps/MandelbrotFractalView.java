@@ -10,8 +10,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	private static final String TAG = "MMaps";
 	
 	
-	public MandelbrotFractalView(Context context) {
-		super(context);
+	public MandelbrotFractalView(Context context, RenderStyle style) {
+		super(context, style);
 
 		// Set the "maximum iteration" calculation constants
 		// Empirically determined values for Mandelbrot set.
@@ -78,7 +78,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		long initialMillis = System.currentTimeMillis();
 		Log.d(TAG, "Initial time: " + initialMillis);
 		
-		int pixelIncrement = 2 * pixelBlockSize;
+		int pixelIncrement = pixelBlockSize;
+		if (section != FractalSection.ALL)
+			pixelIncrement = 2*pixelBlockSize;
 	
 		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
 			//Work backwards on upper half

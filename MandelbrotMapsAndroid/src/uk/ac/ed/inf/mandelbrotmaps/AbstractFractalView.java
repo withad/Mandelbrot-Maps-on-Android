@@ -35,6 +35,14 @@ abstract class AbstractFractalView extends View {
 	
 	private ControlMode controlmode = ControlMode.STATIC;
 	
+	
+	public enum RenderStyle{
+		SINGLE_THREAD,
+		DUAL_THREAD
+	}
+	
+	private RenderStyle renderStyle;
+	
 	public static final int LINES_TO_DRAW_AFTER = 60;
 	
    	// How many different, discrete zoom and contrast levels?
@@ -117,12 +125,14 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 /*Constructor*/
 /*-----------------------------------------------------------------------------------*/
-	public AbstractFractalView(Context context) {
+	public AbstractFractalView(Context context, RenderStyle style) {
 		super(context);
 		setFocusable(true);
 		setFocusableInTouchMode(true);
 		setBackgroundColor(Color.BLACK);
       	setId(0); 
+      	
+      	renderStyle = style;
       
       		//parentActivity = (FractalActivity)context;
       	setOnTouchListener((FractalActivity)context);
@@ -131,7 +141,7 @@ abstract class AbstractFractalView extends View {
       	matrix.reset();
       
       	upperRenderThread.start();
-      	lowerRenderThread.start();
+      	if(renderStyle != RenderStyle.SINGLE_THREAD) lowerRenderThread.start();
    }
 
 	
@@ -219,7 +229,7 @@ abstract class AbstractFractalView extends View {
 	
 	
 	// Computes all necessary pixels (run by render thread)
-	public void computeAllPixels(final int pixelBlockSize, final FractalSection half) {
+	public void computeAllPixels(final int pixelBlockSize, FractalSection half) {
 		// Nothing to do - stop if called before layout has been sanely set...
 		if (getWidth() <= 0 || graphArea == null || pauseRendering)
 			return;
@@ -228,15 +238,21 @@ abstract class AbstractFractalView extends View {
 		int yEnd = getHeight();
 		boolean showRenderProgress = true;
 		
-		if (half == FractalSection.UPPER) {
-			yStart = 0;
-			yEnd = getHeight() - 1;
+		
+		if(renderStyle != RenderStyle.SINGLE_THREAD){
+			if (half == FractalSection.UPPER) {
+				yStart = 0;
+				yEnd = getHeight() - 1;
+			}
+			else if (half == FractalSection.LOWER) {
+				yStart = pixelBlockSize;
+				yEnd = getHeight();
+				showRenderProgress = false;
+			}
 		}
-		else if (half == FractalSection.LOWER) {
-			yStart = 1;
-			yEnd = getHeight();
-			showRenderProgress = false;
-		}
+		else
+			half = FractalSection.ALL;
+			
 		
 		computePixels(
 			fractalPixels,

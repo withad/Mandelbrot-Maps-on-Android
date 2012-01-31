@@ -1,6 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderMode;
+import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 import android.content.Context;
 import android.util.Log;
@@ -14,8 +15,8 @@ public class JuliaFractalView extends AbstractFractalView{
 	private double juliaY = 0;
 	
 	
-	public JuliaFractalView(Context context) {
-		super(context);
+	public JuliaFractalView(Context context, RenderStyle style) {
+		super(context, style);
 
 		// Set the "maximum iteration" calculation constants
 		// Empirically determined values for Julia sets.
