@@ -82,6 +82,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		if (section != FractalSection.ALL)
 			pixelIncrement = 2*pixelBlockSize;
 	
+		int skippedCount = 0;
+		
 		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
 			//Work backwards on upper half
 /*			if (section == FractalSection.UPPER)
@@ -103,9 +105,10 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 				//Check to see if this pixel is already iterated to the necessary block size
-				if(renderMode == RenderMode.JUST_DRAGGED && 
+				if(/*renderMode == RenderMode.JUST_DRAGGED && */
 						pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize)
 				{
+					skippedCount++;
 					continue;
 				}
 				
@@ -146,11 +149,14 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				
 				// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
 				colourCodeHex = (0xFF<<24) + (colourCodeR<<16) + (colourCodeG<<8) + (colourCodeB);
+				
+				currentPixelSizes[(imgWidth*yPixel) + (xPixel)] = 1;//pixelBlockSize; 
+				
 				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
 						if(outputPixelArray == null) return;
 						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
-						currentPixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+						//currentPixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = 1;//pixelBlockSize;
 					}
 				}
 			}
@@ -162,7 +168,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		}
 		
 		postInvalidate();
-		Log.d("MFV", "Reached end of computation loop");
+		Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
 		Log.d(TAG, section.name() + ". Time elapsed: " + (System.currentTimeMillis() - initialMillis));
 	}
 	
