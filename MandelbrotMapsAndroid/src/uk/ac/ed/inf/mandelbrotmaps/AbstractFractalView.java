@@ -43,7 +43,7 @@ abstract class AbstractFractalView extends View {
 	
 	private RenderStyle renderStyle;
 	
-	public static final int LINES_TO_DRAW_AFTER = 60;
+	public static final int LINES_TO_DRAW_AFTER = 20;
 	
    	// How many different, discrete zoom and contrast levels?
 	public static final int ZOOM_SLIDER_SCALING = 300;
@@ -181,6 +181,7 @@ abstract class AbstractFractalView extends View {
 	// (Re)create pixel grid, if not initialised - or if wrong size.
 	if ((fractalPixels == null) || (fractalPixels.length != getWidth()*getHeight())) {
 		fractalPixels = new int[getWidth() * getHeight()];
+		pixelSizes = new int[getWidth() * getHeight()];
 		clearPixelSizes();
 		scheduleNewRenders();
 	}
@@ -253,6 +254,8 @@ abstract class AbstractFractalView extends View {
 		else
 			half = FractalSection.ALL;
 			
+		if (pixelSizes == null)
+			pixelSizes = new int[getWidth() * getHeight()];
 		
 		computePixels(
 			fractalPixels,
@@ -619,7 +622,7 @@ abstract class AbstractFractalView extends View {
 	//Fill the pixel sizes array with a number larger than any reasonable block size
 	private void clearPixelSizes() {
 		Log.d(TAG, "Clearing pixel sizes");
-		pixelSizes = new int[getWidth() * getHeight()];
+		//pixelSizes = new int[getWidth() * getHeight()];
 		
 		for (int i = 0; i < pixelSizes.length; i++)
 		{

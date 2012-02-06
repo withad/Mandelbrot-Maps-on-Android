@@ -54,10 +54,11 @@ public class LauncherActivity extends Activity implements OnClickListener {
          startActivity(i);
          break;
       case R.id.fractal_button:
-         startFractal();
+         startFractal(RenderStyle.SINGLE_THREAD);
          break;
       case R.id.bitmap_test_button:
-    	  startActivity(new Intent(this, BitmapActivity.class));
+    	  //startActivity(new Intent(this, BitmapActivity.class));
+    	  startFractal(RenderStyle.DUAL_THREAD);
     	  break;
       case R.id.exit_button:
          finish();
@@ -74,11 +75,11 @@ public class LauncherActivity extends Activity implements OnClickListener {
    }
 
    /** Start a new game with the given difficulty level */
-   private void startFractal() {
+   private void startFractal(RenderStyle style) {
    		Intent intent = new Intent(this, FractalActivity.class);
    		Bundle bundle = new Bundle();
    		bundle.putInt("FRACTAL", 0);
-   		bundle.putString("RenderStyle", RenderStyle.DUAL_THREAD.toString());
+   		bundle.putString("RenderStyle", style.toString());
    		intent.putExtras(bundle);
    		startActivity(intent);
    }

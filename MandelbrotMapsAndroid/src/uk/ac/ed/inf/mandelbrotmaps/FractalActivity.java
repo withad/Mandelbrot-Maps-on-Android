@@ -49,6 +49,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private ScaleGestureDetector gestureDetector;
 	   
 	private int dragID = -1;
+	
+	RenderStyle style;
    
 
    @Override
@@ -63,7 +65,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       Bundle bundle = getIntent().getExtras();
       
       fractalType = (bundle.getInt("FRACTAL") == 0 ? FractalType.MANDELBROT : FractalType.JULIA);
-      RenderStyle style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
+      style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
       
       if (fractalType == FractalType.MANDELBROT)
     	  fractalView = new MandelbrotFractalView(this, style);
@@ -159,6 +161,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					bundle.putDouble("JULIA_X", juliaParams[0]);
 					bundle.putDouble("JULIA_Y", juliaParams[1]);
+					bundle.putString("RenderStyle", style.toString());
 					
 					intent.putExtras(bundle);
 			   		startActivity(intent);

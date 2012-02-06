@@ -11,8 +11,8 @@
    <string name="app_name">MandelbrotMaps</string>
    <string name="main_title">Mandelbrot Maps</string>
    <string name="continue_label">Continue</string>
-   <string name="fractal_label">Render fractal</string>
-   <string name="bitmap_test_label">Simple square</string>
+   <string name="fractal_label">Fractal - single thread</string>
+   <string name="bitmap_test_label">Fractal - dual threads</string>
    <string name="exit_label">Exit</string>
 
    <string name="settings_label">Settings...</string>

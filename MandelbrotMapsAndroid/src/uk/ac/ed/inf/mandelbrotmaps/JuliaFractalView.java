@@ -93,7 +93,9 @@ public class JuliaFractalView extends AbstractFractalView{
 		double myJuliaX = juliaX;
 		double myJuliaY = juliaY;
 		
-		int pixelIncrement = 2 * pixelBlockSize;
+		int pixelIncrement = pixelBlockSize;
+		if (section != FractalSection.ALL)
+			pixelIncrement = 2*pixelBlockSize;
 		
 		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
 			//Work backwards on upper half
@@ -114,9 +116,8 @@ public class JuliaFractalView extends AbstractFractalView{
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 				//Check to see if this pixel is already iterated to the necessary block size
-				int size = pixelSizes[(imgWidth*yPixel) + xPixel];
 				if(renderMode == RenderMode.JUST_DRAGGED && 
-						size <= pixelBlockSize)
+						pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize)
 				{
 					continue;
 				}
@@ -164,7 +165,7 @@ public class JuliaFractalView extends AbstractFractalView{
 				}
 			}
 			// Show thread's work in progress
-			if ((showRenderingProgress) && (yPixel % 3 == 0)
+			if ((showRenderingProgress) && (yPixel % LINES_TO_DRAW_AFTER == 0)
 			) 
 				{
 					postInvalidate();
