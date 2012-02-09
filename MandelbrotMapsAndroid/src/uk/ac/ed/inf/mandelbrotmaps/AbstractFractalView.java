@@ -134,7 +134,7 @@ abstract class AbstractFractalView extends View {
       	
       	renderStyle = style;
       
-      	//setOnTouchListener((FractalActivity)context);
+      	setOnTouchListener((FractalActivity)context);
       
       	matrix = new Matrix();
       	matrix.reset();
