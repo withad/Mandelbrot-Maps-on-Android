@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 public class LauncherActivity extends Activity implements OnClickListener {
-   private static final String TAG = "Sudoku";
+   private static final String TAG = "MMaps";
    
    /** Called when the activity is first created. */
    @Override
@@ -76,7 +76,7 @@ public class LauncherActivity extends Activity implements OnClickListener {
 
    /** Start a new game with the given difficulty level */
    private void startFractal(RenderStyle style) {
-   		Intent intent = new Intent(this, FractalActivity.class);
+   		Intent intent = new Intent(this.getApplicationContext(), FractalActivity.class);
    		Bundle bundle = new Bundle();
    		bundle.putInt("FRACTAL", 0);
    		bundle.putString("RenderStyle", style.toString());

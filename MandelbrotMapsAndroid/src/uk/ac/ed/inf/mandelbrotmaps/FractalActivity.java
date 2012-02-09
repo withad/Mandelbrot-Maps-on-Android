@@ -4,6 +4,7 @@ import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.ControlMode;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -104,6 +105,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    protected void onPause() {
       super.onPause();
       Log.d(TAG, "onPause");
+      fractalView.upperRenderThread = null;
+      fractalView.lowerRenderThread = null;
    }
    
    

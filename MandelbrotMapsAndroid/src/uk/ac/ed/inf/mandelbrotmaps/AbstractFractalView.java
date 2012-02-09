@@ -64,10 +64,10 @@ abstract class AbstractFractalView extends View {
 	
 	//Upper and lower half rendering queues/threads
 	LinkedBlockingQueue<Rendering> upperRenderQueue = new LinkedBlockingQueue<Rendering>();	
-	RenderThread upperRenderThread = new RenderThread(this, FractalSection.UPPER);
+	RenderThread upperRenderThread = new RenderThread(this, FractalSection.UPPER, "Mandelbrot Upper Thread");
 	
 	LinkedBlockingQueue<Rendering> lowerRenderQueue = new LinkedBlockingQueue<Rendering>();	
-	RenderThread lowerRenderThread = new RenderThread(this, FractalSection.LOWER);
+	RenderThread lowerRenderThread = new RenderThread(this, FractalSection.LOWER, "Mandelbrot Lower Thread");
 	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
@@ -134,7 +134,7 @@ abstract class AbstractFractalView extends View {
       	
       	renderStyle = style;
       
-      	setOnTouchListener((FractalActivity)context);
+      	//setOnTouchListener((FractalActivity)context);
       
       	matrix = new Matrix();
       	matrix.reset();

@@ -14,7 +14,8 @@ class RenderThread extends Thread {
 	private AbstractFractalView mjCanvas;
 	private volatile boolean abortThisRendering = false;
 	
-	public RenderThread(AbstractFractalView mjCanvasHandle, FractalSection section) {
+	public RenderThread(AbstractFractalView mjCanvasHandle, FractalSection section, String name) {
+		setName(name);
 		fractalSection = section;
 		mjCanvas = mjCanvasHandle;
 		setPriority(Thread.MAX_PRIORITY);
