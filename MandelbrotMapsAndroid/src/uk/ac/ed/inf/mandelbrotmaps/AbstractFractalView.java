@@ -64,10 +64,10 @@ abstract class AbstractFractalView extends View {
 	
 	//Upper and lower half rendering queues/threads
 	LinkedBlockingQueue<Rendering> upperRenderQueue = new LinkedBlockingQueue<Rendering>();	
-	RenderThread upperRenderThread = new RenderThread(this, FractalSection.UPPER, "Mandelbrot Upper Thread");
+	RenderThread upperRenderThread;// = new RenderThread(this, FractalSection.UPPER, "Mandelbrot Upper Thread");
 	
 	LinkedBlockingQueue<Rendering> lowerRenderQueue = new LinkedBlockingQueue<Rendering>();	
-	RenderThread lowerRenderThread = new RenderThread(this, FractalSection.LOWER, "Mandelbrot Lower Thread");
+	RenderThread lowerRenderThread;// = new RenderThread(this, FractalSection.LOWER, "Mandelbrot Lower Thread");
 	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
@@ -125,7 +125,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 /*Constructor*/
 /*-----------------------------------------------------------------------------------*/
-	public AbstractFractalView(Context context, RenderStyle style) {
+	public AbstractFractalView(Context context, RenderStyle style, RenderThread firstThread, RenderThread secondThread) {
 		super(context);
 		setFocusable(true);
 		setFocusableInTouchMode(true);
@@ -139,8 +139,17 @@ abstract class AbstractFractalView extends View {
       	matrix = new Matrix();
       	matrix.reset();
       
+      	firstThread = new RenderThread(this, FractalSection.UPPER, "Mandelbrot Upper Thread");
+      	upperRenderThread = firstThread;
+      	
+      	secondThread = new RenderThread(this, FractalSection.LOWER, "Mandelbrot Lower Thread");
+		lowerRenderThread = secondThread;
+      	
       	upperRenderThread.start();
-      	if(renderStyle != RenderStyle.SINGLE_THREAD) lowerRenderThread.start();
+      	if(renderStyle != RenderStyle.SINGLE_THREAD)
+      		{
+      			lowerRenderThread.start();
+      		}
    }
 
 	
@@ -707,6 +716,12 @@ abstract class AbstractFractalView extends View {
 		Log.d(TAG, "Jumping to bookmark");
 		
 		setGraphArea(bookmark, true);
+	}
+	
+	
+	public void interruptThreads(){
+		upperRenderThread.interrupt();
+		lowerRenderThread.interrupt();
 	}
 	
 	

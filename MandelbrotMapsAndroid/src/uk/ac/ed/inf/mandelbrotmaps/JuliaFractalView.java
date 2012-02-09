@@ -8,15 +8,15 @@ import android.util.Log;
 
 public class JuliaFractalView extends AbstractFractalView{
 
-	private static final String TAG = "MMaps";
+	private String TAG = "MMaps";
 	
 	// Point paramaterising this Julia set
 	private double juliaX = 0;
 	private double juliaY = 0;
 	
 	
-	public JuliaFractalView(Context context, RenderStyle style) {
-		super(context, style);
+	public JuliaFractalView(Context context, RenderStyle style, RenderThread firstThread, RenderThread secondThread) {
+		super(context, style, firstThread, secondThread);
 
 		// Set the "maximum iteration" calculation constants
 		// Empirically determined values for Julia sets.

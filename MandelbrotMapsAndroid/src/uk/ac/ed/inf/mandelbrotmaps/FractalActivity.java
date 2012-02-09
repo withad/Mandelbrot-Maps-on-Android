@@ -2,6 +2,7 @@ package uk.ac.ed.inf.mandelbrotmaps;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.ControlMode;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
+import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 
 import android.app.Activity;
 import android.content.Context;
@@ -52,6 +53,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private int dragID = -1;
 	
 	RenderStyle style;
+	
+	RenderThread upperRenderThread = null;
+    RenderThread lowerRenderThread = null;
    
 
    @Override
@@ -69,10 +73,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
       
       if (fractalType == FractalType.MANDELBROT)
-    	  fractalView = new MandelbrotFractalView(this, style);
+    	  fractalView = new MandelbrotFractalView(this, style, upperRenderThread, lowerRenderThread);
       else if (fractalType == FractalType.JULIA)
       {
-    	  fractalView = new JuliaFractalView(this, style);
+    	  fractalView = new JuliaFractalView(this, style, upperRenderThread, lowerRenderThread);
       }
       
       setContentView(fractalView);
@@ -105,8 +109,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    protected void onPause() {
       super.onPause();
       Log.d(TAG, "onPause");
-      fractalView.upperRenderThread = null;
-      fractalView.lowerRenderThread = null;
    }
    
    
@@ -114,6 +116,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    protected void onStop() {
       super.onStop();
       Log.d(TAG, "onStop");
+   }
+   
+   
+   @Override
+   protected void onDestroy(){
+	   super.onDestroy();
+	   fractalView.interruptThreads();
    }
    
    

@@ -40,8 +40,9 @@ class RenderThread extends Thread {
 				mjCanvas.computeAllPixels(newRendering.getPixelBlockSize(), fractalSection);
 				abortThisRendering = false;
 			} catch (InterruptedException e) {
-				abortThisRendering = false;
-				Log.d("Testing", "Caught exception");
+				return;
+				/*abortThisRendering = false;
+				Log.d("Testing", "Caught exception");*/
 			}
 		}
 	}
