@@ -16,9 +16,9 @@ import android.view.View;
 
 abstract class AbstractFractalView extends View {
    
-	private static final String TAG = "MMaps";
+	private final String TAG = "MMaps";
 	
-	public static enum RenderMode{
+	public enum RenderMode{
 		NEW,
 		JUST_DRAGGED,
 		JUST_ZOOMED
@@ -27,7 +27,7 @@ abstract class AbstractFractalView extends View {
 	private RenderMode renderMode = RenderMode.NEW;
 	
 	
-	public static enum ControlMode {
+	public enum ControlMode {
 		ZOOMING,
 		DRAGGING,
 		STATIC
@@ -46,8 +46,8 @@ abstract class AbstractFractalView extends View {
 	public int LINES_TO_DRAW_AFTER = 20;
 	
    	// How many different, discrete zoom and contrast levels?
-	public static final int ZOOM_SLIDER_SCALING = 300;
-	public static final int CONTRAST_SLIDER_SCALING = 200;
+	public final int ZOOM_SLIDER_SCALING = 300;
+	public final int CONTRAST_SLIDER_SCALING = 200;
    
 	// Default "crude rendering" pixel block size?
 	int INITIAL_PIXEL_BLOCK = 2;
@@ -56,7 +56,7 @@ abstract class AbstractFractalView extends View {
 	int DEFAULT_PIXEL_SIZE = 1;
    
    	// How much of a zoom, on each increment?
-	public static final int zoomPercent = 1;
+	public final int zoomPercent = 1;
    
 	// Rendering queue (modified from a LinkedBlockingDeque in the original version)
 	//LinkedBlockingQueue<Rendering> renderingQueue = new LinkedBlockingQueue<Rendering>();	
@@ -134,7 +134,6 @@ abstract class AbstractFractalView extends View {
       	
       	renderStyle = style;
       
-      		//parentActivity = (FractalActivity)context;
       	setOnTouchListener((FractalActivity)context);
       
       	matrix = new Matrix();

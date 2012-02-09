@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
 
-	private static final String TAG = "MMaps";
+	private final String TAG = "MMaps";
 	
 	
 	public MandelbrotFractalView(Context context, RenderStyle style) {

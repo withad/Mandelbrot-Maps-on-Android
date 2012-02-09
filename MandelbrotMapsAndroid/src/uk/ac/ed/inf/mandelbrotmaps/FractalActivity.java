@@ -38,7 +38,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	private DisplayMode displaymode = DisplayMode.MANDELBROT;
 	
-	private static final String TAG = "MMaps";
+	private final String TAG = "MMaps";
 
 	private AbstractFractalView fractalView;
 	private MandelbrotJuliaLocation mjLocation;
