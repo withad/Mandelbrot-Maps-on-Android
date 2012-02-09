@@ -43,7 +43,7 @@ abstract class AbstractFractalView extends View {
 	
 	private RenderStyle renderStyle;
 	
-	public static final int LINES_TO_DRAW_AFTER = 20;
+	public int LINES_TO_DRAW_AFTER = 20;
 	
    	// How many different, discrete zoom and contrast levels?
 	public static final int ZOOM_SLIDER_SCALING = 300;
@@ -83,9 +83,9 @@ abstract class AbstractFractalView extends View {
 	
 	// Scaling factor for maxIterations() calculations
 	double iterationScaling = 0.3;
+	double ITERATIONSCALING_DEFAULT = 0.3;
 	double ITERATIONSCALING_MIN = 0.01;
 	double ITERATIONSCALING_MAX = 100;
-	double ITERATIONSCALING_DEFAULT = 0.3;
 	
 	// Mouse dragging state.
 	int dragLastX = 0;
@@ -167,6 +167,9 @@ abstract class AbstractFractalView extends View {
    @Override
    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 	   super.onSizeChanged(w, h, oldw, oldh);
+	   
+	   LINES_TO_DRAW_AFTER = getHeight()/12;
+	   Log.d(TAG, "Drawing every " + LINES_TO_DRAW_AFTER + " lines.");
    }
    
    
@@ -259,7 +262,7 @@ abstract class AbstractFractalView extends View {
 		
 		computePixels(
 			fractalPixels,
-			pixelSizes, 
+			new int[getWidth()*getHeight()],//pixelSizes, 
 			pixelBlockSize,
 			showRenderProgress,
 			0, 
@@ -563,6 +566,8 @@ abstract class AbstractFractalView extends View {
 		double absLnPixelSize = Math.abs(Math.log(getPixelSize()));
 		double dblIterations = iterationScaling * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
 		int iterationsToPerform = (int)dblIterations;
+		Log.d(TAG, "Performing " + iterationsToPerform + " iterations.");
+		Log.d(TAG, "Iteration scaling is " + iterationScaling + ".");
 		return Math.max(iterationsToPerform, MIN_ITERATIONS);
 	}
 	
