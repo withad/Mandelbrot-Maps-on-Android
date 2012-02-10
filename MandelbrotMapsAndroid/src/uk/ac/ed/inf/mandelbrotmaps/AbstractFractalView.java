@@ -50,7 +50,7 @@ abstract class AbstractFractalView extends View {
 	public final int CONTRAST_SLIDER_SCALING = 200;
    
 	// Default "crude rendering" pixel block size?
-	int INITIAL_PIXEL_BLOCK = 2;
+	int INITIAL_PIXEL_BLOCK = 3;
    
 	//Default pixel size
 	int DEFAULT_PIXEL_SIZE = 1;
@@ -262,7 +262,7 @@ abstract class AbstractFractalView extends View {
 		
 		computePixels(
 			fractalPixels,
-			new int[getWidth()*getHeight()],//pixelSizes, 
+			pixelSizes,
 			pixelBlockSize,
 			showRenderProgress,
 			0, 
