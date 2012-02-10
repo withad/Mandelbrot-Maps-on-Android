@@ -123,6 +123,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    protected void onDestroy(){
 	   super.onDestroy();
 	   fractalView.interruptThreads();
+	   Log.d(TAG, "Running onDestroy().");
+   }
+   
+   
+   @Override
+public void finish(){
+	   super.finish();
+	   Log.d(TAG, "Running finish.");
    }
    
    
@@ -230,8 +238,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		        break;
 		        
 			case MotionEvent.ACTION_UP:
-				currentlyDragging = false;
-				fractalView.stopDragging(false);
+				if(currentlyDragging)
+				{
+					currentlyDragging = false;
+					fractalView.stopDragging(false);
+				}
 				break;
 		}
 		return true;
