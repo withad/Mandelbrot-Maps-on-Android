@@ -15,9 +15,12 @@ public class JuliaFractalView extends AbstractFractalView{
 	private double juliaY = 0;
 	
 	
-	public JuliaFractalView(Context context, RenderStyle style, RenderThread firstThread, RenderThread secondThread) {
-		super(context, style, firstThread, secondThread);
+	public JuliaFractalView(Context context, RenderStyle style) {
+		super(context, style);
 
+		upperRenderThread.setName("Julia primary thread");
+		lowerRenderThread.setName("Julia seconary thread");
+		
 		// Set the "maximum iteration" calculation constants
 		// Empirically determined values for Julia sets.
 		ITERATION_BASE = 1.58;

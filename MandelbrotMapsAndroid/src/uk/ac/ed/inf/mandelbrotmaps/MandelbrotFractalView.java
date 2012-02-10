@@ -9,10 +9,14 @@ public class MandelbrotFractalView extends AbstractFractalView{
 
 	private final String TAG = "MMaps";
 	
+	private String viewName = "Mandelbrot";
 	
-	public MandelbrotFractalView(Context context, RenderStyle style, RenderThread firstThread, RenderThread secondThread) {
-		super(context, style, firstThread, secondThread);
-
+	public MandelbrotFractalView(Context context, RenderStyle style) {
+		super(context, style);
+		
+		upperRenderThread.setName("Mandelbrot primary thread");
+		lowerRenderThread.setName("Mandelbrot seconary thread");
+		
 		// Set the "maximum iteration" calculation constants
 		// Empirically determined values for Mandelbrot set.
 		ITERATION_BASE = 1.24;

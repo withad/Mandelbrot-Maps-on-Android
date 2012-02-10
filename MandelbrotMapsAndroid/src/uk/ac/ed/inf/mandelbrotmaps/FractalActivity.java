@@ -53,9 +53,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private int dragID = -1;
 	
 	RenderStyle style;
-	
-	RenderThread upperRenderThread = null;
-    RenderThread lowerRenderThread = null;
    
 
    @Override
@@ -73,10 +70,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
       
       if (fractalType == FractalType.MANDELBROT)
-    	  fractalView = new MandelbrotFractalView(this, style, upperRenderThread, lowerRenderThread);
+    	  fractalView = new MandelbrotFractalView(this, style);
       else if (fractalType == FractalType.JULIA)
       {
-    	  fractalView = new JuliaFractalView(this, style, upperRenderThread, lowerRenderThread);
+    	  fractalView = new JuliaFractalView(this, style);
       }
       
       setContentView(fractalView);
