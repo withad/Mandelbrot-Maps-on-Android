@@ -1,8 +1,11 @@
 package uk.ac.ed.inf.mandelbrotmaps;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Calendar;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
@@ -624,6 +628,51 @@ abstract class AbstractFractalView extends View {
 /*Utilities*/
 /*-----------------------------------------------------------------------------------*/
 	
+	public void saveImage()
+	{
+		//TODO: Check if file exists already, add user filename, change to co-ordinates
+		//Check if external storage is available
+		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+		{
+			File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+			File imagefile = new File(path, "FractalImage" + getFileTag() + ".jpg");
+			
+			try {
+				//Check pictures directory already exists
+				path.mkdir();
+				
+				FileOutputStream output = new FileOutputStream(imagefile);
+				fractalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
+
+				output.close();
+				
+				Log.d(TAG, "Wrote image out to " + imagefile.getAbsolutePath());
+			}
+			catch (IOException ioe)
+			{
+				//File writing failed
+				Log.d(TAG, "Could not write image file to " + imagefile.getAbsolutePath());
+			}
+		}
+	}
+	
+	
+	private String getFileTag() {
+		String datetime = "";
+		
+		Calendar currentTime = Calendar.getInstance();
+		datetime += currentTime.get(Calendar.YEAR) + "-";
+		datetime += currentTime.get(Calendar.MONTH) + "-";
+		datetime += currentTime.get(Calendar.DAY_OF_MONTH) + "-";
+		datetime += currentTime.get(Calendar.HOUR_OF_DAY) + "-";
+		datetime += currentTime.get(Calendar.MINUTE) + "-";
+		datetime += currentTime.get(Calendar.SECOND);
+		
+		return datetime;
+	}
+
+
+
 	//Fill the pixel sizes array with a number larger than any reasonable block size
 	private void clearPixelSizes() {
 		Log.d(TAG, "Clearing pixel sizes");
@@ -640,10 +689,11 @@ abstract class AbstractFractalView extends View {
 	public void reset(){
 		pauseRendering = false;
 		
+		stopAllRendering();
+		
 		bitmapCreations = 0;
 
 		matrix.reset();
-		stopAllRendering();
 		fractalPixels = new int[getWidth() * getHeight()];
 		clearPixelSizes();
 		canvasHome();

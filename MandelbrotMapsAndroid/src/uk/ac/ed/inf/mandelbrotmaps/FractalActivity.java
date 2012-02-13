@@ -43,6 +43,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private final String TAG = "MMaps";
 
 	private AbstractFractalView fractalView;
+	private AbstractFractalView littleFractalView;
 	private MandelbrotJuliaLocation mjLocation;
 	   
 	private float dragLastX;
@@ -119,6 +120,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    protected void onDestroy(){
 	   super.onDestroy();
+	   fractalView.stopAllRendering();
 	   fractalView.interruptThreads();
 	   Log.d(TAG, "Running onDestroy().");
    }
@@ -157,6 +159,9 @@ public void finish(){
     	  return true;
       case R.id.toggleCrude:
     	  fractalView.crudeRendering = !fractalView.crudeRendering;
+    	  return true;
+      case R.id.saveImage:
+    	  fractalView.saveImage();
     	  return true;
       }
       return false;

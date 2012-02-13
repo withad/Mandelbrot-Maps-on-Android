@@ -6,5 +6,6 @@
     <item android:visible="true" android:id="@+id/toggleCrude" android:enabled="true" android:title="Toggle crude" android:checked="false" android:checkable="true"></item>
     <item android:checkable="false" android:title="Print location" android:id="@+id/printLocation" android:visible="true" android:enabled="true" android:checked="false"></item>
     <item android:title="Set to bookmark" android:id="@+id/settobookmark"></item>
+    <item android:id="@+id/saveImage" android:title="Save image"></item>
     
 </menu>
