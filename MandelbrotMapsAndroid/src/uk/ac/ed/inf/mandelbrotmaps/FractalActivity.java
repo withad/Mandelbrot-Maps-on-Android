@@ -22,6 +22,8 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
 
@@ -65,29 +67,46 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
+      
       Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+      
       Log.d(TAG, "onCreate");
       
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+      
+      RelativeLayout relativeLayout = new RelativeLayout(this);      
+      
       Bundle bundle = getIntent().getExtras();
       
       fractalType = (bundle.getInt("FRACTAL") == 0 ? FractalType.MANDELBROT : FractalType.JULIA);
       style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
       
-      if (fractalType == FractalType.MANDELBROT)
+      if (fractalType == FractalType.MANDELBROT) 
+      {
     	  fractalView = new MandelbrotFractalView(this, style);
+      	  littleFractalView = new JuliaFractalView(this, style);
+      }
       else if (fractalType == FractalType.JULIA)
       {
     	  fractalView = new JuliaFractalView(this, style);
       }
       
-      setContentView(fractalView);
+            
+      LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+      relativeLayout.addView(fractalView, lp);
+      
+      LayoutParams lp2 = new LayoutParams(200, 200);
+      relativeLayout.addView(littleFractalView, lp2);
+      
+      //setContentView(fractalView);
+      setContentView(relativeLayout);
       fractalView.requestFocus();
       
       mjLocation = new MandelbrotJuliaLocation();
       fractalView.loadLocation(mjLocation);
+      littleFractalView.loadLocation(mjLocation);
       
       if (fractalType == FractalType.JULIA)
       {
