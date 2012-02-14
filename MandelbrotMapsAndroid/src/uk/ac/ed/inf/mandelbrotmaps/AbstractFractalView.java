@@ -7,11 +7,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
@@ -628,7 +630,7 @@ abstract class AbstractFractalView extends View {
 /*Utilities*/
 /*-----------------------------------------------------------------------------------*/
 	
-	public void saveImage()
+	public File saveImage()
 	{
 		//TODO: Check if file exists already, add user filename, change to co-ordinates
 		//Check if external storage is available
@@ -642,7 +644,7 @@ abstract class AbstractFractalView extends View {
 				path.mkdir();
 				
 				FileOutputStream output = new FileOutputStream(imagefile);
-				fractalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
+				fractalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, output);
 
 				output.close();
 				
@@ -653,6 +655,12 @@ abstract class AbstractFractalView extends View {
 				//File writing failed
 				Log.d(TAG, "Could not write image file to " + imagefile.getAbsolutePath());
 			}
+			
+			return imagefile;
+		}
+		else
+		{
+			return null;
 		}
 	}
 	
@@ -670,7 +678,6 @@ abstract class AbstractFractalView extends View {
 		
 		return datetime;
 	}
-
 
 
 	//Fill the pixel sizes array with a number larger than any reasonable block size

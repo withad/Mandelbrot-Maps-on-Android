@@ -1,5 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import java.io.File;
+
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.ControlMode;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
@@ -7,6 +9,7 @@ import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -54,7 +57,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private int dragID = -1;
 	
 	RenderStyle style;
+	
+	private int SHARE_IMAGE_REQUEST = 0;
    
+	private File imagefile;
 
    @Override
    protected void onCreate(Bundle savedInstanceState) {
@@ -127,13 +133,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    
    
    @Override
-public void finish(){
-	   super.finish();
-	   Log.d(TAG, "Running finish.");
-   }
-   
-   
-   @Override
    public boolean onCreateOptionsMenu(Menu menu) {
       super.onCreateOptionsMenu(menu);
       MenuInflater inflater = getMenuInflater();
@@ -141,13 +140,14 @@ public void finish(){
       return true;
    }
 
+   
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
-      case R.id.printLocation:
+      /*case R.id.printLocation:
     	  double[] current_area = fractalView.getGraphArea();
     	  Log.d(TAG, "X: " + current_area[0] + " Y: " + current_area[1] + " Width: " + current_area[2]);
-    	  return true;
+    	  return true;*/
       case R.id.settobookmark:
     	  fractalView.setToBookmark();
     	  return true;
@@ -163,8 +163,32 @@ public void finish(){
       case R.id.saveImage:
     	  fractalView.saveImage();
     	  return true;
+      case R.id.shareImage:
+    	  shareImage();
+    	  return true;
       }
       return false;
+   }
+
+
+   private void shareImage() {
+	   imagefile = fractalView.saveImage();
+		
+		Intent imageIntent = new Intent(Intent.ACTION_SEND);
+		imageIntent.setType("image/jpg");
+		imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
+		
+		startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+   }
+   
+   
+   @Override
+   protected void onActivityResult(int requestCode, int resultCode, Intent data)
+   {
+	   if (requestCode == 0) {
+			   Log.d(TAG, "Deleting temporary jpg " + imagefile.getAbsolutePath());
+			   imagefile.delete();
+	   }
    }
 
 

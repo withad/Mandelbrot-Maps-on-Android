@@ -4,8 +4,9 @@
     <item android:id="@+id/resetFractal" android:enabled="true" android:visible="true" android:title="Reset"></item>
     <item android:checkable="true" android:title="Julia" android:checked="false" android:id="@+id/juliamode" android:visible="true"></item>
     <item android:visible="true" android:id="@+id/toggleCrude" android:enabled="true" android:title="Toggle crude" android:checked="false" android:checkable="true"></item>
-    <item android:checkable="false" android:title="Print location" android:id="@+id/printLocation" android:visible="true" android:enabled="true" android:checked="false"></item>
+    
     <item android:title="Set to bookmark" android:id="@+id/settobookmark"></item>
-    <item android:id="@+id/saveImage" android:title="Save image"></item>
+    <item android:id="@+id/shareImage" android:title="Share image"></item><item android:id="@+id/saveImage" android:title="Save image"></item>
+    
     
 </menu>
