@@ -2,12 +2,8 @@ package uk.ac.ed.inf.mandelbrotmaps;
 
 import java.io.File;
 
-import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.ControlMode;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
-import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
-
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -64,6 +60,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    
 	private File imagefile;
 
+	private boolean includeLittle;
+	
+	
+	
+/*-----------------------------------------------------------------------------------*/
+/*Android lifecycle handling*/
+/*-----------------------------------------------------------------------------------*/
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
@@ -80,13 +83,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       
       Bundle bundle = getIntent().getExtras();
       
+      includeLittle = bundle.getBoolean("SideBySide");
       fractalType = (bundle.getInt("FRACTAL") == 0 ? FractalType.MANDELBROT : FractalType.JULIA);
       style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
       
       if (fractalType == FractalType.MANDELBROT) 
       {
     	  fractalView = new MandelbrotFractalView(this, style);
-      	  littleFractalView = new JuliaFractalView(this, style);
+      	  if(includeLittle) littleFractalView = new JuliaFractalView(this, style);
       }
       else if (fractalType == FractalType.JULIA)
       {
@@ -97,8 +101,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
       relativeLayout.addView(fractalView, lp);
       
-      LayoutParams lp2 = new LayoutParams(200, 200);
-      relativeLayout.addView(littleFractalView, lp2);
+      if (includeLittle)
+      {
+	      LayoutParams lp2 = new LayoutParams(50, 50);
+	      relativeLayout.addView(littleFractalView, lp2);
+      }
       
       //setContentView(fractalView);
       setContentView(relativeLayout);
@@ -106,7 +113,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       
       mjLocation = new MandelbrotJuliaLocation();
       fractalView.loadLocation(mjLocation);
-      littleFractalView.loadLocation(mjLocation);
+      if(includeLittle) littleFractalView.loadLocation(mjLocation);
       
       if (fractalType == FractalType.JULIA)
       {
@@ -118,7 +125,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       
       gestureDetector = new ScaleGestureDetector(this, this);
    }
-
    
    @Override
    protected void onResume() {
@@ -126,21 +132,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       displaymode = DisplayMode.MANDELBROT;      
       Log.d(TAG, "onResume");
    }
-
-   
-   @Override
-   protected void onPause() {
-      super.onPause();
-      Log.d(TAG, "onPause");
-   }
-   
-   
-   @Override
-   protected void onStop() {
-      super.onStop();
-      Log.d(TAG, "onStop");
-   }
-   
    
    @Override
    protected void onDestroy(){
@@ -151,6 +142,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    }
    
    
+   
+/*-----------------------------------------------------------------------------------*/
+/*Menu creation/handling*/
+/*-----------------------------------------------------------------------------------*/
    @Override
    public boolean onCreateOptionsMenu(Menu menu) {
       super.onCreateOptionsMenu(menu);
@@ -159,7 +154,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       return true;
    }
 
-   
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
@@ -171,7 +165,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  fractalView.setToBookmark();
     	  return true;
       case R.id.juliamode:
-    	  displaymode = DisplayMode.ABOUT_TO_JULIA;
+    	  if(!includeLittle)displaymode = DisplayMode.ABOUT_TO_JULIA;
     	  return true;
       case R.id.resetFractal:
     	  fractalView.reset();
@@ -190,6 +184,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    }
 
 
+/*-----------------------------------------------------------------------------------*/
+/*Image sharing*/
+/*-----------------------------------------------------------------------------------*/
    private void shareImage() {
 	   imagefile = fractalView.saveImage();
 		
@@ -200,7 +197,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
    }
    
-   
    @Override
    protected void onActivityResult(int requestCode, int resultCode, Intent data)
    {
@@ -210,7 +206,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   }
    }
 
+   
 
+/*-----------------------------------------------------------------------------------*/
+/*Touch controls*/
+/*-----------------------------------------------------------------------------------*/
    public boolean onTouch(View v, MotionEvent evt) {
 		gestureDetector.onTouchEvent(evt);
 		
@@ -222,6 +222,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					Intent intent = new Intent(this, FractalActivity.class);
 					Bundle bundle = new Bundle();
 					bundle.putInt("FRACTAL", 1);
+					bundle.putBoolean("SideBySide", includeLittle);
 					
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					bundle.putDouble("JULIA_X", juliaParams[0]);
@@ -230,6 +231,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					
 					intent.putExtras(bundle);
 			   		startActivity(intent);
+				}
+				else if (includeLittle)
+				{
+					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
+					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
 				}
 				else
 				{
@@ -259,6 +265,12 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					dragLastY = evt.getY(pointerIndex);
 					return true;
 				}
+				else if (includeLittle)
+				{
+					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
+					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+				}
+				
 				return false;
 				
 			case MotionEvent.ACTION_POINTER_UP:
@@ -292,8 +304,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		}
 		return true;
 	}
-	
-	
+
    public boolean onScaleBegin(ScaleGestureDetector detector) {
 	   fractalView.stopDragging(true);
 	   fractalView.startZooming(detector.getFocusX(), detector.getFocusY());
@@ -301,13 +312,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   currentlyDragging = false;
 	   return true;
 	}
-	
-	
+
    public boolean onScale(ScaleGestureDetector detector) {
 		fractalView.zoomImage(detector.getFocusX(), detector.getFocusY(), detector.getScaleFactor());
 		return true;
 	}
-	
 	
    public void onScaleEnd(ScaleGestureDetector detector) {
 	   fractalView.stopZooming();

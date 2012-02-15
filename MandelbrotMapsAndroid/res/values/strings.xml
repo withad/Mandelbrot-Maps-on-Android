@@ -29,4 +29,5 @@ moving a Mandelbrot fractal.
 </string>
    <string name="about_label">About</string>
    <string name="bitmap_label">Bitmap (not implemented)</string>
+   <string name="side_by_side_label">Side-by-side fractals</string>
 </resources>

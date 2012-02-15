@@ -35,6 +35,9 @@ public class LauncherActivity extends Activity implements OnClickListener {
       
       View uiMockupButton = findViewById(R.id.bitmap_test_button);
       uiMockupButton.setOnClickListener(this);
+      
+      View sideBySideButton = findViewById(R.id.side_by_side_button);
+      sideBySideButton.setOnClickListener(this);
    }
 
    @Override
@@ -54,11 +57,15 @@ public class LauncherActivity extends Activity implements OnClickListener {
          startActivity(i);
          break;
       case R.id.fractal_button:
-         startFractal(RenderStyle.SINGLE_THREAD);
+         startFractal(RenderStyle.SINGLE_THREAD, false);
          break;
       case R.id.bitmap_test_button:
     	  //startActivity(new Intent(this, BitmapActivity.class));
-    	  startFractal(RenderStyle.DUAL_THREAD);
+    	  startFractal(RenderStyle.DUAL_THREAD, false);
+    	  break;
+      case R.id.side_by_side_button:
+    	  Log.d(TAG, "Side by side button pressed");
+    	  startFractal(RenderStyle.DUAL_THREAD, true);
     	  break;
       case R.id.exit_button:
          finish();
@@ -75,9 +82,10 @@ public class LauncherActivity extends Activity implements OnClickListener {
    }
 
    /** Start a new game with the given difficulty level */
-   private void startFractal(RenderStyle style) {
+   private void startFractal(RenderStyle style, boolean sideBySide) {
    		Intent intent = new Intent(this.getApplicationContext(), FractalActivity.class);
    		Bundle bundle = new Bundle();
+   		bundle.putBoolean("SideBySide", sideBySide);
    		bundle.putInt("FRACTAL", 0);
    		bundle.putString("RenderStyle", style.toString());
    		intent.putExtras(bundle);

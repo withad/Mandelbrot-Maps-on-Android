@@ -292,123 +292,123 @@ abstract class AbstractFractalView extends View {
 /* Movement */
 /*-----------------------------------------------------------------------------------*/
 		
-		// Set new graph area
-		public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
-			Log.d(TAG, "moveFractal()");
-			
-			// What does each pixel correspond to, on the complex plane?
-			double pixelSize = getPixelSize();
-			
-			// Adjust the Graph Area
-			double[] newGraphArea = getGraphArea();
-			newGraphArea[0] -= (dragDiffPixelsX * pixelSize);
-			newGraphArea[1] -= -(dragDiffPixelsY * pixelSize);
-			setGraphArea(newGraphArea, false);
-		}
+	// Set new graph area
+	public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
+		Log.d(TAG, "moveFractal()");
 		
+		// What does each pixel correspond to, on the complex plane?
+		double pixelSize = getPixelSize();
 		
-		// Begin translating the image relative to the users finger
-		public void startDragging()
-		{			
-			controlmode = ControlMode.DRAGGING;
-			
-			//Stop current rendering (to not render areas that are offscreen afterwards)
-			stopAllRendering();
-			
-			//Clear translation variables
-			bitmapX = 0;
-			bitmapY = 0;
-			totalDragX = 0;
-			totalDragY = 0;
-			
-			hasZoomed = false;
-		}
+		// Adjust the Graph Area
+		double[] newGraphArea = getGraphArea();
+		newGraphArea[0] -= (dragDiffPixelsX * pixelSize);
+		newGraphArea[1] -= -(dragDiffPixelsY * pixelSize);
+		setGraphArea(newGraphArea, false);
+	}
+	
+	
+	// Begin translating the image relative to the users finger
+	public void startDragging()
+	{			
+		controlmode = ControlMode.DRAGGING;
 		
+		//Stop current rendering (to not render areas that are offscreen afterwards)
+		stopAllRendering();
 		
-		// Update the position of the image on screen as finger moves
-		public void dragFractal(float dragDiffPixelsX, float dragDiffPixelsY) {		
-			bitmapX = dragDiffPixelsX;
-			bitmapY = dragDiffPixelsY;
-			
-			totalDragX += dragDiffPixelsX;
-			totalDragY += dragDiffPixelsY;
-			
-			invalidate();
-		}
+		//Clear translation variables
+		bitmapX = 0;
+		bitmapY = 0;
+		totalDragX = 0;
+		totalDragY = 0;
 		
+		hasZoomed = false;
+	}
+	
+	
+	// Update the position of the image on screen as finger moves
+	public void dragFractal(float dragDiffPixelsX, float dragDiffPixelsY) {		
+		bitmapX = dragDiffPixelsX;
+		bitmapY = dragDiffPixelsY;
 		
-		// Stop moving the image around, calculate new area. Run when finger lifted.
-		public void stopDragging(boolean stoppedOnZoom)
-		{		
-			controlmode = ControlMode.STATIC;
-			
-			Log.d(TAG, "Stopped on zoom: " + stoppedOnZoom);
-			
-			// If no zooming's occured, keep the remaining pixels
-			if(!hasZoomed && !stoppedOnZoom) 
-			{
-				renderMode = RenderMode.JUST_DRAGGED;
-				shiftPixels((int)totalDragX, (int)totalDragY);
-			}
-			else 
-				renderMode = RenderMode.NEW;
-			
-			//Set the new location for the fractals
-			moveFractal((int)totalDragX, (int)totalDragY);
-			
-			if(!stoppedOnZoom) scheduleNewRenders();
-			
-			// Reset all the variables (possibly paranoid)
-			if(!hasZoomed && !stoppedOnZoom) matrix.reset();
-			
-			
-			hasZoomed = false;
-			
-			invalidate();
-		}
-
+		totalDragX += dragDiffPixelsX;
+		totalDragY += dragDiffPixelsY;
 		
-		// Take the current pixel value array and adjust it to keep pixels that have already been calculated
-		public void shiftPixels(int shiftX, int shiftY)
+		invalidate();
+	}
+	
+	
+	// Stop moving the image around, calculate new area. Run when finger lifted.
+	public void stopDragging(boolean stoppedOnZoom)
+	{		
+		controlmode = ControlMode.STATIC;
+		
+		Log.d(TAG, "Stopped on zoom: " + stoppedOnZoom);
+		
+		// If no zooming's occured, keep the remaining pixels
+		if(!hasZoomed && !stoppedOnZoom) 
 		{
-			Log.d(TAG, "Shifting pixels");
-			
-			int height = getHeight();
-			int width = getWidth();
-			int[] newPixels = new int[height * width];
-			int[] newSizes = new int[height * width];
-			for (int i = 0; i < newSizes.length; i++) newSizes[i] = 1000;
-			
-			//Choose rows to copy from
-			int rowNum = height - Math.abs(shiftY);
-			int origStartRow = (shiftY < 0 ? Math.abs(shiftY) : 0);
-			
-			//Choose columns to copy from
-			int colNum = width - Math.abs(shiftX);
-			int origStartCol = (shiftX < 0 ? Math.abs(shiftX) : 0);
-			
-			//Choose columns to copy to
-			int destStartCol = (shiftX < 0 ? 0 : shiftX);
-			
-			//Copy useful parts into new array
-			for (int origY = origStartRow; origY < origStartRow + rowNum; origY++)
-			{
-				int destY = origY + shiftY;
-				System.arraycopy(fractalPixels, (origY * width) + origStartCol, 
-								 newPixels, (destY * width) + destStartCol,
-								 colNum);
-				System.arraycopy(pixelSizes, (origY * width) + origStartCol, 
-						 newSizes, (destY * width) + destStartCol,
-						 colNum);
-			}
-			
-			//Set values
-			fractalPixels = newPixels;
-			pixelSizes = newSizes;
+			renderMode = RenderMode.JUST_DRAGGED;
+			shiftPixels((int)totalDragX, (int)totalDragY);
+		}
+		else 
+			renderMode = RenderMode.NEW;
+		
+		//Set the new location for the fractals
+		moveFractal((int)totalDragX, (int)totalDragY);
+		
+		if(!stoppedOnZoom) scheduleNewRenders();
+		
+		// Reset all the variables (possibly paranoid)
+		if(!hasZoomed && !stoppedOnZoom) matrix.reset();
+		
+		
+		hasZoomed = false;
+		
+		invalidate();
+	}
+
+	
+	// Take the current pixel value array and adjust it to keep pixels that have already been calculated
+	public void shiftPixels(int shiftX, int shiftY)
+	{
+		Log.d(TAG, "Shifting pixels");
+		
+		int height = getHeight();
+		int width = getWidth();
+		int[] newPixels = new int[height * width];
+		int[] newSizes = new int[height * width];
+		for (int i = 0; i < newSizes.length; i++) newSizes[i] = 1000;
+		
+		//Choose rows to copy from
+		int rowNum = height - Math.abs(shiftY);
+		int origStartRow = (shiftY < 0 ? Math.abs(shiftY) : 0);
+		
+		//Choose columns to copy from
+		int colNum = width - Math.abs(shiftX);
+		int origStartCol = (shiftX < 0 ? Math.abs(shiftX) : 0);
+		
+		//Choose columns to copy to
+		int destStartCol = (shiftX < 0 ? 0 : shiftX);
+		
+		//Copy useful parts into new array
+		for (int origY = origStartRow; origY < origStartRow + rowNum; origY++)
+		{
+			int destY = origY + shiftY;
+			System.arraycopy(fractalPixels, (origY * width) + origStartCol, 
+							 newPixels, (destY * width) + destStartCol,
+							 colNum);
+			System.arraycopy(pixelSizes, (origY * width) + origStartCol, 
+					 newSizes, (destY * width) + destStartCol,
+					 colNum);
 		}
 		
-		
-		
+		//Set values
+		fractalPixels = newPixels;
+		pixelSizes = newSizes;
+	}
+	
+	
+	
 /*-----------------------------------------------------------------------------------*/
 /* Zooming */	
 /*-----------------------------------------------------------------------------------*/
