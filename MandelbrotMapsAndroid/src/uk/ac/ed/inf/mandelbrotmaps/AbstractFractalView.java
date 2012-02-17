@@ -29,25 +29,27 @@ abstract class AbstractFractalView extends View {
 		JUST_DRAGGED,
 		JUST_ZOOMED
 	}
-	
 	private RenderMode renderMode = RenderMode.NEW;
-	
 	
 	public enum ControlMode {
 		ZOOMING,
 		DRAGGING,
 		STATIC
 	}
-	
 	private ControlMode controlmode = ControlMode.STATIC;
-	
 	
 	public enum RenderStyle{
 		SINGLE_THREAD,
 		DUAL_THREAD
 	}
-	
 	private RenderStyle renderStyle;
+	
+	public enum FractalViewSize{
+		LARGE,
+		LITTLE,
+		HALF
+	}
+	private FractalViewSize fractalViewSize;
 	
 	public int LINES_TO_DRAW_AFTER = 20;
 	
@@ -91,11 +93,8 @@ abstract class AbstractFractalView extends View {
 	double ITERATIONSCALING_MIN = 0.01;
 	double ITERATIONSCALING_MAX = 100;
 	
-	// Mouse dragging state.
-	int dragLastX = 0;
-	int dragLastY = 0;
 	
-	// Graph Area on the Complex Plane? new double[] {x_min, y_max, width}
+	// Graph area on the complex plane? Stored as double[] {x_min, y_max, width}
 	double[] graphArea;
 	double[] homeGraphArea;
 	
@@ -103,33 +102,43 @@ abstract class AbstractFractalView extends View {
 	int[] fractalPixels;
 	int[] pixelSizes;
 	Bitmap fractalBitmap;
-	Bitmap movingBitmap;
+	Bitmap movingBitmap;	
 	
-	// Where to draw the image onscreen
-	public float bitmapX = 0;
-	public float bitmapY = 0;	
+	
+	// Dragging state
+	int dragLastX = 0;
+	int dragLastY = 0;
 	
 	private float totalDragX = 0;
 	private float totalDragY = 0;
 	
+	public float bitmapX = 0;
+	public float bitmapY = 0;
+	
+	
+	// Scaling state
 	public float scaleFactor = 1.0f;
 	public float midX = 0.0f;
 	public float midY = 0.0f;
 	
-	boolean pauseRendering = false;
 	boolean zoomingFractal = false;
 	boolean hasZoomed = false;
 	
+	
+	// Tracks scaling/ dragging position
 	private Matrix matrix;
 	
-	boolean crudeRendering = true;//false;
+	boolean crudeRendering = true;
 	
+	// Track number of draws to screen (debug info)
 	int bitmapCreations = 0;
+	
+	
 	
 /*-----------------------------------------------------------------------------------*/
 /*Constructor*/
 /*-----------------------------------------------------------------------------------*/
-	public AbstractFractalView(Context context, RenderStyle style) {
+	public AbstractFractalView(Context context, RenderStyle style, FractalViewSize size) {
 		super(context);
 		setFocusable(true);
 		setFocusableInTouchMode(true);
@@ -137,6 +146,7 @@ abstract class AbstractFractalView extends View {
       	setId(0); 
       	
       	renderStyle = style;
+      	fractalViewSize = size;
       
       	setOnTouchListener((FractalActivity)context);
       
@@ -229,8 +239,8 @@ abstract class AbstractFractalView extends View {
 		//Abort future rendering queue.
 		stopAllRendering();
 		
-		//Schedule a crude rendering
-		if(crudeRendering)
+		//Schedule a crude rendering, if needed and not small view
+		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE)
 			scheduleRendering(INITIAL_PIXEL_BLOCK);
 		
 		// Schedule a high-quality rendering
@@ -241,7 +251,7 @@ abstract class AbstractFractalView extends View {
 	// Computes all necessary pixels (run by render thread)
 	public void computeAllPixels(final int pixelBlockSize, FractalSection half) {
 		// Nothing to do - stop if called before layout has been sanely set...
-		if (getWidth() <= 0 || graphArea == null || pauseRendering)
+		if (getWidth() <= 0 || graphArea == null)
 			return;
 		
 		int yStart = 0;
@@ -265,6 +275,9 @@ abstract class AbstractFractalView extends View {
 			
 		if (pixelSizes == null)
 			pixelSizes = new int[getWidth() * getHeight()];
+		
+		// Don't bother showing render progress on little views
+		if(fractalViewSize == FractalViewSize.LITTLE) showRenderProgress = false;
 		
 		computePixels(
 			fractalPixels,
@@ -571,9 +584,12 @@ abstract class AbstractFractalView extends View {
 		// How many iterations to perform?
 		double absLnPixelSize = Math.abs(Math.log(getPixelSize()));
 		double dblIterations = iterationScaling * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
+		
 		int iterationsToPerform = (int)dblIterations;
+		
 		Log.d(TAG, "Performing " + iterationsToPerform + " iterations.");
 		Log.d(TAG, "Iteration scaling is " + iterationScaling + ".");
+		
 		return Math.max(iterationsToPerform, MIN_ITERATIONS);
 	}
 	
@@ -693,9 +709,7 @@ abstract class AbstractFractalView extends View {
 	
 	
 	//Stop current rendering and return to "home"
-	public void reset(){
-		pauseRendering = false;
-		
+	public void reset(){		
 		stopAllRendering();
 		
 		bitmapCreations = 0;

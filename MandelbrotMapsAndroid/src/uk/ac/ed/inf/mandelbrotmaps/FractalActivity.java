@@ -2,6 +2,7 @@ package uk.ac.ed.inf.mandelbrotmaps;
 
 import java.io.File;
 
+import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 import android.app.Activity;
 import android.content.Intent;
@@ -61,6 +62,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private File imagefile;
 
 	private boolean includeLittle;
+	FractalViewSize size;
 	
 	
 	
@@ -83,18 +85,18 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       
       Bundle bundle = getIntent().getExtras();
       
-      includeLittle = bundle.getBoolean("SideBySide");
       fractalType = (bundle.getInt("FRACTAL") == 0 ? FractalType.MANDELBROT : FractalType.JULIA);
       style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
+      includeLittle = bundle.getBoolean("SideBySide");
       
       if (fractalType == FractalType.MANDELBROT) 
       {
-    	  fractalView = new MandelbrotFractalView(this, style);
-      	  if(includeLittle) littleFractalView = new JuliaFractalView(this, style);
+    	  fractalView = new MandelbrotFractalView(this, style, FractalViewSize.LARGE);
+      	  if(includeLittle) littleFractalView = new JuliaFractalView(this, style, FractalViewSize.LITTLE);
       }
       else if (fractalType == FractalType.JULIA)
       {
-    	  fractalView = new JuliaFractalView(this, style);
+    	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
       }
       
             
@@ -157,10 +159,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
-      /*case R.id.printLocation:
-    	  double[] current_area = fractalView.getGraphArea();
-    	  Log.d(TAG, "X: " + current_area[0] + " Y: " + current_area[1] + " Width: " + current_area[2]);
-    	  return true;*/
       case R.id.settobookmark:
     	  fractalView.setToBookmark();
     	  return true;

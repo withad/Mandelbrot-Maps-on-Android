@@ -1,5 +1,6 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderMode;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
@@ -15,8 +16,8 @@ public class JuliaFractalView extends AbstractFractalView{
 	private double juliaY = 0;
 	
 	
-	public JuliaFractalView(Context context, RenderStyle style) {
-		super(context, style);
+	public JuliaFractalView(Context context, RenderStyle style, FractalViewSize size) {
+		super(context, style, size);
 
 		upperRenderThread.setName("Julia primary thread");
 		lowerRenderThread.setName("Julia seconary thread");
