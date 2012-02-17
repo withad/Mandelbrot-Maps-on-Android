@@ -190,7 +190,7 @@ abstract class AbstractFractalView extends View {
 	   LINES_TO_DRAW_AFTER = getHeight()/12;
 	   Log.d(TAG, "Drawing every " + LINES_TO_DRAW_AFTER + " lines.");
 	   
-	   
+	   parentActivity.onSizeChanged(w, h);
    }
    
    

@@ -86,6 +86,24 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
       includeLittle = bundle.getBoolean("SideBySide");
       
+      if (fractalType == FractalType.MANDELBROT) 
+      {
+    	  fractalView = new MandelbrotFractalView(this, style, FractalViewSize.LARGE);
+      	  if(includeLittle) littleFractalView = new JuliaFractalView(this, style, FractalViewSize.LITTLE);
+      }
+      else if (fractalType == FractalType.JULIA)
+      {
+    	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
+      }
+      
+      if (fractalType == FractalType.JULIA)
+      {
+    	  double juliaX = bundle.getDouble("JULIA_X");
+          double juliaY = bundle.getDouble("JULIA_Y");
+          
+          ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);
+      }
+      
       gestureDetector = new ScaleGestureDetector(this, this);
    }
    
@@ -106,43 +124,24 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    
    public void onSizeChanged(int width, int height)
    {
-	   RelativeLayout relativeLayout = new RelativeLayout(this);
-	   
-	   if (fractalType == FractalType.MANDELBROT) 
-	      {
-	    	  fractalView = new MandelbrotFractalView(this, style, FractalViewSize.LARGE);
-	      	  if(includeLittle) littleFractalView = new JuliaFractalView(this, style, FractalViewSize.LITTLE);
-	      }
-	      else if (fractalType == FractalType.JULIA)
-	      {
-	    	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
-	      }
-	      
+	   RelativeLayout relativeLayout = new RelativeLayout(this);	      
 	            
-	      LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-	      relativeLayout.addView(fractalView, lp);
-	      
-	      if (includeLittle)
-	      {
-		      LayoutParams lp2 = new LayoutParams(50, 50);
-		      relativeLayout.addView(littleFractalView, lp2);
-	      }
-	      
-	      //setContentView(fractalView);
-	      setContentView(relativeLayout);
-	      fractalView.requestFocus();
-	      
-	      mjLocation = new MandelbrotJuliaLocation();
-	      fractalView.loadLocation(mjLocation);
-	      if(includeLittle) littleFractalView.loadLocation(mjLocation);
-	      
-	      /*if (fractalType == FractalType.JULIA)
-	      {
-	    	  double juliaX = bundle.getDouble("JULIA_X");
-	          double juliaY = bundle.getDouble("JULIA_Y");
-	          
-	          ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);
-	      }*/
+      LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+      relativeLayout.addView(fractalView, lp);
+      
+      if (includeLittle)
+      {
+	      LayoutParams lp2 = new LayoutParams(50, 50);
+	      relativeLayout.addView(littleFractalView, lp2);
+      }
+      
+      //setContentView(fractalView);
+      setContentView(relativeLayout);
+      fractalView.requestFocus();
+      
+      mjLocation = new MandelbrotJuliaLocation();
+      fractalView.loadLocation(mjLocation);
+      if(includeLittle) littleFractalView.loadLocation(mjLocation);
    }
    
 /*-----------------------------------------------------------------------------------*/
