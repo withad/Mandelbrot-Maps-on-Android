@@ -78,52 +78,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       Log.d(TAG, "onCreate");
       
       requestWindowFeature(Window.FEATURE_NO_TITLE);
-      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-      
-      RelativeLayout relativeLayout = new RelativeLayout(this);      
+      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);      
       
       Bundle bundle = getIntent().getExtras();
       
       fractalType = (bundle.getInt("FRACTAL") == 0 ? FractalType.MANDELBROT : FractalType.JULIA);
       style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
       includeLittle = bundle.getBoolean("SideBySide");
-      
-      if (fractalType == FractalType.MANDELBROT) 
-      {
-    	  fractalView = new MandelbrotFractalView(this, style, FractalViewSize.LARGE);
-      	  if(includeLittle) littleFractalView = new JuliaFractalView(this, style, FractalViewSize.LITTLE);
-      }
-      else if (fractalType == FractalType.JULIA)
-      {
-    	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
-      }
-      
-            
-      LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-      relativeLayout.addView(fractalView, lp);
-      
-      if (includeLittle)
-      {
-	      LayoutParams lp2 = new LayoutParams(50, 50);
-	      relativeLayout.addView(littleFractalView, lp2);
-      }
-      
-      //setContentView(fractalView);
-      setContentView(relativeLayout);
-      fractalView.requestFocus();
-      
-      mjLocation = new MandelbrotJuliaLocation();
-      fractalView.loadLocation(mjLocation);
-      if(includeLittle) littleFractalView.loadLocation(mjLocation);
-      
-      if (fractalType == FractalType.JULIA)
-      {
-    	  double juliaX = bundle.getDouble("JULIA_X");
-          double juliaY = bundle.getDouble("JULIA_Y");
-          
-          ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);
-      }
       
       gestureDetector = new ScaleGestureDetector(this, this);
    }
@@ -143,7 +104,46 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   Log.d(TAG, "Running onDestroy().");
    }
    
-   
+   public void onSizeChanged(int width, int height)
+   {
+	   RelativeLayout relativeLayout = new RelativeLayout(this);
+	   
+	   if (fractalType == FractalType.MANDELBROT) 
+	      {
+	    	  fractalView = new MandelbrotFractalView(this, style, FractalViewSize.LARGE);
+	      	  if(includeLittle) littleFractalView = new JuliaFractalView(this, style, FractalViewSize.LITTLE);
+	      }
+	      else if (fractalType == FractalType.JULIA)
+	      {
+	    	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
+	      }
+	      
+	            
+	      LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+	      relativeLayout.addView(fractalView, lp);
+	      
+	      if (includeLittle)
+	      {
+		      LayoutParams lp2 = new LayoutParams(50, 50);
+		      relativeLayout.addView(littleFractalView, lp2);
+	      }
+	      
+	      //setContentView(fractalView);
+	      setContentView(relativeLayout);
+	      fractalView.requestFocus();
+	      
+	      mjLocation = new MandelbrotJuliaLocation();
+	      fractalView.loadLocation(mjLocation);
+	      if(includeLittle) littleFractalView.loadLocation(mjLocation);
+	      
+	      /*if (fractalType == FractalType.JULIA)
+	      {
+	    	  double juliaX = bundle.getDouble("JULIA_X");
+	          double juliaY = bundle.getDouble("JULIA_Y");
+	          
+	          ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);
+	      }*/
+   }
    
 /*-----------------------------------------------------------------------------------*/
 /*Menu creation/handling*/
