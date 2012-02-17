@@ -133,7 +133,7 @@ abstract class AbstractFractalView extends View {
 	// Track number of draws to screen (debug info)
 	int bitmapCreations = 0;
 	
-	FractalActivity parentActivity;
+	//FractalActivity parentActivity;
 	
 	
 	
@@ -150,8 +150,8 @@ abstract class AbstractFractalView extends View {
       	renderStyle = style;
       	fractalViewSize = size;
       
-      	parentActivity = (FractalActivity)context;
-      	setOnTouchListener(parentActivity);
+      	//parentActivity = (FractalActivity)context;
+      	setOnTouchListener((FractalActivity)context);
       
       	matrix = new Matrix();
       	matrix.reset();
@@ -189,8 +189,6 @@ abstract class AbstractFractalView extends View {
 	   
 	   LINES_TO_DRAW_AFTER = getHeight()/12;
 	   Log.d(TAG, "Drawing every " + LINES_TO_DRAW_AFTER + " lines.");
-	   
-	   if(fractalViewSize == FractalViewSize.LARGE) parentActivity.onSizeChanged(w, h);
    }
    
    

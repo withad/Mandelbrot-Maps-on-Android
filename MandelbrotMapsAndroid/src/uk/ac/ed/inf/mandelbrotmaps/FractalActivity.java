@@ -78,7 +78,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       Log.d(TAG, "onCreate");
       
       requestWindowFeature(Window.FEATURE_NO_TITLE);
-      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);      
+      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+      
+      RelativeLayout relativeLayout = new RelativeLayout(this);      
       
       Bundle bundle = getIntent().getExtras();
       
@@ -95,6 +98,24 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       {
     	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
       }
+      
+            
+      LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+      relativeLayout.addView(fractalView, lp);
+      
+      if (includeLittle)
+      {
+	      LayoutParams lp2 = new LayoutParams(50, 50);
+	      relativeLayout.addView(littleFractalView, lp2);
+      }
+      
+      //setContentView(fractalView);
+      setContentView(relativeLayout);
+      fractalView.requestFocus();
+      
+      mjLocation = new MandelbrotJuliaLocation();
+      fractalView.loadLocation(mjLocation);
+      if(includeLittle) littleFractalView.loadLocation(mjLocation);
       
       if (fractalType == FractalType.JULIA)
       {
@@ -122,27 +143,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   Log.d(TAG, "Running onDestroy().");
    }
    
-   public void onSizeChanged(int width, int height)
-   {
-	   RelativeLayout relativeLayout = new RelativeLayout(this);	      
-	            
-      LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-      relativeLayout.addView(fractalView, lp);
-      
-      if (includeLittle)
-      {
-	      LayoutParams lp2 = new LayoutParams(50, 50);
-	      relativeLayout.addView(littleFractalView, lp2);
-      }
-      
-      //setContentView(fractalView);
-      setContentView(relativeLayout);
-      fractalView.requestFocus();
-      
-      mjLocation = new MandelbrotJuliaLocation();
-      fractalView.loadLocation(mjLocation);
-      if(includeLittle) littleFractalView.loadLocation(mjLocation);
-   }
+   
    
 /*-----------------------------------------------------------------------------------*/
 /*Menu creation/handling*/
