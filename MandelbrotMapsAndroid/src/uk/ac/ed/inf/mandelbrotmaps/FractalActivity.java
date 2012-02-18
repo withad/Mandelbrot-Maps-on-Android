@@ -176,7 +176,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  return true;
       case R.id.juliamode:
     	  if(relativeLayout.indexOfChild(littleFractalView) != -1)
-    		  removeJuliaView();//if(!includeLittle)displaymode = DisplayMode.ABOUT_TO_JULIA;
+    		  removeJuliaView();
     	  else
     		  addJuliaView();
     	  return true;
