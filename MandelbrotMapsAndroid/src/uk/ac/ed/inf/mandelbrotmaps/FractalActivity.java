@@ -104,13 +104,15 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       relativeLayout.addView(fractalView, lp);
       setContentView(relativeLayout);
       
-      addJuliaView();
+      //addJuliaView();
+      
+      Log.d(TAG, "Width: " + fractalView.getWidth());
       
       fractalView.requestFocus();
       
       mjLocation = new MandelbrotJuliaLocation();
       fractalView.loadLocation(mjLocation);
-      if(includeLittle) littleFractalView.loadLocation(mjLocation);
+      
       
       if (fractalType == FractalType.JULIA)
       {
@@ -130,6 +132,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	      LayoutParams lp2 = new LayoutParams(50, 50);
 	      relativeLayout.addView(littleFractalView, lp2);
       }
+      
+      if(includeLittle) littleFractalView.loadLocation(mjLocation);
       
       setContentView(relativeLayout);
    }
