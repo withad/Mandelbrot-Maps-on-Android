@@ -1,5 +1,6 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,8 +12,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 	private String viewName = "Mandelbrot";
 	
-	public MandelbrotFractalView(Context context, RenderStyle style) {
-		super(context, style);
+	public MandelbrotFractalView(Context context, RenderStyle style, FractalViewSize size) {
+		super(context, style, size);
 		
 		upperRenderThread.setName("Mandelbrot primary thread");
 		lowerRenderThread.setName("Mandelbrot seconary thread");

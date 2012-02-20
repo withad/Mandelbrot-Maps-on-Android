@@ -29,25 +29,27 @@ abstract class AbstractFractalView extends View {
 		JUST_DRAGGED,
 		JUST_ZOOMED
 	}
-	
 	private RenderMode renderMode = RenderMode.NEW;
-	
 	
 	public enum ControlMode {
 		ZOOMING,
 		DRAGGING,
 		STATIC
 	}
-	
 	private ControlMode controlmode = ControlMode.STATIC;
-	
 	
 	public enum RenderStyle{
 		SINGLE_THREAD,
 		DUAL_THREAD
 	}
-	
 	private RenderStyle renderStyle;
+	
+	public enum FractalViewSize{
+		LARGE,
+		LITTLE,
+		HALF
+	}
+	private FractalViewSize fractalViewSize;
 	
 	public int LINES_TO_DRAW_AFTER = 20;
 	
@@ -91,11 +93,8 @@ abstract class AbstractFractalView extends View {
 	double ITERATIONSCALING_MIN = 0.01;
 	double ITERATIONSCALING_MAX = 100;
 	
-	// Mouse dragging state.
-	int dragLastX = 0;
-	int dragLastY = 0;
 	
-	// Graph Area on the Complex Plane? new double[] {x_min, y_max, width}
+	// Graph area on the complex plane? Stored as double[] {x_min, y_max, width}
 	double[] graphArea;
 	double[] homeGraphArea;
 	
@@ -103,42 +102,60 @@ abstract class AbstractFractalView extends View {
 	int[] fractalPixels;
 	int[] pixelSizes;
 	Bitmap fractalBitmap;
-	Bitmap movingBitmap;
+	Bitmap movingBitmap;	
 	
-	// Where to draw the image onscreen
-	public float bitmapX = 0;
-	public float bitmapY = 0;	
+	
+	// Dragging state
+	int dragLastX = 0;
+	int dragLastY = 0;
 	
 	private float totalDragX = 0;
 	private float totalDragY = 0;
 	
+	public float bitmapX = 0;
+	public float bitmapY = 0;
+	
+	
+	// Scaling state
 	public float scaleFactor = 1.0f;
 	public float midX = 0.0f;
 	public float midY = 0.0f;
 	
-	boolean pauseRendering = false;
 	boolean zoomingFractal = false;
 	boolean hasZoomed = false;
 	
+	
+	// Tracks scaling/ dragging position
 	private Matrix matrix;
 	
-	boolean crudeRendering = true;//false;
+	boolean crudeRendering = true;
 	
+	// Track number of draws to screen (debug info)
 	int bitmapCreations = 0;
+	
+	FractalActivity parentActivity;
+	
+	
 	
 /*-----------------------------------------------------------------------------------*/
 /*Constructor*/
 /*-----------------------------------------------------------------------------------*/
-	public AbstractFractalView(Context context, RenderStyle style) {
+	public AbstractFractalView(Context context, RenderStyle style, FractalViewSize size) {
 		super(context);
 		setFocusable(true);
 		setFocusableInTouchMode(true);
-		setBackgroundColor(Color.BLACK);
       	setId(0); 
       	
       	renderStyle = style;
+      	fractalViewSize = size;
+      	
+/*      	if (fractalViewSize == FractalViewSize.LARGE)
+			setBackgroundColor(Color.BLACK);
+		else*/
+			setBackgroundColor(Color.BLUE);
       
-      	setOnTouchListener((FractalActivity)context);
+      	parentActivity = (FractalActivity)context;
+      	setOnTouchListener(parentActivity);
       
       	matrix = new Matrix();
       	matrix.reset();
@@ -173,6 +190,8 @@ abstract class AbstractFractalView extends View {
    @Override
    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 	   super.onSizeChanged(w, h, oldw, oldh);
+	   
+	   if(fractalViewSize == FractalViewSize.LARGE) parentActivity.addJuliaView();
 	   
 	   LINES_TO_DRAW_AFTER = getHeight()/12;
 	   Log.d(TAG, "Drawing every " + LINES_TO_DRAW_AFTER + " lines.");
@@ -213,7 +232,7 @@ abstract class AbstractFractalView extends View {
 	if(controlmode == ControlMode.STATIC) 
 		{
 			bitmapCreations++;
-			Log.d(TAG, "Create a new bitmap! " + bitmapCreations);
+			//Log.d(TAG, "Create a new bitmap! " + bitmapCreations);
 			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		}
 	
@@ -224,13 +243,11 @@ abstract class AbstractFractalView extends View {
    
    // Adds renders to the queue for processing by render thread
 	void scheduleNewRenders() {		
-		Log.d(TAG, "scheduleNewRenders");
-		
 		//Abort future rendering queue.
 		stopAllRendering();
 		
-		//Schedule a crude rendering
-		if(crudeRendering)
+		//Schedule a crude rendering, if needed and not small view
+		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE)
 			scheduleRendering(INITIAL_PIXEL_BLOCK);
 		
 		// Schedule a high-quality rendering
@@ -241,7 +258,7 @@ abstract class AbstractFractalView extends View {
 	// Computes all necessary pixels (run by render thread)
 	public void computeAllPixels(final int pixelBlockSize, FractalSection half) {
 		// Nothing to do - stop if called before layout has been sanely set...
-		if (getWidth() <= 0 || graphArea == null || pauseRendering)
+		if (getWidth() <= 0 || graphArea == null)
 			return;
 		
 		int yStart = 0;
@@ -265,6 +282,9 @@ abstract class AbstractFractalView extends View {
 			
 		if (pixelSizes == null)
 			pixelSizes = new int[getWidth() * getHeight()];
+		
+		// Don't bother showing render progress on little views
+		if(fractalViewSize == FractalViewSize.LITTLE) showRenderProgress = false;
 		
 		computePixels(
 			fractalPixels,
@@ -292,123 +312,123 @@ abstract class AbstractFractalView extends View {
 /* Movement */
 /*-----------------------------------------------------------------------------------*/
 		
-		// Set new graph area
-		public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
-			Log.d(TAG, "moveFractal()");
-			
-			// What does each pixel correspond to, on the complex plane?
-			double pixelSize = getPixelSize();
-			
-			// Adjust the Graph Area
-			double[] newGraphArea = getGraphArea();
-			newGraphArea[0] -= (dragDiffPixelsX * pixelSize);
-			newGraphArea[1] -= -(dragDiffPixelsY * pixelSize);
-			setGraphArea(newGraphArea, false);
-		}
+	// Set new graph area
+	public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
+		Log.d(TAG, "moveFractal()");
 		
+		// What does each pixel correspond to, on the complex plane?
+		double pixelSize = getPixelSize();
 		
-		// Begin translating the image relative to the users finger
-		public void startDragging()
-		{			
-			controlmode = ControlMode.DRAGGING;
-			
-			//Stop current rendering (to not render areas that are offscreen afterwards)
-			stopAllRendering();
-			
-			//Clear translation variables
-			bitmapX = 0;
-			bitmapY = 0;
-			totalDragX = 0;
-			totalDragY = 0;
-			
-			hasZoomed = false;
-		}
+		// Adjust the Graph Area
+		double[] newGraphArea = getGraphArea();
+		newGraphArea[0] -= (dragDiffPixelsX * pixelSize);
+		newGraphArea[1] -= -(dragDiffPixelsY * pixelSize);
+		setGraphArea(newGraphArea, false);
+	}
+	
+	
+	// Begin translating the image relative to the users finger
+	public void startDragging()
+	{			
+		controlmode = ControlMode.DRAGGING;
 		
+		//Stop current rendering (to not render areas that are offscreen afterwards)
+		stopAllRendering();
 		
-		// Update the position of the image on screen as finger moves
-		public void dragFractal(float dragDiffPixelsX, float dragDiffPixelsY) {		
-			bitmapX = dragDiffPixelsX;
-			bitmapY = dragDiffPixelsY;
-			
-			totalDragX += dragDiffPixelsX;
-			totalDragY += dragDiffPixelsY;
-			
-			invalidate();
-		}
+		//Clear translation variables
+		bitmapX = 0;
+		bitmapY = 0;
+		totalDragX = 0;
+		totalDragY = 0;
 		
+		hasZoomed = false;
+	}
+	
+	
+	// Update the position of the image on screen as finger moves
+	public void dragFractal(float dragDiffPixelsX, float dragDiffPixelsY) {		
+		bitmapX = dragDiffPixelsX;
+		bitmapY = dragDiffPixelsY;
 		
-		// Stop moving the image around, calculate new area. Run when finger lifted.
-		public void stopDragging(boolean stoppedOnZoom)
-		{		
-			controlmode = ControlMode.STATIC;
-			
-			Log.d(TAG, "Stopped on zoom: " + stoppedOnZoom);
-			
-			// If no zooming's occured, keep the remaining pixels
-			if(!hasZoomed && !stoppedOnZoom) 
-			{
-				renderMode = RenderMode.JUST_DRAGGED;
-				shiftPixels((int)totalDragX, (int)totalDragY);
-			}
-			else 
-				renderMode = RenderMode.NEW;
-			
-			//Set the new location for the fractals
-			moveFractal((int)totalDragX, (int)totalDragY);
-			
-			if(!stoppedOnZoom) scheduleNewRenders();
-			
-			// Reset all the variables (possibly paranoid)
-			if(!hasZoomed && !stoppedOnZoom) matrix.reset();
-			
-			
-			hasZoomed = false;
-			
-			invalidate();
-		}
-
+		totalDragX += dragDiffPixelsX;
+		totalDragY += dragDiffPixelsY;
 		
-		// Take the current pixel value array and adjust it to keep pixels that have already been calculated
-		public void shiftPixels(int shiftX, int shiftY)
+		invalidate();
+	}
+	
+	
+	// Stop moving the image around, calculate new area. Run when finger lifted.
+	public void stopDragging(boolean stoppedOnZoom)
+	{		
+		controlmode = ControlMode.STATIC;
+		
+		Log.d(TAG, "Stopped on zoom: " + stoppedOnZoom);
+		
+		// If no zooming's occured, keep the remaining pixels
+		if(!hasZoomed && !stoppedOnZoom) 
 		{
-			Log.d(TAG, "Shifting pixels");
-			
-			int height = getHeight();
-			int width = getWidth();
-			int[] newPixels = new int[height * width];
-			int[] newSizes = new int[height * width];
-			for (int i = 0; i < newSizes.length; i++) newSizes[i] = 1000;
-			
-			//Choose rows to copy from
-			int rowNum = height - Math.abs(shiftY);
-			int origStartRow = (shiftY < 0 ? Math.abs(shiftY) : 0);
-			
-			//Choose columns to copy from
-			int colNum = width - Math.abs(shiftX);
-			int origStartCol = (shiftX < 0 ? Math.abs(shiftX) : 0);
-			
-			//Choose columns to copy to
-			int destStartCol = (shiftX < 0 ? 0 : shiftX);
-			
-			//Copy useful parts into new array
-			for (int origY = origStartRow; origY < origStartRow + rowNum; origY++)
-			{
-				int destY = origY + shiftY;
-				System.arraycopy(fractalPixels, (origY * width) + origStartCol, 
-								 newPixels, (destY * width) + destStartCol,
-								 colNum);
-				System.arraycopy(pixelSizes, (origY * width) + origStartCol, 
-						 newSizes, (destY * width) + destStartCol,
-						 colNum);
-			}
-			
-			//Set values
-			fractalPixels = newPixels;
-			pixelSizes = newSizes;
+			renderMode = RenderMode.JUST_DRAGGED;
+			shiftPixels((int)totalDragX, (int)totalDragY);
+		}
+		else 
+			renderMode = RenderMode.NEW;
+		
+		//Set the new location for the fractals
+		moveFractal((int)totalDragX, (int)totalDragY);
+		
+		if(!stoppedOnZoom) scheduleNewRenders();
+		
+		// Reset all the variables (possibly paranoid)
+		if(!hasZoomed && !stoppedOnZoom) matrix.reset();
+		
+		
+		hasZoomed = false;
+		
+		invalidate();
+	}
+
+	
+	// Take the current pixel value array and adjust it to keep pixels that have already been calculated
+	public void shiftPixels(int shiftX, int shiftY)
+	{
+		Log.d(TAG, "Shifting pixels");
+		
+		int height = getHeight();
+		int width = getWidth();
+		int[] newPixels = new int[height * width];
+		int[] newSizes = new int[height * width];
+		for (int i = 0; i < newSizes.length; i++) newSizes[i] = 1000;
+		
+		//Choose rows to copy from
+		int rowNum = height - Math.abs(shiftY);
+		int origStartRow = (shiftY < 0 ? Math.abs(shiftY) : 0);
+		
+		//Choose columns to copy from
+		int colNum = width - Math.abs(shiftX);
+		int origStartCol = (shiftX < 0 ? Math.abs(shiftX) : 0);
+		
+		//Choose columns to copy to
+		int destStartCol = (shiftX < 0 ? 0 : shiftX);
+		
+		//Copy useful parts into new array
+		for (int origY = origStartRow; origY < origStartRow + rowNum; origY++)
+		{
+			int destY = origY + shiftY;
+			System.arraycopy(fractalPixels, (origY * width) + origStartCol, 
+							 newPixels, (destY * width) + destStartCol,
+							 colNum);
+			System.arraycopy(pixelSizes, (origY * width) + origStartCol, 
+					 newSizes, (destY * width) + destStartCol,
+					 colNum);
 		}
 		
-		
-		
+		//Set values
+		fractalPixels = newPixels;
+		pixelSizes = newSizes;
+	}
+	
+	
+	
 /*-----------------------------------------------------------------------------------*/
 /* Zooming */	
 /*-----------------------------------------------------------------------------------*/
@@ -571,9 +591,9 @@ abstract class AbstractFractalView extends View {
 		// How many iterations to perform?
 		double absLnPixelSize = Math.abs(Math.log(getPixelSize()));
 		double dblIterations = iterationScaling * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
+		
 		int iterationsToPerform = (int)dblIterations;
-		Log.d(TAG, "Performing " + iterationsToPerform + " iterations.");
-		Log.d(TAG, "Iteration scaling is " + iterationScaling + ".");
+		
 		return Math.max(iterationsToPerform, MIN_ITERATIONS);
 	}
 	
@@ -693,9 +713,7 @@ abstract class AbstractFractalView extends View {
 	
 	
 	//Stop current rendering and return to "home"
-	public void reset(){
-		pauseRendering = false;
-		
+	public void reset(){		
 		stopAllRendering();
 		
 		bitmapCreations = 0;

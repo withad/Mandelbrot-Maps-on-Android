@@ -40,6 +40,9 @@
             <Button
                android:id="@+id/bitmap_test_button"
                android:text="@string/bitmap_test_label" />
+            <Button
+               android:id="@+id/side_by_side_button"
+               android:text="@string/side_by_side_label" />
          </TableRow>
          <TableRow>
          	<Button
