@@ -144,11 +144,15 @@ abstract class AbstractFractalView extends View {
 		super(context);
 		setFocusable(true);
 		setFocusableInTouchMode(true);
-		setBackgroundColor(Color.BLACK);
       	setId(0); 
       	
       	renderStyle = style;
       	fractalViewSize = size;
+      	
+/*      	if (fractalViewSize == FractalViewSize.LARGE)
+			setBackgroundColor(Color.BLACK);
+		else*/
+			setBackgroundColor(Color.BLUE);
       
       	parentActivity = (FractalActivity)context;
       	setOnTouchListener(parentActivity);
@@ -228,7 +232,7 @@ abstract class AbstractFractalView extends View {
 	if(controlmode == ControlMode.STATIC) 
 		{
 			bitmapCreations++;
-			Log.d(TAG, "Create a new bitmap! " + bitmapCreations);
+			//Log.d(TAG, "Create a new bitmap! " + bitmapCreations);
 			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		}
 	
@@ -239,8 +243,6 @@ abstract class AbstractFractalView extends View {
    
    // Adds renders to the queue for processing by render thread
 	void scheduleNewRenders() {		
-		Log.d(TAG, "scheduleNewRenders");
-		
 		//Abort future rendering queue.
 		stopAllRendering();
 		
@@ -591,9 +593,6 @@ abstract class AbstractFractalView extends View {
 		double dblIterations = iterationScaling * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
 		
 		int iterationsToPerform = (int)dblIterations;
-		
-		Log.d(TAG, "Performing " + iterationsToPerform + " iterations.");
-		Log.d(TAG, "Iteration scaling is " + iterationScaling + ".");
 		
 		return Math.max(iterationsToPerform, MIN_ITERATIONS);
 	}
