@@ -2,6 +2,9 @@ package uk.ac.ed.inf.mandelbrotmaps;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.ColouringScheme;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.RGBWalkColouringScheme;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.SpiralRenderer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -11,6 +14,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	private final String TAG = "MMaps";
 	
 	private String viewName = "Mandelbrot";
+	
+	ColouringScheme colourer = new SpiralRenderer();
 	
 	public MandelbrotFractalView(Context context, RenderStyle style, FractalViewSize size) {
 		super(context, style, size);
@@ -89,6 +94,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 		int skippedCount = 0;
 		
+		int colourFromRenderer;
+		
 		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
 			//Work backwards on upper half
 /*			if (section == FractalSection.UPPER)
@@ -123,6 +130,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				// Start at x0, y0
 				x = x0;
 				y = y0;
+				
+				boolean inside = false;
 			
 				for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
 					// z^2 + c
@@ -133,8 +142,16 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					y = newy;
 				
 					// Well known result: if distance is >2, escapes to infinity...
-					if ( (x*x + y*y) > 4) break;
+					if ( (x*x + y*y) > 4) {
+						inside = true;
+						break;
+					}
 				}
+				
+				if (inside)
+					colourFromRenderer = colourer.colourOutsidePoint(iterationNr);
+				else
+					colourFromRenderer = colourer.colourInsidePoint();
 				
 				// Percentage (0.0 -- 1.0)
 				colourCode = (double)iterationNr / (double)maxIterations;
@@ -160,7 +177,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
 						if(outputPixelArray == null) return;
-						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
+						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourFromRenderer;//colourCodeHex;
 					}
 				}
 			}

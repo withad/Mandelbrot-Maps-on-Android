@@ -15,15 +15,13 @@
 
 package uk.ac.ed.inf.mandelbrotmaps.colouring;
 
-import java.io.Serializable;
-
 
 /**
  * Defines a colour scheme that moves from black to blue, cyan, green, yellow,
  * red, magenta and back to blue.
  * @author mallia
  */
-public class RGBWalkColouringScheme implements ColouringScheme, Serializable{
+public class RGBWalkColouringScheme implements ColouringScheme {
 
     /**
      * The spacing of the colours.  For example, when creating blue colours, the
@@ -46,7 +44,6 @@ public class RGBWalkColouringScheme implements ColouringScheme, Serializable{
      * @param iterations
      * @return RGB colour as int
      */
-    @Override
     public int colourOutsidePoint(int iterations){
         if (iterations <= 0){
             return 0xFF000000;
@@ -130,7 +127,6 @@ public class RGBWalkColouringScheme implements ColouringScheme, Serializable{
         return colourCodeHex;
     }
 
-    @Override
     public int colourInsidePoint() {
         return 0xFFFFFFFF;
         //return 0xFF000000;
