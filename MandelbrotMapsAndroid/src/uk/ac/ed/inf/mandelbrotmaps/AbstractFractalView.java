@@ -145,14 +145,9 @@ abstract class AbstractFractalView extends View {
 		setFocusable(true);
 		setFocusableInTouchMode(true);
       	setId(0); 
-      	
+      	setBackgroundColor(Color.BLACK);
       	renderStyle = style;
       	fractalViewSize = size;
-      	
-/*      	if (fractalViewSize == FractalViewSize.LARGE)
-			setBackgroundColor(Color.BLACK);
-		else*/
-			setBackgroundColor(Color.BLUE);
       
       	parentActivity = (FractalActivity)context;
       	setOnTouchListener(parentActivity);
