@@ -7,6 +7,7 @@ import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.opengl.Visibility;
 import android.os.Bundle;
@@ -73,6 +74,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	RelativeLayout relativeLayout;
 	
 	private boolean showingJulia = false;
+	boolean juliaSelected = false;
 	
 	
 	
@@ -131,7 +133,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    
    
    public void addJuliaView() {   
-	   if (showingJulia || !includeLittle) return;
+	   if (showingJulia || !includeLittle || fractalType == FractalType.JULIA) return;
 	   
 	   int width = fractalView.getWidth();
 	   int height = fractalView.getHeight();
@@ -148,7 +150,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   Log.d(TAG, "Little fractal size: " + width + "x" + height);	   
 	   
 	   borderView = new View(this);
-	   borderView.setBackgroundColor(Color.GREEN);
+	   borderView.setBackgroundColor(Color.GRAY);
 	   LayoutParams borderLayout = new LayoutParams(width + 2*borderwidth, height + 2*borderwidth);
 
 	   LayoutParams lp2 = new LayoutParams(width, height);
@@ -270,10 +272,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		switch (evt.getAction() & MotionEvent.ACTION_MASK)
 		{
 			case MotionEvent.ACTION_DOWN:
-				if (withinLittleFractalView(evt.getX(), evt.getY())) {
-					
+				if (showingJulia && evt.getX() <= borderView.getWidth() && evt.getY() <= borderView.getHeight()) {
+					borderView.setBackgroundColor(Color.DKGRAY);
+					juliaSelected = true;
 				}
-				if (displaymode == DisplayMode.ABOUT_TO_JULIA) {
+				else if (displaymode == DisplayMode.ABOUT_TO_JULIA) {
 					launchJulia(evt.getX(), evt.getY());
 				} 
 				else if (showingJulia)	{
@@ -291,7 +294,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				if(currentlyDragging) {
 					dragFractal(evt);
 				}
-				else if (showingJulia)	{
+				else if (showingJulia && !juliaSelected)	{
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
 				}
@@ -311,16 +314,17 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			case MotionEvent.ACTION_UP:
 				if(currentlyDragging)
 					stopDragging();
+				else if (juliaSelected) {
+					borderView.setBackgroundColor(Color.GRAY);
+					juliaSelected = false;
+					if (evt.getX() <= borderView.getWidth() && evt.getY() <= borderView.getHeight())
+						launchJulia(((JuliaFractalView)littleFractalView).getJuliaParam());
+				}					
 				
 				break;
 		}
 		return true;
 	}
-
-   private boolean withinLittleFractalView(float x, float y) {
-	// TODO Auto-generated method stub
-	return false;
-}
 
 
 private void dragFractal(MotionEvent evt) {
