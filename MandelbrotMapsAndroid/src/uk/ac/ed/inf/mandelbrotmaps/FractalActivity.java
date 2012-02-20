@@ -6,7 +6,9 @@ import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,11 +16,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.ViewGroup;
 import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
@@ -64,6 +68,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private boolean includeLittle;
 	FractalViewSize size;
 	
+	RelativeLayout relativeLayout;
+	
+	private boolean juliaShowing = false;
+	
 	
 	
 /*-----------------------------------------------------------------------------------*/
@@ -78,10 +86,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       Log.d(TAG, "onCreate");
       
       requestWindowFeature(Window.FEATURE_NO_TITLE);
-      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-      
-      RelativeLayout relativeLayout = new RelativeLayout(this);      
+      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);      
       
       Bundle bundle = getIntent().getExtras();
       
@@ -99,23 +104,19 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
       }
       
-            
+      relativeLayout = new RelativeLayout(this);
+      
       LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
       relativeLayout.addView(fractalView, lp);
-      
-      if (includeLittle)
-      {
-	      LayoutParams lp2 = new LayoutParams(50, 50);
-	      relativeLayout.addView(littleFractalView, lp2);
-      }
-      
-      //setContentView(fractalView);
       setContentView(relativeLayout);
+      
+      Log.d(TAG, "Width: " + fractalView.getWidth());
+      
       fractalView.requestFocus();
       
       mjLocation = new MandelbrotJuliaLocation();
       fractalView.loadLocation(mjLocation);
-      if(includeLittle) littleFractalView.loadLocation(mjLocation);
+      
       
       if (fractalType == FractalType.JULIA)
       {
@@ -127,6 +128,50 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       
       gestureDetector = new ScaleGestureDetector(this, this);
    }
+   
+   
+   public void addJuliaView() {   
+	   if (juliaShowing) return;
+	   
+	   int width = fractalView.getWidth();
+	   int height = fractalView.getHeight();
+	   
+	   Log.d(TAG, "Large fractal size: " + width + "x" + height);
+	   
+	   int borderwidth = Math.max(1, (int)(width/300.0));
+	   
+	   double ratio = (double)width/(double)height;
+	   width /= 7;
+	   height = (int)(width/ratio);
+	   
+	   Log.d(TAG, "Screen ratio: " + ratio);
+	   Log.d(TAG, "Little fractal size: " + width + "x" + height);	   
+	   
+	   View border = new View(this);
+	   border.setBackgroundColor(Color.GREEN);
+	   LayoutParams borderLayout = new LayoutParams(width + 2*borderwidth, height + 2*borderwidth);
+
+	   LayoutParams lp2 = new LayoutParams(width, height);
+	   lp2.setMargins(borderwidth, borderwidth, borderwidth, borderwidth);
+	   
+	   relativeLayout.addView(border, borderLayout);
+	   relativeLayout.addView(littleFractalView, lp2);
+	   
+	   
+	   littleFractalView.loadLocation(mjLocation);
+      
+	   setContentView(relativeLayout);
+	   
+	   juliaShowing = true;
+   }
+   
+   
+   public void removeJuliaView() {
+	   if(!juliaShowing) return;
+	   
+	   relativeLayout.removeView(littleFractalView);
+   }
+   
    
    @Override
    protected void onResume() {
@@ -163,7 +208,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  fractalView.setToBookmark();
     	  return true;
       case R.id.juliamode:
-    	  if(!includeLittle)displaymode = DisplayMode.ABOUT_TO_JULIA;
+    	  if(relativeLayout.indexOfChild(littleFractalView) != -1)
+    		  removeJuliaView();
+    	  else
+    		  addJuliaView();
     	  return true;
       case R.id.resetFractal:
     	  fractalView.reset();

@@ -40,8 +40,6 @@ class RenderThread extends Thread {
 				abortThisRendering = false;
 			} catch (InterruptedException e) {
 				return;
-				/*abortThisRendering = false;
-				Log.d("Testing", "Caught exception");*/
 			}
 		}
 	}
