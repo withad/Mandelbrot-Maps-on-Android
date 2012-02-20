@@ -88,8 +88,8 @@ abstract class AbstractFractalView extends View {
 	double ITERATION_CONSTANT_FACTOR;
 	
 	// Scaling factor for maxIterations() calculations
-	double iterationScaling = 0.3;
-	double ITERATIONSCALING_DEFAULT = 0.3;
+	double iterationScaling = 0.6;
+	double ITERATIONSCALING_DEFAULT = 0.6;
 	double ITERATIONSCALING_MIN = 0.01;
 	double ITERATIONSCALING_MAX = 100;
 	
@@ -151,6 +151,11 @@ abstract class AbstractFractalView extends View {
       
       	parentActivity = (FractalActivity)context;
       	setOnTouchListener(parentActivity);
+      	
+      	if (fractalViewSize == FractalViewSize.LITTLE) {
+      		iterationScaling *= 1.5;
+      		ITERATIONSCALING_DEFAULT *= 1.5;
+      	}
       
       	matrix = new Matrix();
       	matrix.reset();

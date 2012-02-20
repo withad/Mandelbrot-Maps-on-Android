@@ -305,8 +305,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			case MotionEvent.ACTION_POINTER_UP:
 				if(evt.getPointerCount() == 1)
 					break;
-				else 
-					chooseNewActivePointer(evt);
+				else {
+					try {
+						chooseNewActivePointer(evt);
+					} 
+					catch (IllegalArgumentException iae) {} 
+					
+				}
 				
 				break;
 		       
