@@ -76,6 +76,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private boolean showingLittle = false;
 	boolean littleFractalSelected = false;
 	
+	double[] littleMandelbrotLocation;
+	
 	
 	
 /*-----------------------------------------------------------------------------------*/
@@ -95,6 +97,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	      fractalType = FractalType.valueOf(bundle.getString("FractalType"));
 	      style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
 	      includeLittle = bundle.getBoolean("SideBySide");
+	      littleMandelbrotLocation = bundle.getDoubleArray("LittleMandelbrotLocation");
       } 
       catch (NullPointerException npe) {}
       
@@ -124,7 +127,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  double juliaX = bundle.getDouble("JULIA_X");
           double juliaY = bundle.getDouble("JULIA_Y");
           
-          ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);
+          ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);          
       }
       
       gestureDetector = new ScaleGestureDetector(this, this);
@@ -164,6 +167,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   
 	   relativeLayout.addView(borderView, borderLayout);
 	   relativeLayout.addView(littleFractalView, lp2);
+	   
+	   if(littleMandelbrotLocation != null)
+	   Log.d(TAG, "Little mandelbrot [0]" + littleMandelbrotLocation[0]);
+	   
+	   mjLocation.setMandelbrotGraphArea(littleMandelbrotLocation);
 	   
 	   littleFractalView.loadLocation(mjLocation);
       
@@ -399,6 +407,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		Bundle bundle = new Bundle();
 		bundle.putString("FractalType", FractalType.JULIA.toString());
 		bundle.putBoolean("SideBySide", includeLittle);
+		
+		bundle.putDoubleArray("LittleMandelbrotLocation", mjLocation.getMandelbrotGraphArea());
 		
 		bundle.putDouble("JULIA_X", juliaParams[0]);
 		bundle.putDouble("JULIA_Y", juliaParams[1]);

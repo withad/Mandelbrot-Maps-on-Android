@@ -1,5 +1,9 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import java.lang.reflect.Array;
+
+import android.R.array;
+
 
 class MandelbrotJuliaLocation {
 	//private URL urlBase;
@@ -16,6 +20,10 @@ class MandelbrotJuliaLocation {
 		juliaParam = new double[] {0.152, 0.584};
 	}
 	
+	public void setMandelbrotGraphArea(double[] newMandelbrotGraphArea) {
+		System.arraycopy(newMandelbrotGraphArea, 0, mandelbrotGraphArea, 0, mandelbrotGraphArea.length);
+	}
+
 	public double[] getMandelbrotGraphArea() {
 		return mandelbrotGraphArea;
 	}
