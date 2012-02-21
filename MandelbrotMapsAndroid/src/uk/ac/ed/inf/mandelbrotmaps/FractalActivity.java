@@ -88,11 +88,15 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);   
     //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
       
-      //Extract features from bundle      
-      Bundle bundle = getIntent().getExtras();      
-      fractalType = FractalType.valueOf(bundle.getString("FractalType"));
-      style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
-      includeLittle = bundle.getBoolean("SideBySide");
+      Bundle bundle = getIntent().getExtras();
+      
+      //Extract features from bundle, if there is one
+      try {     
+	      fractalType = FractalType.valueOf(bundle.getString("FractalType"));
+	      style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
+	      includeLittle = bundle.getBoolean("SideBySide");
+      } 
+      catch (NullPointerException npe) {}
       
       if (fractalType == FractalType.MANDELBROT) {
     	  fractalView = new MandelbrotFractalView(this, style, FractalViewSize.LARGE);
@@ -190,6 +194,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   super.onDestroy();
 	   fractalView.stopAllRendering();
 	   fractalView.interruptThreads();
+	   littleFractalView.stopAllRendering();
+	   littleFractalView.interruptThreads();
 	   Log.d(TAG, "Running onDestroy().");
    }
    
@@ -391,7 +397,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    {
 	   	Intent intent = new Intent(this, FractalActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putInt("FRACTAL", 1);
+		bundle.putString("FractalType", FractalType.JULIA.toString());
 		bundle.putBoolean("SideBySide", includeLittle);
 		
 		bundle.putDouble("JULIA_X", juliaParams[0]);
