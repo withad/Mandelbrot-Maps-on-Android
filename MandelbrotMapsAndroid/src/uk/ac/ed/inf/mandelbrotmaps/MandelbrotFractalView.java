@@ -153,7 +153,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				else
 					colourFromRenderer = colourer.colourInsidePoint();*/
 				
-				// Percentage (0.0 -- 1.0)
+				/*// Percentage (0.0 -- 1.0)
 				colourCode = (double)iterationNr / (double)maxIterations;
 				
 				// Red
@@ -167,13 +167,52 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					127.5 - 127.5*Math.cos(
 						7 * Math.PI * colourCode
 					)
-				);
+				);*/
+				
+				if (iterationNr == 0){
+		            colourCodeHex = 0xFF000000;
+		        }
+				else {
+			        //calucalate theta - 2pi represents 255 iterations
+			        double theta = (double) ((double)iterationNr / (double)255) * 2 * Math.PI;
+			        
+			        //compute r
+			        double x2 = theta * (2.0 * (Math.cos(theta) + 1));
+	
+			        //compute x
+			        double r = theta;
+	
+			        //compute y
+			        double y2 = theta * (2.0 * (Math.sin(theta) + 1));        
+			        
+			        //defines the number of colours used in each component of RGB
+			        int colourRange = 230;
+			        //the starting point in each compenent of RGB
+			        int startColour = 25;
+	
+			        //compute the red compnent
+			        colourCodeR = (int) (colourRange * r);
+			        colourCodeR = boundColour(colourCodeR, colourRange);
+			        colourCodeR += startColour;
+			        
+			        //compute the green component
+			        colourCodeG = (int) (colourRange * y2);
+			        colourCodeG = boundColour(colourCodeG, colourRange);
+			        colourCodeG += startColour;
+			        
+			        //compute the blue component
+			        colourCodeB = (int) (colourRange * x2);
+			        colourCodeB = boundColour(colourCodeB, colourRange);
+			        colourCodeB += startColour;
+	
+			        //compute colour from the three components
+			        colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
+				}
 				
 				//Note that the pixel being calculated has been calculated in full (upper right of a block)
 				currentPixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
 				
-				// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
-				colourCodeHex = (0xFF<<24) + (colourCodeR<<16) + (colourCodeG<<8) + (colourCodeB);				
+				// Save colour info for this pixel. int, interpreted: 0xAARRGGBB				
 				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
 						if(outputPixelArray == null) return;
@@ -192,6 +231,20 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
 		Log.d(TAG, section.name() + ". Time elapsed: " + (System.currentTimeMillis() - initialMillis));
 	}
+	
+	
+	private int boundColour(int colour, int colourRange){
+        if (colour > (colourRange * 2)){ 
+            int i = (int) (colour / (colourRange * 2));
+
+            colour = colour - (colourRange * 2 * i);
+        }
+        if (colour > (colourRange)){
+            colour = colourRange - (colour - colourRange);
+        }
+        
+        return colour;
+    }
 	
 	
 	public double[] getJuliaParams(float touchX, float touchY)
