@@ -148,10 +148,10 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					}
 				}
 				
-				if (inside)
+				/*if (inside)
 					colourFromRenderer = colourer.colourOutsidePoint(iterationNr);
 				else
-					colourFromRenderer = colourer.colourInsidePoint();
+					colourFromRenderer = colourer.colourInsidePoint();*/
 				
 				// Percentage (0.0 -- 1.0)
 				colourCode = (double)iterationNr / (double)maxIterations;
@@ -177,7 +177,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
 						if(outputPixelArray == null) return;
-						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourFromRenderer;//colourCodeHex;
+						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 					}
 				}
 			}
