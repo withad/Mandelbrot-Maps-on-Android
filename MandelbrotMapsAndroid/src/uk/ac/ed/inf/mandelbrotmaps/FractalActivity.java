@@ -85,7 +85,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       
-      Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+      //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
       
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);      

@@ -259,45 +259,5 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		juliaParams[1] = mandelbrotGraphArea[1] - ( (double)touchY * pixelSize );
 		
 		return juliaParams;
-	}
-
-	
-
-	
-	/* Mouse events
-	private void changeMode(int modeID) {
-		mandelbrotMode = modeID;
-	}
-	//Mouse click
-	public void mouseClicked(MouseEvent e) {
-		// Real time mode? Change modes on click.
-		if (mandelbrotMode == MODE_REALTIMEJULIA) {
-			changeMode(MODE_FREEZE);
-			setCursor(null);
-		} else if (mandelbrotMode == MODE_FREEZE) {
-			changeMode(MODE_REALTIMEJULIA);
-			// Generate Julia set immediately.
-			mouseMoved(e);
-		}
 	}	
-	public void mouseMoved(MouseEvent e) {
-		// Draw Julia set - if in real-time Julia mode, and real-time enabled
-		if (
-			(mandelbrotMode == MODE_REALTIMEJULIA)
-		) {
-			double[] mandelbrotGraphArea = getGraphArea();
-			double pixelSize = getPixelSize();
-		
-			// Mouse position, on the complex plane (translated from pixels)
-			juliaX = mandelbrotGraphArea[0] + ( (double)e.getX() * pixelSize );
-			juliaY = mandelbrotGraphArea[1] - ( (double)e.getY() * pixelSize );
-		}
-	}
-	
-	// Need to override for MouseListener; unused at present.
-	public void mouseReleased(MouseEvent e) {}
-	public void mouseEntered(MouseEvent e) {}
-	public void mouseExited(MouseEvent e) {}
-	*/
-	
 }
