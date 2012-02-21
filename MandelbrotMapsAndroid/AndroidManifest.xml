@@ -8,12 +8,7 @@
         <activity android:name=".LauncherActivity"
               android:label="@string/app_name"
               android:screenOrientation="landscape"
-              android:configChanges="orientation">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+              android:configChanges="orientation"/>
         <activity android:name=".About"
               android:label="@string/about_title"
               android:theme="@android:style/Theme.Dialog"
@@ -26,9 +21,14 @@
               android:configChanges="orientation"/>
               
         <activity android:name=".FractalActivity"
-              android:label="Fractal"
+              android:label="Mandelbrot Maps"
               android:screenOrientation="landscape"
-              android:configChanges="orientation"/>
+              android:configChanges="orientation">
+              <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
               
         <activity android:name = ".UIMockup"
         		android:label="UIMockup"

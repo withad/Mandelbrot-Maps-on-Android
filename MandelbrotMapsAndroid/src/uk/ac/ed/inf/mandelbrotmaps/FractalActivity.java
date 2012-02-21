@@ -62,13 +62,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   
 	private int dragID = -1;
 	
-	RenderStyle style;
+	RenderStyle style = RenderStyle.DUAL_THREAD;
 	
 	private int SHARE_IMAGE_REQUEST = 0;
    
 	private File imagefile;
 
-	private boolean includeLittle;
+	private boolean includeLittle = true;
 	FractalViewSize size;
 	
 	RelativeLayout relativeLayout;
@@ -86,7 +86,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       super.onCreate(savedInstanceState);      
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);   
-    //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+      Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
       
       Bundle bundle = getIntent().getExtras();
       
