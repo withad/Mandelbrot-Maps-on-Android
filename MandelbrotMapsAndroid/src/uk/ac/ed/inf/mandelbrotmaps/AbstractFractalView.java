@@ -191,7 +191,7 @@ abstract class AbstractFractalView extends View {
    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 	   super.onSizeChanged(w, h, oldw, oldh);
 	   
-	   if(fractalViewSize == FractalViewSize.LARGE) parentActivity.addJuliaView();
+	   if(fractalViewSize == FractalViewSize.LARGE) parentActivity.addLittleView();
 	   
 	   LINES_TO_DRAW_AFTER = getHeight()/12;
 	   Log.d(TAG, "Drawing every " + LINES_TO_DRAW_AFTER + " lines.");

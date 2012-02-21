@@ -1,6 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
+import uk.ac.ed.inf.mandelbrotmaps.FractalActivity.FractalType;
 import uk.ac.ed.inf.mandelbrotmaps.R;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -86,7 +87,7 @@ public class LauncherActivity extends Activity implements OnClickListener {
    		Intent intent = new Intent(this.getApplicationContext(), FractalActivity.class);
    		Bundle bundle = new Bundle();
    		bundle.putBoolean("SideBySide", sideBySide);
-   		bundle.putInt("FRACTAL", 0);
+   		bundle.putString("FractalType", FractalType.MANDELBROT.toString());
    		bundle.putString("RenderStyle", style.toString());
    		intent.putExtras(bundle);
    		startActivity(intent);

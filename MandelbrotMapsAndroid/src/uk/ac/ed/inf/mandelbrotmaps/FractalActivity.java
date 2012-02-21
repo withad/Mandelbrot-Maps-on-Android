@@ -73,8 +73,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	RelativeLayout relativeLayout;
 	
-	private boolean showingJulia = false;
-	boolean juliaSelected = false;
+	private boolean showingLittle = false;
+	boolean littleFractalSelected = false;
 	
 	
 	
@@ -83,26 +83,21 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 /*-----------------------------------------------------------------------------------*/
    @Override
    protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      
-      //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-      
+      super.onCreate(savedInstanceState);      
       requestWindowFeature(Window.FEATURE_NO_TITLE);
-      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);      
+      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);   
+    //Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
       
-      Bundle bundle = getIntent().getExtras();
-      
-      fractalType = (bundle.getInt("FRACTAL") == 0 ? FractalType.MANDELBROT : FractalType.JULIA);
+      //Extract features from bundle      
+      Bundle bundle = getIntent().getExtras();      
+      fractalType = FractalType.valueOf(bundle.getString("FractalType"));
       style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
       includeLittle = bundle.getBoolean("SideBySide");
       
-      if (fractalType == FractalType.MANDELBROT) 
-      {
+      if (fractalType == FractalType.MANDELBROT) {
     	  fractalView = new MandelbrotFractalView(this, style, FractalViewSize.LARGE);
-      	  if(includeLittle) littleFractalView = new JuliaFractalView(this, style, FractalViewSize.LITTLE);
       }
-      else if (fractalType == FractalType.JULIA)
-      {
+      else if (fractalType == FractalType.JULIA) {
     	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
       }
       
@@ -132,8 +127,15 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    }
    
    
-   public void addJuliaView() {   
-	   if (showingJulia || !includeLittle || fractalType == FractalType.JULIA) return;
+   public void addLittleView() {   
+	   if (showingLittle || !includeLittle) return;
+	   
+	   if(fractalType == FractalType.MANDELBROT) {
+		   littleFractalView = new JuliaFractalView(this, style, FractalViewSize.LITTLE);
+	   }
+	   else {
+		   littleFractalView = new MandelbrotFractalView(this, style, FractalViewSize.LITTLE);
+	   }
 	   
 	   int width = fractalView.getWidth();
 	   int height = fractalView.getHeight();
@@ -159,21 +161,20 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   relativeLayout.addView(borderView, borderLayout);
 	   relativeLayout.addView(littleFractalView, lp2);
 	   
-	   
 	   littleFractalView.loadLocation(mjLocation);
       
 	   setContentView(relativeLayout);
 	   
-	   showingJulia = true;
+	   showingLittle = true;
    }
    
-   public void removeJuliaView() {
-	   if(!showingJulia) return;
+   public void removeLittleView() {
+	   if(!showingLittle) return;
 	   
 	   relativeLayout.removeView(borderView);
 	   relativeLayout.removeView(littleFractalView);
 	   
-	   showingJulia = false;
+	   showingLittle = false;
    }
    
    
@@ -214,10 +215,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       case R.id.juliamode:
     	  if(includeLittle)
 	    	  {
-	    	  if(showingJulia)
-	    		  removeJuliaView();
+	    	  if(showingLittle)
+	    		  removeLittleView();
 	    	  else
-	    		  addJuliaView();
+	    		  addLittleView();
 	    	  }
     	  else
     		  displaymode = DisplayMode.ABOUT_TO_JULIA;
@@ -272,14 +273,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		switch (evt.getAction() & MotionEvent.ACTION_MASK)
 		{
 			case MotionEvent.ACTION_DOWN:
-				if (showingJulia && evt.getX() <= borderView.getWidth() && evt.getY() <= borderView.getHeight()) {
+				if (showingLittle && evt.getX() <= borderView.getWidth() && evt.getY() <= borderView.getHeight()) {
 					borderView.setBackgroundColor(Color.DKGRAY);
-					juliaSelected = true;
+					littleFractalSelected = true;
 				}
 				else if (displaymode == DisplayMode.ABOUT_TO_JULIA) {
 					launchJulia(evt.getX(), evt.getY());
 				} 
-				else if (showingJulia)	{
+				else if (showingLittle && fractalType == FractalType.MANDELBROT)	{
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
 				}
@@ -294,7 +295,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				if(currentlyDragging) {
 					dragFractal(evt);
 				}
-				else if (showingJulia && !juliaSelected)	{
+				else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT)	{
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
 				}
@@ -319,11 +320,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			case MotionEvent.ACTION_UP:
 				if(currentlyDragging)
 					stopDragging();
-				else if (juliaSelected) {
+				else if (littleFractalSelected) {
 					borderView.setBackgroundColor(Color.GRAY);
-					juliaSelected = false;
+					littleFractalSelected = false;
 					if (evt.getX() <= borderView.getWidth() && evt.getY() <= borderView.getHeight())
-						launchJulia(((JuliaFractalView)littleFractalView).getJuliaParam());
+						if (fractalType == FractalType.MANDELBROT)
+							launchJulia(((JuliaFractalView)littleFractalView).getJuliaParam());
+						else if (fractalType == FractalType.JULIA)
+							finish();
 				}					
 				
 				break;
@@ -332,58 +336,58 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
 
 
-private void dragFractal(MotionEvent evt) {
-	   	int pointerIndex = evt.findPointerIndex(dragID);
-		
-		float dragDiffPixelsX = evt.getX(pointerIndex) - dragLastX;
-		float dragDiffPixelsY = evt.getY(pointerIndex) - dragLastY;
-		
-		// Move the canvas
-		if (dragDiffPixelsX != 0.0f && dragDiffPixelsY != 0.0f)
-			fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
-		
-		// Update last mouse position
-		dragLastX = evt.getX(pointerIndex);
-		dragLastY = evt.getY(pointerIndex);
-}
-
-
-private void startDragging(MotionEvent evt) {
-	   dragLastX = (int) evt.getX();
-	   dragLastY = (int) evt.getY();
-	   dragID = evt.getPointerId(0);	
-	
-	   fractalView.startDragging();
-	   currentlyDragging = true;
-   }
-
-
-private void chooseNewActivePointer(MotionEvent evt) {
-	// Extract the index of the pointer that came up
-	final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-	final int pointerId = evt.getPointerId(pointerIndex);
-	   
-	dragLastX = (int) evt.getX(dragID);
-	dragLastY = (int) evt.getY(dragID);
-	   
-	if (pointerId == dragID) {
-		Log.d(TAG, "Choosing new active pointer");
-		final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-		dragLastX = (int) evt.getX(newPointerIndex);
-		dragLastY = (int) evt.getY(newPointerIndex);
-		dragID = evt.getPointerId(newPointerIndex);
+	private void dragFractal(MotionEvent evt) {
+		   	int pointerIndex = evt.findPointerIndex(dragID);
+			
+			float dragDiffPixelsX = evt.getX(pointerIndex) - dragLastX;
+			float dragDiffPixelsY = evt.getY(pointerIndex) - dragLastY;
+			
+			// Move the canvas
+			if (dragDiffPixelsX != 0.0f && dragDiffPixelsY != 0.0f)
+				fractalView.dragFractal(dragDiffPixelsX, dragDiffPixelsY);
+			
+			// Update last mouse position
+			dragLastX = evt.getX(pointerIndex);
+			dragLastY = evt.getY(pointerIndex);
 	}
 	
-}
-
-
-private void stopDragging() {
-	   	currentlyDragging = false;
-		fractalView.stopDragging(false);	
-}
-
-
-private void launchJulia(double[] juliaParams)
+	
+	private void startDragging(MotionEvent evt) {
+		   dragLastX = (int) evt.getX();
+		   dragLastY = (int) evt.getY();
+		   dragID = evt.getPointerId(0);	
+		
+		   fractalView.startDragging();
+		   currentlyDragging = true;
+	   }
+	
+	
+	private void chooseNewActivePointer(MotionEvent evt) {
+		// Extract the index of the pointer that came up
+		final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+		final int pointerId = evt.getPointerId(pointerIndex);
+		   
+		dragLastX = (int) evt.getX(dragID);
+		dragLastY = (int) evt.getY(dragID);
+		   
+		if (pointerId == dragID) {
+			Log.d(TAG, "Choosing new active pointer");
+			final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+			dragLastX = (int) evt.getX(newPointerIndex);
+			dragLastY = (int) evt.getY(newPointerIndex);
+			dragID = evt.getPointerId(newPointerIndex);
+		}
+		
+	}
+	
+	
+	private void stopDragging() {
+		   	currentlyDragging = false;
+			fractalView.stopDragging(false);	
+	}
+	
+	
+	private void launchJulia(double[] juliaParams)
    {
 	   	Intent intent = new Intent(this, FractalActivity.class);
 		Bundle bundle = new Bundle();
