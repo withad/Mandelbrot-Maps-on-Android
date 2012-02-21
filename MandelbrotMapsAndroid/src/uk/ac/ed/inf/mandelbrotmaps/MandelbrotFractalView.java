@@ -153,7 +153,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				else
 					colourFromRenderer = colourer.colourInsidePoint();*/
 				
-				/*// Percentage (0.0 -- 1.0)
+				// Percentage (0.0 -- 1.0)
 				colourCode = (double)iterationNr / (double)maxIterations;
 				
 				// Red
@@ -167,13 +167,13 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					127.5 - 127.5*Math.cos(
 						7 * Math.PI * colourCode
 					)
-				);*/
+				);
 				
-				if (iterationNr == 0){
+				/*if (iterationNr == 0){
 		            colourCodeHex = 0xFF000000;
 		        }
 				else {
-			        //calucalate theta - 2pi represents 255 iterations
+			        //calculate theta - 2pi represents 255 iterations
 			        double theta = (double) ((double)iterationNr / (double)255) * 2 * Math.PI;
 			        
 			        //compute r
@@ -206,8 +206,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			        colourCodeB += startColour;
 	
 			        //compute colour from the three components
-			        colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
-				}
+*/			        colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
+				//}
 				
 				//Note that the pixel being calculated has been calculated in full (upper right of a block)
 				currentPixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
