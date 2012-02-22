@@ -216,7 +216,18 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       super.onCreateOptionsMenu(menu);
       MenuInflater inflater = getMenuInflater();
       inflater.inflate(R.menu.navigationmenu, menu);
+      
       return true;
+   }
+   
+   @Override
+   public boolean onPrepareOptionsMenu(Menu menu) {
+	   if (fractalType == FractalType.JULIA) {
+	    	  MenuItem showLittle = menu.findItem(R.id.toggleLittle);
+	    	  showLittle.setTitle("Show Mandelbrot");
+	      }
+	   
+	   return true;
    }
 
    @Override
@@ -225,14 +236,15 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       case R.id.settobookmark:
     	  fractalView.setToBookmark();
     	  return true;
-      case R.id.juliamode:
-    	  if(includeLittle)
-	    	  {
-	    	  if(showingLittle)
+      case R.id.toggleLittle:
+    	  if(includeLittle) {
+	    	  if(showingLittle) {
 	    		  removeLittleView();
-	    	  else
+	    	  }
+	    	  else {
 	    		  addLittleView();
 	    	  }
+    	  }
     	  else
     		  displaymode = DisplayMode.ABOUT_TO_JULIA;
     	  return true;
