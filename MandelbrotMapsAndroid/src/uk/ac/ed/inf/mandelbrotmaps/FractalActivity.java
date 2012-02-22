@@ -135,8 +135,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    
    
    public void addLittleView() {   
+	   //Check to see if view has already or should never be included
 	   if (showingLittle || !includeLittle) return;
 	   
+	   //Show a little Julia next to a Mandelbrot and vice versa
 	   if(fractalType == FractalType.MANDELBROT) {
 		   littleFractalView = new JuliaFractalView(this, style, FractalViewSize.LITTLE);
 	   }
@@ -144,34 +146,31 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   littleFractalView = new MandelbrotFractalView(this, style, FractalViewSize.LITTLE);
 	   }
 	   
+	   //Set size of border, little view proportional to screen size
 	   int width = fractalView.getWidth();
 	   int height = fractalView.getHeight();
-	   
-	   Log.d(TAG, "Large fractal size: " + width + "x" + height);
-	   
 	   int borderwidth = Math.max(1, (int)(width/300.0));
 	   
 	   double ratio = (double)width/(double)height;
 	   width /= 7;
-	   height = (int)(width/ratio);
+	   height = (int)(width/ratio);   
 	   
-	   Log.d(TAG, "Screen ratio: " + ratio);
-	   Log.d(TAG, "Little fractal size: " + width + "x" + height);	   
-	   
+	   //Add border view (behind little view, slightly larger)
 	   borderView = new View(this);
 	   borderView.setBackgroundColor(Color.GRAY);
 	   LayoutParams borderLayout = new LayoutParams(width + 2*borderwidth, height + 2*borderwidth);
+	   relativeLayout.addView(borderView, borderLayout);
 
+	   //Add little fractal view
 	   LayoutParams lp2 = new LayoutParams(width, height);
 	   lp2.setMargins(borderwidth, borderwidth, borderwidth, borderwidth);
-	   
-	   relativeLayout.addView(borderView, borderLayout);
 	   relativeLayout.addView(littleFractalView, lp2);
 	   
-	   if(littleMandelbrotLocation != null)
-	   Log.d(TAG, "Little mandelbrot [0]" + littleMandelbrotLocation[0]);
-	   
-	   mjLocation.setMandelbrotGraphArea(littleMandelbrotLocation);
+	   if(littleMandelbrotLocation == null)
+		   Log.d(TAG, "Null something");
+	   else	 
+		   //Log.d(TAG, "Not null " + littleMandelbrotLocation[0]);
+		   mjLocation.setMandelbrotGraphArea(littleMandelbrotLocation);
 	   
 	   littleFractalView.loadLocation(mjLocation);
       
@@ -380,17 +379,22 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		// Extract the index of the pointer that came up
 		final int pointerIndex = (evt.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 		final int pointerId = evt.getPointerId(pointerIndex);
-		   
-		dragLastX = (int) evt.getX(dragID);
-		dragLastY = (int) evt.getY(dragID);
-		   
-		if (pointerId == dragID) {
-			Log.d(TAG, "Choosing new active pointer");
-			final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-			dragLastX = (int) evt.getX(newPointerIndex);
-			dragLastY = (int) evt.getY(newPointerIndex);
-			dragID = evt.getPointerId(newPointerIndex);
-		}
+		
+		//evt.getX/Y() can apparently throw these exceptions, in some versions of Android (2.2, at least)
+		//(https://android-review.googlesource.com/#/c/21318/)
+		try {		
+			dragLastX = (int) evt.getX(dragID);
+			dragLastY = (int) evt.getY(dragID);
+			   
+			if (pointerId == dragID) {
+				Log.d(TAG, "Choosing new active pointer");
+				final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+				dragLastX = (int) evt.getX(newPointerIndex);
+				dragLastY = (int) evt.getY(newPointerIndex);
+				dragID = evt.getPointerId(newPointerIndex);
+			}
+		} 
+		catch (ArrayIndexOutOfBoundsException aie) {}
 		
 	}
 	
@@ -408,7 +412,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		bundle.putString("FractalType", FractalType.JULIA.toString());
 		bundle.putBoolean("SideBySide", includeLittle);
 		
-		bundle.putDoubleArray("LittleMandelbrotLocation", mjLocation.getMandelbrotGraphArea());
+		Log.d(TAG, "Mandelbrot Graph Area at launch: " + (mjLocation.getMandelbrotGraphArea())[0]);
+		bundle.putDoubleArray("LittleMandelbrotLocation", fractalView.graphArea);
 		
 		bundle.putDouble("JULIA_X", juliaParams[0]);
 		bundle.putDouble("JULIA_Y", juliaParams[1]);
