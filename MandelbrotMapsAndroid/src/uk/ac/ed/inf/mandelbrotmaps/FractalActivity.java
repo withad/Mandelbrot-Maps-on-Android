@@ -167,7 +167,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   relativeLayout.addView(littleFractalView, lp2);
 	   
 	   if(fractalType == FractalType.MANDELBROT) {
-		   littleFractalView.loadLocation(mjLocation);
+		   littleFractalView.loadLocation(mjLocation); 
 		   double[] jParams = ((MandelbrotFractalView)fractalView).getJuliaParams(fractalView.getWidth()/2, fractalView.getHeight()/2);
 		   ((JuliaFractalView)littleFractalView).setJuliaParameter(jParams[0], jParams[1]);
 	   }
@@ -366,6 +366,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 
 
 	private void dragFractal(MotionEvent evt) {
+		try {
 		   	int pointerIndex = evt.findPointerIndex(dragID);
 			
 			float dragDiffPixelsX = evt.getX(pointerIndex) - dragLastX;
@@ -378,6 +379,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			// Update last mouse position
 			dragLastX = evt.getX(pointerIndex);
 			dragLastY = evt.getY(pointerIndex);
+		}
+		catch (ArrayIndexOutOfBoundsException iae) {}
 	}
 	
 	
