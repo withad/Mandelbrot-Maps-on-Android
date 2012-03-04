@@ -167,13 +167,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				}
 		}
 		
-		if(pixelBlockSize == DEFAULT_PIXEL_SIZE) {
-		if(section == FractalSection.UPPER || section == FractalSection.ALL)
-			upperCompletedRender = true;
-		else
-			lowerCompletedRender = true;
-		}
 		postInvalidate();
+		notifyCompleteRender(section, pixelBlockSize);
 		Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
 		Log.d(TAG, section.name() + ". Time elapsed: " + (System.currentTimeMillis() - initialMillis));
 	}

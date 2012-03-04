@@ -22,6 +22,7 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 abstract class AbstractFractalView extends View {
    
@@ -145,6 +146,8 @@ abstract class AbstractFractalView extends View {
 	boolean upperCompletedRender = true;
 	boolean lowerCompletedRender = true;
 	
+	long renderStartTime;
+	
 	
 	
 	
@@ -257,10 +260,13 @@ abstract class AbstractFractalView extends View {
 		//Abort future rendering queue.
 		stopAllRendering();
 		
-		parentActivity.showProgressSpinner();
+		if(fractalViewSize == FractalViewSize.LARGE)
+			parentActivity.showProgressSpinner();
 		
 		upperCompletedRender = false;
 		lowerCompletedRender = false;
+		
+		renderStartTime = System.currentTimeMillis();
 		
 		//Schedule a crude rendering, if needed and not small view
 		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE)
@@ -668,9 +674,28 @@ abstract class AbstractFractalView extends View {
 /*Utilities*/
 /*-----------------------------------------------------------------------------------*/
 	
-	public boolean renderFinished() {
+	//TODO change function to meet name
+	public boolean isRendering() {
 		return upperCompletedRender && lowerCompletedRender;
 	}  
+	
+	public void notifyCompleteRender(FractalSection section, int pixelBlockSize) {
+		if(pixelBlockSize == DEFAULT_PIXEL_SIZE) {
+			if(section == FractalSection.UPPER || section == FractalSection.ALL) {
+				upperCompletedRender = true;
+			}
+			else {
+				lowerCompletedRender = true;
+			}
+		}
+		
+		if (upperCompletedRender && lowerCompletedRender && fractalViewSize == FractalViewSize.LARGE) {
+			Log.d(TAG, "Renders completed.");
+			long time = System.currentTimeMillis() - renderStartTime;
+			Toast.makeText(parentActivity.getApplicationContext(), "Rendering time: " + (int)(time/1000) + " seconds", Toast.LENGTH_SHORT);
+			parentActivity.hideProgressSpinner();
+		}
+	}
 	
 	public File saveImage()
 	{

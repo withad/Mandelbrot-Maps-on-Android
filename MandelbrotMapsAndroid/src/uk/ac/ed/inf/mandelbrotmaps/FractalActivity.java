@@ -88,6 +88,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	private ProgressBar progressBar;
 	boolean showingSpinner = false;
+	boolean allowSpinner = false;
 	
 	
 	
@@ -198,7 +199,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    }
    
    public void showProgressSpinner() {
-	    if(showingSpinner) return;
+	    if(showingSpinner || !allowSpinner) return;
 	    
 		LayoutParams progressBarParams = new LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 		progressBarParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -208,9 +209,17 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    }
    
    public void hideProgressSpinner() {
-	   if(!showingSpinner) return;
+	   if(!showingSpinner || !allowSpinner) return;
+	   Log.d(TAG, "Remove spinner");
 	   
-	   relativeLayout.removeView(progressBar);
+	   runOnUiThread(new Runnable() {
+		
+		public void run() {
+			relativeLayout.removeView(progressBar);
+			
+		}
+	});
+	   showingSpinner = false;
    }
    
    @Override
@@ -306,13 +315,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		}
 	});
 
-	if(!(fractalView.renderFinished())) {
+	if(!(fractalView.isRendering())) {
 		savingDialog.show();
 		
 		//Launch a thread to wait for completion
 		new Thread(new Runnable() {  
 			public void run() {  
-				while (!cancelledSave && !fractalView.renderFinished()) {
+				while (!cancelledSave && !fractalView.isRendering()) {
 					try {
 						Thread.sleep(100);
 						Log.d(TAG, "Waiting to save...");
