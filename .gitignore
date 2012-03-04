@@ -1,1 +1,4 @@
 bin/
+*.dex
+*.apk
+*.ap_
