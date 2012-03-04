@@ -5,11 +5,15 @@ import java.io.File;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -17,15 +21,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.ViewGroup;
 import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.Toast;
 
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
 
@@ -77,6 +80,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	boolean littleFractalSelected = false;
 	
 	double[] littleMandelbrotLocation;
+
+	private boolean cancelledSave;
+
+	private ProgressDialog savingDialog;
 	
 	
 	
@@ -259,7 +266,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  fractalView.crudeRendering = !fractalView.crudeRendering;
     	  return true;
       case R.id.saveImage:
-    	  fractalView.saveImage();
+    	  saveImage();
     	  return true;
       case R.id.shareImage:
     	  shareImage();
@@ -270,10 +277,56 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 
 
 /*-----------------------------------------------------------------------------------*/
-/*Image sharing*/
+/*Image saving/sharing*/
 /*-----------------------------------------------------------------------------------*/
+   private File saveImage() {
+	   imagefile = null;
+	   
+	cancelledSave = false;
+	savingDialog = new ProgressDialog(this);
+	savingDialog.setMessage("Waiting for render to finish...");
+	savingDialog.setCancelable(true);
+	savingDialog.setIndeterminate(true);
+	savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+		public void onCancel(DialogInterface dialog) {
+			FractalActivity.this.cancelledSave = true;
+		}
+	});
+
+	if(!(fractalView.renderFinished())) {
+		savingDialog.show();
+		
+		//Launch a thread to wait for completion
+		new Thread(new Runnable() {  
+			public void run() {  
+				while (!cancelledSave || !fractalView.renderFinished()) {
+					try {
+						Thread.sleep(1000);
+						Log.d(TAG, "Waiting to save...");
+					} catch (InterruptedException e) {}
+				}
+				savingDialog.dismiss();					
+				return;  
+			}
+		}).start(); 
+	   }
+	
+	if(!cancelledSave) {
+		imagefile = fractalView.saveImage();
+
+		String toastText = "Saved fractal as    " + imagefile.getAbsolutePath();
+		Toast toast = Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_LONG);
+		toast.show();
+	}
+	
+	return imagefile;
+   }
+  
+   
    private void shareImage() {
 	   imagefile = fractalView.saveImage();
+	   
+	   if(imagefile == null) return;
 		
 		Intent imageIntent = new Intent(Intent.ACTION_SEND);
 		imageIntent.setType("image/jpg");

@@ -6,6 +6,10 @@ import java.util.Calendar;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,7 +17,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
@@ -134,6 +137,11 @@ abstract class AbstractFractalView extends View {
 	int bitmapCreations = 0;
 	
 	FractalActivity parentActivity;
+	
+	Boolean cancelledSave = false;
+	
+	ProgressDialog savingDialog;
+	
 	
 	
 	
@@ -652,6 +660,11 @@ abstract class AbstractFractalView extends View {
 /*Utilities*/
 /*-----------------------------------------------------------------------------------*/
 	
+	public boolean renderFinished() {
+		// TODO Auto-generated method stub
+		return true;
+	}  
+	
 	public File saveImage()
 	{
 		//TODO: Check if file exists already, add user filename, change to co-ordinates
@@ -668,7 +681,7 @@ abstract class AbstractFractalView extends View {
 				FileOutputStream output = new FileOutputStream(imagefile);
 				fractalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, output);
 
-				output.close();
+				output.close();				
 				
 				Log.d(TAG, "Wrote image out to " + imagefile.getAbsolutePath());
 			}
@@ -792,6 +805,7 @@ abstract class AbstractFractalView extends View {
 		upperRenderThread.interrupt();
 		lowerRenderThread.interrupt();
 	}
+
 	
 	
 	// Abstract methods
