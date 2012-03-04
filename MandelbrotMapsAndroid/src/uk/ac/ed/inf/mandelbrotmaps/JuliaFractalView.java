@@ -60,7 +60,7 @@ public class JuliaFractalView extends AbstractFractalView{
 	// Iterate a rectangle of pixels, in range (xPixelMin, yPixelMin) to (xPixelMax, yPixelMax)
 	void computePixels(
 		int[] outputPixelArray,  // Where pixels are output
-		int[] currentPixelSizes,
+		//int[] currentPixelSizes,
 		int pixelBlockSize,  // Pixel "blockiness"
 		final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
 		final int xPixelMin,
@@ -164,7 +164,7 @@ public class JuliaFractalView extends AbstractFractalView{
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
 						if(outputPixelArray == null) return;
 						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
-						currentPixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+						pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
 					}
 				}
 			}
