@@ -288,7 +288,7 @@ abstract class AbstractFractalView extends View {
 		
 		computePixels(
 			fractalPixels,
-			pixelSizes,
+			//pixelSizes,
 			pixelBlockSize,
 			showRenderProgress,
 			0, 
@@ -532,6 +532,8 @@ abstract class AbstractFractalView extends View {
 	// After pinch gesture stops, crop bitmap to image on screen
 	public void stopZooming()
 	{		
+		clearPixelSizes();
+		
 		controlmode = ControlMode.DRAGGING;
 		
 		stopAllRendering();
@@ -796,7 +798,7 @@ abstract class AbstractFractalView extends View {
 	abstract void loadLocation(MandelbrotJuliaLocation mjLocation);
 	abstract void computePixels(
 			int[] outputPixelArray,  // Where pixels are output
-			int[] pixelSizeArray, //The size of each pixel's associated block
+			//int[] pixelSizeArray, //The size of each pixel's associated block
 			int pixelBlockSize,  // Pixel "blockiness"
 			final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
 			final int xPixelMin,

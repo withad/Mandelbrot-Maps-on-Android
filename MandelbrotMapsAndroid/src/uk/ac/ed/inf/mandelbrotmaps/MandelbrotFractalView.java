@@ -45,7 +45,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	// Iterate a rectangle of pixels, in range (xPixelMin, yPixelMin) to (xPixelMax, yPixelMax)
 	void computePixels(
 		int[] outputPixelArray,  // Where pixels are output
-		int[] currentPixelSizes,
 		int pixelBlockSize,  // Pixel "blockiness"
 		final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
 		final int xPixelMin,
@@ -61,14 +60,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	) {				
 		int maxIterations = getMaxIterations();
 		int imgWidth = xPixelMax - xPixelMin;
-		
-		// Efficiency: For very high-demanding pictures, increase pixel block.
-		if (
-			(pixelBlockSize!=1) && (maxIterations>10000)
-		) pixelBlockSize = Math.min(
-			getWidth() / 17,
-			pixelBlockSize * (maxIterations/5000)
-		);
 		
 		int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
 		double colourCode;
@@ -97,29 +88,19 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		int colourFromRenderer;
 		
 		for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
-			//Work backwards on upper half
-/*			if (section == FractalSection.UPPER)
-				yPixel = yPixelMax - yIncrement - 1;
-			else */
-				yPixel = yIncrement;
+			yPixel = yIncrement;
 			
-			if (
-				allowInterruption &&
-				upperRenderThread.abortSignalled()
-			) 
-				{
-					Log.d("MFV", "Returning based on interruption test");
-					return;
-				}
+			if (allowInterruption && (upperRenderThread.abortSignalled() || lowerRenderThread.abortSignalled())) {
+				Log.d("MFV", "Returning based on interruption test");
+				return;
+			}
 			
 			// Set y0 (im part of c)
 			y0 = yMax - ( (double)yPixel * pixelSize );			
 		
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 				//Check to see if this pixel is already iterated to the necessary block size
-				if(/*renderMode == RenderMode.JUST_DRAGGED && */
-						pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize)
-				{
+				if(pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
 					skippedCount++;
 					continue;
 				}
@@ -131,7 +112,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				x = x0;
 				y = y0;
 				
-				boolean inside = false;
+				boolean inside = true;
 			
 				for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
 					// z^2 + c
@@ -143,15 +124,10 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				
 					// Well known result: if distance is >2, escapes to infinity...
 					if ( (x*x + y*y) > 4) {
-						inside = true;
+						inside = false;
 						break;
 					}
 				}
-				
-				/*if (inside)
-					colourFromRenderer = colourer.colourOutsidePoint(iterationNr);
-				else
-					colourFromRenderer = colourer.colourInsidePoint();*/
 				
 				// Percentage (0.0 -- 1.0)
 				colourCode = (double)iterationNr / (double)maxIterations;
@@ -163,60 +139,24 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				colourCodeG = (int)(255*colourCode);
 				
 				// Blue
-				colourCodeB = (int)(
-					127.5 - 127.5*Math.cos(
-						7 * Math.PI * colourCode
-					)
-				);
+				colourCodeB = (int)(127.5 - 127.5*Math.cos(7 * Math.PI * colourCode));
 				
-				/*if (iterationNr == 0){
-		            colourCodeHex = 0xFF000000;
-		        }
-				else {
-			        //calculate theta - 2pi represents 255 iterations
-			        double theta = (double) ((double)iterationNr / (double)255) * 2 * Math.PI;
-			        
-			        //compute r
-			        double x2 = theta * (2.0 * (Math.cos(theta) + 1));
-	
-			        //compute x
-			        double r = theta;
-	
-			        //compute y
-			        double y2 = theta * (2.0 * (Math.sin(theta) + 1));        
-			        
-			        //defines the number of colours used in each component of RGB
-			        int colourRange = 230;
-			        //the starting point in each compenent of RGB
-			        int startColour = 25;
-	
-			        //compute the red compnent
-			        colourCodeR = (int) (colourRange * r);
-			        colourCodeR = boundColour(colourCodeR, colourRange);
-			        colourCodeR += startColour;
-			        
-			        //compute the green component
-			        colourCodeG = (int) (colourRange * y2);
-			        colourCodeG = boundColour(colourCodeG, colourRange);
-			        colourCodeG += startColour;
-			        
-			        //compute the blue component
-			        colourCodeB = (int) (colourRange * x2);
-			        colourCodeB = boundColour(colourCodeB, colourRange);
-			        colourCodeB += startColour;
-	
-			        //compute colour from the three components
-*/			        colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
-				//}
+		        //Compute colour from the three components
+				colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
 				
 				//Note that the pixel being calculated has been calculated in full (upper right of a block)
-				currentPixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
+				pixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
 				
-				// Save colour info for this pixel. int, interpreted: 0xAARRGGBB				
+				// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
+				int p = 0;
 				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
+						if(p != 0) {
+							pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+						}
+						p++;
 						if(outputPixelArray == null) return;
-						outputPixelArray[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
+						fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 					}
 				}
 			}
