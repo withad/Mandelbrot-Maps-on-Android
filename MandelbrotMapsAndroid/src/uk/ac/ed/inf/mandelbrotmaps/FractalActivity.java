@@ -380,7 +380,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			dragLastX = evt.getX(pointerIndex);
 			dragLastY = evt.getY(pointerIndex);
 		}
-		catch (ArrayIndexOutOfBoundsException iae) {}
+		catch (Exception iae) {}
 	}
 	
 	
