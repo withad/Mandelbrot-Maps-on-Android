@@ -676,7 +676,7 @@ abstract class AbstractFractalView extends View {
 	
 	//TODO change function to meet name
 	public boolean isRendering() {
-		return upperCompletedRender && lowerCompletedRender;
+		return !(upperCompletedRender || lowerCompletedRender);
 	}  
 	
 	public void notifyCompleteRender(FractalSection section, int pixelBlockSize) {
@@ -691,8 +691,11 @@ abstract class AbstractFractalView extends View {
 		
 		if (upperCompletedRender && lowerCompletedRender && fractalViewSize == FractalViewSize.LARGE) {
 			Log.d(TAG, "Renders completed.");
-			long time = System.currentTimeMillis() - renderStartTime;
-			Toast.makeText(parentActivity.getApplicationContext(), "Rendering time: " + (int)(time/1000) + " seconds", Toast.LENGTH_SHORT);
+			
+			final long time = System.currentTimeMillis() - renderStartTime;
+			String renderCompleteMessage = "Rendering time: " + (int)(time/1000) + " seconds";
+			parentActivity.showToastOnUIThread(renderCompleteMessage, Toast.LENGTH_SHORT);	
+			
 			parentActivity.hideProgressSpinner();
 		}
 	}

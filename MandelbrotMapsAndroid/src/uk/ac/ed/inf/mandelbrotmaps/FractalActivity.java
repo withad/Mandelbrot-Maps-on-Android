@@ -315,13 +315,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		}
 	});
 
-	if(!(fractalView.isRendering())) {
+	if(fractalView.isRendering()) {
 		savingDialog.show();
 		
 		//Launch a thread to wait for completion
 		new Thread(new Runnable() {  
 			public void run() {  
-				while (!cancelledSave && !fractalView.isRendering()) {
+				while (!cancelledSave && fractalView.isRendering()) {
 					try {
 						Thread.sleep(100);
 						Log.d(TAG, "Waiting to save...");
@@ -332,13 +332,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					savingDialog.dismiss();	
 					imagefile = fractalView.saveImage();
 
-					final String toastText = "Saved fractal as    " + imagefile.getAbsolutePath();
-					runOnUiThread(new Runnable() {
-						
-						public void run() {
-							Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
-						}
-					});
+					final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
+					showToastOnUIThread(toastText, Toast.LENGTH_LONG);
 				}				
 				return;  
 			}
@@ -347,7 +342,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	else {
 		imagefile = fractalView.saveImage();
 
-		String toastText = "Saved fractal as    " + imagefile.getAbsolutePath();
+		String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
 		Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
 	}
 	
@@ -551,4 +546,17 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   currentlyDragging = true;
 	   fractalView.startDragging();
 	}
+   
+/*-----------------------------------------------------------------------------------*/
+/*Utilities*/
+/*-----------------------------------------------------------------------------------*/
+   //A single method for running toasts on the UI thread, rather than 
+   //creating new Runnables each time.
+   public void showToastOnUIThread(final String toastText, final int length) {
+	    runOnUiThread(new Runnable() {
+			public void run() {
+				Toast.makeText(getApplicationContext(), toastText, length).show();
+			}
+		});
+   }
 }
