@@ -307,46 +307,40 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     imagefile = null;
 	   
 	cancelledSave = false;
-	ProgressDialog savingDialog = new ProgressDialog(this);
-	savingDialog.setMessage("Waiting for render to finish...");
-	savingDialog.setCancelable(true);
-	savingDialog.setIndeterminate(true);
-	savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-		public void onCancel(DialogInterface dialog) {
-			FractalActivity.this.cancelledSave = true;
-		}
-	});
 	
-	savingDialog.show();
-	renderComplete = false;
+	
+	if(fractalView.isRendering()) {
+		ProgressDialog savingDialog = new ProgressDialog(this);
+		savingDialog.setMessage("Waiting for render to finish...");
+		savingDialog.setCancelable(true);
+		savingDialog.setIndeterminate(true);
+		savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			public void onCancel(DialogInterface dialog) {
+				FractalActivity.this.cancelledSave = true;
+			}
+		});
+		savingDialog.show();
 
-	//Launch a thread to wait for completion
-	/*new Thread(new Runnable() {  
-		public void run() {  
-			if(fractalView.isRendering()) {
-				while (!cancelledSave && fractalView.isRendering()) {
-					try {
-						Thread.sleep(100);
-						Log.d(TAG, "Waiting to save...");
-					} catch (InterruptedException e) {}
-				}
-			}		
-			FractalActivity.this.renderComplete.notify();
-			return;  
-		}
-	}).start(); */
-	
-	SavingThread savingThread = new SavingThread(fractalView, cancelledSave);
-	savingThread.start();
-	
-	synchronized (savingThread) {
-	try {
-		savingThread.wait();
-	} catch (InterruptedException e) {}
-	}
-	
-	if(!cancelledSave) {
-		savingDialog.dismiss();	
+		//Launch a thread to wait for completion
+		new Thread(new Runnable() {  
+			public void run() {  
+				if(fractalView.isRendering()) {
+					while (!cancelledSave && fractalView.isRendering()) {
+						try {
+							Thread.sleep(100);
+							Log.d(TAG, "Waiting to save...");
+						} catch (InterruptedException e) {}
+					}
+					
+					if(!cancelledSave) {						
+					}
+					
+				}		
+				return;  
+			}
+		}).start(); 
+	} 
+	else {
 		imagefile = fractalView.saveImage();
 		final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
 		showToastOnUIThread(toastText, Toast.LENGTH_LONG);
