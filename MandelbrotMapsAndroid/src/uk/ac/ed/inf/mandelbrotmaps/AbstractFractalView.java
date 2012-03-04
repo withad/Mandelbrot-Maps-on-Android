@@ -142,6 +142,9 @@ abstract class AbstractFractalView extends View {
 	
 	ProgressDialog savingDialog;
 	
+	boolean upperCompletedRender = true;
+	boolean lowerCompletedRender = true;
+	
 	
 	
 	
@@ -253,6 +256,9 @@ abstract class AbstractFractalView extends View {
 	void scheduleNewRenders() {		
 		//Abort future rendering queue.
 		stopAllRendering();
+		
+		upperCompletedRender = false;
+		lowerCompletedRender = false;
 		
 		//Schedule a crude rendering, if needed and not small view
 		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE)
@@ -661,8 +667,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 	
 	public boolean renderFinished() {
-		// TODO Auto-generated method stub
-		return true;
+		return upperCompletedRender && lowerCompletedRender;
 	}  
 	
 	public File saveImage()

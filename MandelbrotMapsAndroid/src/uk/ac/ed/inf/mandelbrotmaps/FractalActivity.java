@@ -299,24 +299,34 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		//Launch a thread to wait for completion
 		new Thread(new Runnable() {  
 			public void run() {  
-				while (!cancelledSave || !fractalView.renderFinished()) {
+				while (!cancelledSave && !fractalView.renderFinished()) {
 					try {
 						Thread.sleep(1000);
 						Log.d(TAG, "Waiting to save...");
 					} catch (InterruptedException e) {}
 				}
-				savingDialog.dismiss();					
+				
+				if(!cancelledSave) {
+					savingDialog.dismiss();	
+					imagefile = fractalView.saveImage();
+
+					final String toastText = "Saved fractal as    " + imagefile.getAbsolutePath();
+					runOnUiThread(new Runnable() {
+						
+						public void run() {
+							Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
+						}
+					});
+				}				
 				return;  
 			}
 		}).start(); 
 	   }
-	
-	if(!cancelledSave) {
+	else {
 		imagefile = fractalView.saveImage();
 
 		String toastText = "Saved fractal as    " + imagefile.getAbsolutePath();
-		Toast toast = Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_LONG);
-		toast.show();
+		Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
 	}
 	
 	return imagefile;
