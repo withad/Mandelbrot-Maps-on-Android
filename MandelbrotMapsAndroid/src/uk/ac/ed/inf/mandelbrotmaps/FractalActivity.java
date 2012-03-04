@@ -1,6 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
@@ -29,6 +30,7 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView.SavedState;
 import android.widget.Toast;
 
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
@@ -82,13 +84,13 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	double[] littleMandelbrotLocation;
 
-	private boolean cancelledSave;
-
-	private ProgressDialog savingDialog;
+	Boolean cancelledSave;
 	
 	private ProgressBar progressBar;
 	boolean showingSpinner = false;
 	boolean allowSpinner = false;
+	
+	Boolean renderComplete = false;
 	
 	
 	
@@ -302,10 +304,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 /*Image saving/sharing*/
 /*-----------------------------------------------------------------------------------*/
    private File saveImage() {
-	   imagefile = null;
+    imagefile = null;
 	   
 	cancelledSave = false;
-	savingDialog = new ProgressDialog(this);
+	ProgressDialog savingDialog = new ProgressDialog(this);
 	savingDialog.setMessage("Waiting for render to finish...");
 	savingDialog.setCancelable(true);
 	savingDialog.setIndeterminate(true);
@@ -314,36 +316,40 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			FractalActivity.this.cancelledSave = true;
 		}
 	});
+	
+	savingDialog.show();
+	renderComplete = false;
 
-	if(fractalView.isRendering()) {
-		savingDialog.show();
-		
-		//Launch a thread to wait for completion
-		new Thread(new Runnable() {  
-			public void run() {  
+	//Launch a thread to wait for completion
+	/*new Thread(new Runnable() {  
+		public void run() {  
+			if(fractalView.isRendering()) {
 				while (!cancelledSave && fractalView.isRendering()) {
 					try {
 						Thread.sleep(100);
 						Log.d(TAG, "Waiting to save...");
 					} catch (InterruptedException e) {}
 				}
-				
-				if(!cancelledSave) {
-					savingDialog.dismiss();	
-					imagefile = fractalView.saveImage();
-
-					final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
-					showToastOnUIThread(toastText, Toast.LENGTH_LONG);
-				}				
-				return;  
-			}
-		}).start(); 
-	   }
-	else {
+			}		
+			FractalActivity.this.renderComplete.notify();
+			return;  
+		}
+	}).start(); */
+	
+	SavingThread savingThread = new SavingThread(fractalView, cancelledSave);
+	savingThread.start();
+	
+	synchronized (savingThread) {
+	try {
+		savingThread.wait();
+	} catch (InterruptedException e) {}
+	}
+	
+	if(!cancelledSave) {
+		savingDialog.dismiss();	
 		imagefile = fractalView.saveImage();
-
-		String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
-		Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
+		final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
+		showToastOnUIThread(toastText, Toast.LENGTH_LONG);
 	}
 	
 	return imagefile;
