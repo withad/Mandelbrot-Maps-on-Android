@@ -91,6 +91,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	boolean allowSpinner = false;
 	
 	Boolean renderComplete = false;
+	ProgressDialog savingDialog;
 	
 	
 	
@@ -310,7 +311,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	
 	if(fractalView.isRendering()) {
-		ProgressDialog savingDialog = new ProgressDialog(this);
+		savingDialog = new ProgressDialog(this);
 		savingDialog.setMessage("Waiting for render to finish...");
 		savingDialog.setCancelable(true);
 		savingDialog.setIndeterminate(true);
@@ -332,9 +333,12 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 						} catch (InterruptedException e) {}
 					}
 					
-					if(!cancelledSave) {						
+					if(!cancelledSave) {
+						savingDialog.dismiss();
+						imagefile = fractalView.saveImage();
+						final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
+						showToastOnUIThread(toastText, Toast.LENGTH_LONG);
 					}
-					
 				}		
 				return;  
 			}
