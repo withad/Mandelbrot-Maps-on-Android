@@ -257,6 +257,8 @@ abstract class AbstractFractalView extends View {
 		//Abort future rendering queue.
 		stopAllRendering();
 		
+		parentActivity.showProgressSpinner();
+		
 		upperCompletedRender = false;
 		lowerCompletedRender = false;
 		

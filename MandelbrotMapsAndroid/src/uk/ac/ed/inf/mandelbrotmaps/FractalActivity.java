@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
@@ -85,6 +86,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 
 	private ProgressDialog savingDialog;
 	
+	private ProgressBar progressBar;
+	boolean showingSpinner = false;
+	
 	
 	
 /*-----------------------------------------------------------------------------------*/
@@ -95,9 +99,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       super.onCreate(savedInstanceState);      
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);   
-      Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+      Thread.currentThread().setPriority(Thread.MAX_PRIORITY);      
       
       Bundle bundle = getIntent().getExtras();
+      
+      double juliaX = 0;
+      double juliaY = 0;
+      
+      relativeLayout = new RelativeLayout(this);
       
       //Extract features from bundle, if there is one
       try {     
@@ -113,29 +122,18 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       }
       else if (fractalType == FractalType.JULIA) {
     	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
+    	  juliaX = bundle.getDouble("JULIA_X");
+          juliaY = bundle.getDouble("JULIA_Y");
       }
-      
-      relativeLayout = new RelativeLayout(this);
       
       LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
       relativeLayout.addView(fractalView, lp);
       setContentView(relativeLayout);
       
-      Log.d(TAG, "Width: " + fractalView.getWidth());
-      
-      fractalView.requestFocus();
-      
       mjLocation = new MandelbrotJuliaLocation();
       fractalView.loadLocation(mjLocation);
-      
-      
-      if (fractalType == FractalType.JULIA)
-      {
-    	  double juliaX = bundle.getDouble("JULIA_X");
-          double juliaY = bundle.getDouble("JULIA_Y");
-          
-          ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);          
-      }
+      if(fractalType == FractalType.JULIA)
+    	  ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);
       
       gestureDetector = new ScaleGestureDetector(this, this);
    }
@@ -199,6 +197,21 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   showingLittle = false;
    }
    
+   public void showProgressSpinner() {
+	    if(showingSpinner) return;
+	    
+		LayoutParams progressBarParams = new LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		progressBarParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		progressBar = new ProgressBar(getApplicationContext());
+		relativeLayout.addView(progressBar, progressBarParams);
+		showingSpinner = true;
+   }
+   
+   public void hideProgressSpinner() {
+	   if(!showingSpinner) return;
+	   
+	   relativeLayout.removeView(progressBar);
+   }
    
    @Override
    protected void onResume() {
@@ -301,7 +314,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			public void run() {  
 				while (!cancelledSave && !fractalView.renderFinished()) {
 					try {
-						Thread.sleep(1000);
+						Thread.sleep(100);
 						Log.d(TAG, "Waiting to save...");
 					} catch (InterruptedException e) {}
 				}
