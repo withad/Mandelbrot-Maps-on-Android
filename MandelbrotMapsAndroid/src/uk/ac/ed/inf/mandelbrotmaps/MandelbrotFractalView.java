@@ -6,6 +6,7 @@ import uk.ac.ed.inf.mandelbrotmaps.colouring.RGBWalkColouringScheme;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.SpiralRenderer;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
@@ -105,6 +106,13 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
 						skippedCount++;
 						continue;
+					}
+					
+					if(pixelBlockSize == INITIAL_PIXEL_BLOCK) {
+						if(noCrudeRect.contains(xPixel, yPixel)) {
+							Log.d(TAG, "Should be skipping this...");
+							continue;
+						}
 					}
 					
 					// Set x0 (real part of c)

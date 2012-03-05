@@ -19,6 +19,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
@@ -148,6 +150,8 @@ abstract class AbstractFractalView extends View {
 	
 	long renderStartTime;
 	
+	Rect noCrudeRect = new Rect(0,0,0,0);
+	
 	
 	
 	
@@ -159,7 +163,7 @@ abstract class AbstractFractalView extends View {
 		setFocusable(true);
 		setFocusableInTouchMode(true);
       	setId(0); 
-      	setBackgroundColor(Color.BLACK);
+      	setBackgroundColor(Color.BLUE);
       	renderStyle = style;
       	fractalViewSize = size;
       	
@@ -252,7 +256,6 @@ abstract class AbstractFractalView extends View {
 	if(controlmode == ControlMode.STATIC) 
 		{
 			bitmapCreations++;
-			//Log.d(TAG, "Create a new bitmap! " + bitmapCreations);
 			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		}
 	
@@ -555,6 +558,13 @@ abstract class AbstractFractalView extends View {
 		controlmode = ControlMode.DRAGGING;
 		
 		stopAllRendering();
+		
+		RectF rectangle = new RectF(0, 0, fractalBitmap.getHeight(), fractalBitmap.getHeight());
+		matrix.mapRect(rectangle);
+		Log.d("RectChecking", "Rectangle = " + rectangle.toString());
+		
+		noCrudeRect = new Rect((int)rectangle.left, (int)rectangle.top, (int)rectangle.right, (int)rectangle.bottom);
+		Log.d(TAG, "noCrudeRect = " + noCrudeRect.flattenToString());
 		
 		setDrawingCacheEnabled(true);
 		fractalBitmap = Bitmap.createBitmap(getDrawingCache());

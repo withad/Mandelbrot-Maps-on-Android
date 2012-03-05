@@ -164,6 +164,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   width /= 7;
 	   height = (int)(width/ratio);   
 	   
+	   Log.d("RectChecking", "Little view width: " + width + " and height: " + height);
+	   
 	   //Add border view (behind little view, slightly larger)
 	   borderView = new View(this);
 	   borderView.setBackgroundColor(Color.GRAY);
