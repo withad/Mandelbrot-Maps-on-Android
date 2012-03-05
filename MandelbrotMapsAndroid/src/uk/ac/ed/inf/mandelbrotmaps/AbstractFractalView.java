@@ -8,7 +8,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -78,12 +77,7 @@ abstract class AbstractFractalView extends View {
 	//Track render queues for each thread
 	int noOfThreads = 2;
 	ArrayList<LinkedBlockingQueue<Rendering>> renderQueueList = new ArrayList<LinkedBlockingQueue<Rendering>>();
-	
-	LinkedBlockingQueue<Rendering> upperRenderQueue = new LinkedBlockingQueue<Rendering>();	
-	RenderThread upperRenderThread = new RenderThread(this, FractalSection.UPPER);
-	
-	LinkedBlockingQueue<Rendering> lowerRenderQueue = new LinkedBlockingQueue<Rendering>();	
-	RenderThread lowerRenderThread = new RenderThread(this, FractalSection.LOWER);
+	ArrayList<RenderThread> renderThreadList = new ArrayList<RenderThread>();
 	
 	
 	// What zoom range do we allow? Expressed as ln(pixelSize).
@@ -149,8 +143,7 @@ abstract class AbstractFractalView extends View {
 	
 	ProgressDialog savingDialog;
 	
-	boolean upperCompletedRender = true;
-	boolean lowerCompletedRender = true;
+	ArrayList<Boolean> rendersComplete = new ArrayList<Boolean>();
 	
 	long renderStartTime;
 	
@@ -180,11 +173,14 @@ abstract class AbstractFractalView extends View {
       	matrix = new Matrix();
       	matrix.reset();
       	
-      	upperRenderThread.start();
-      	if(renderStyle != RenderStyle.SINGLE_THREAD)
-      		{
-      			lowerRenderThread.start();
-      		}
+      	//Create the render threads
+      	
+      	for (int i = 0; i < noOfThreads; i++) {
+      		rendersComplete.add(false);
+      		renderQueueList.add(new LinkedBlockingQueue<Rendering>());	
+      		renderThreadList.add(new RenderThread(this, i, noOfThreads));
+      		renderThreadList.get(i).start();
+      	}
    }
 
 	
@@ -269,8 +265,9 @@ abstract class AbstractFractalView extends View {
 		if(fractalViewSize == FractalViewSize.LARGE)
 			parentActivity.showProgressSpinner();
 		
-		upperCompletedRender = false;
-		lowerCompletedRender = false;
+		for(int i = 0; i < noOfThreads; i++) {
+			rendersComplete.set(i, false);
+		}
 		
 		renderStartTime = System.currentTimeMillis();
 		
@@ -284,7 +281,7 @@ abstract class AbstractFractalView extends View {
 	
 	
 	// Computes all necessary pixels (run by render thread)
-	public void computeAllPixels(final int pixelBlockSize, FractalSection half) {
+	public void computeAllPixels(final int pixelBlockSize, final int threadID) {
 		// Nothing to do - stop if called before layout has been sanely set...
 		if (getWidth() <= 0 || graphArea == null)
 			return;
@@ -295,18 +292,16 @@ abstract class AbstractFractalView extends View {
 		
 		
 		if(renderStyle != RenderStyle.SINGLE_THREAD){
-			if (half == FractalSection.UPPER) {
+			if (threadID == 0) {
 				yStart = 0;
 				yEnd = getHeight() - 1;
 			}
-			else if (half == FractalSection.LOWER) {
+			else if (threadID == 1) {
 				yStart = pixelBlockSize;
 				yEnd = getHeight();
 				showRenderProgress = false;
 			}
 		}
-		else
-			half = FractalSection.ALL;
 			
 		if (pixelSizes == null)
 			pixelSizes = new int[getWidth() * getHeight()];
@@ -315,8 +310,6 @@ abstract class AbstractFractalView extends View {
 		if(fractalViewSize == FractalViewSize.LITTLE) showRenderProgress = false;
 		
 		computePixels(
-			fractalPixels,
-			//pixelSizes,
 			pixelBlockSize,
 			showRenderProgress,
 			0, 
@@ -328,7 +321,8 @@ abstract class AbstractFractalView extends View {
 			getPixelSize(),
 			true,
 			renderMode,
-			half
+			threadID,
+			noOfThreads
 		);
 		
 		postInvalidate();
@@ -680,22 +674,23 @@ abstract class AbstractFractalView extends View {
 /*Utilities*/
 /*-----------------------------------------------------------------------------------*/
 	
-	//TODO change function to meet name
+	//Returns true if any threads are still rendering
 	public boolean isRendering() {
-		return (!upperCompletedRender || !lowerCompletedRender);
-	}  
-	
-	public void notifyCompleteRender(FractalSection section, int pixelBlockSize) {
-		if(pixelBlockSize == DEFAULT_PIXEL_SIZE) {
-			if(section == FractalSection.UPPER || section == FractalSection.ALL) {
-				upperCompletedRender = true;
-			}
-			else {
-				lowerCompletedRender = true;
-			}
+		boolean allComplete = true;
+		
+		for (Boolean b : rendersComplete) {
+			allComplete = allComplete && b;
 		}
 		
-		if (upperCompletedRender && lowerCompletedRender && fractalViewSize == FractalViewSize.LARGE) {
+		return !allComplete;
+	}  
+	
+	public void notifyCompleteRender(int threadID, int pixelBlockSize) {
+		if(pixelBlockSize == DEFAULT_PIXEL_SIZE) {
+			rendersComplete.set(threadID, true);
+		}
+		
+		if (!(isRendering()) && fractalViewSize == FractalViewSize.LARGE) {
 			Log.d(TAG, "Renders completed.");
 			
 			//Show time in seconds
@@ -798,34 +793,25 @@ abstract class AbstractFractalView extends View {
 	
 	//Stop all rendering, including planned and current
 	void stopAllRendering() {
-		//Stop planned renders
-		//renderingQueue.clear();
-		upperRenderQueue.clear();
-		lowerRenderQueue.clear();
-		
-		//Stop current render
-		upperRenderThread.abortRendering();
-		lowerRenderThread.abortRendering();
+		for (int i = 0; i < noOfThreads; i++) {
+			renderQueueList.get(i).clear();
+			renderThreadList.get(i).abortRendering();
+		}
 	}
 	
 	
 	//Add a rendering of a particular pixel size to the queue
 	void scheduleRendering(int pixelBlockSize) {
-		upperRenderThread.allowRendering();
-		lowerRenderThread.allowRendering();
-		upperRenderQueue.add( new Rendering(pixelBlockSize) );
-		lowerRenderQueue.add( new Rendering(pixelBlockSize) );
+		for (int i = 0; i < noOfThreads; i++) {
+			renderThreadList.get(i).allowRendering();
+			renderQueueList.get(i).add(new Rendering(pixelBlockSize));
+		}
 	}
 	
 	
 	//Retrieve the next rendering from the queue (used by render thread)
-	public Rendering getNextRendering(FractalSection section) throws InterruptedException {
-		if (section == FractalSection.UPPER)
-			return upperRenderQueue.take();
-		else //if (section == FractalSection.LOWER)
-			return lowerRenderQueue.take();
-		//else
-			//return renderingQueue.take();
+	public Rendering getNextRendering(int threadID) throws InterruptedException {
+		return renderQueueList.get(threadID).take();
 	}
 	
 	
@@ -848,8 +834,9 @@ abstract class AbstractFractalView extends View {
 	
 	
 	public void interruptThreads(){
-		upperRenderThread.interrupt();
-		lowerRenderThread.interrupt();
+		for (RenderThread thread : renderThreadList) {
+			thread.interrupt();
+		}
 	}
 
 	
@@ -857,8 +844,6 @@ abstract class AbstractFractalView extends View {
 	// Abstract methods
 	abstract void loadLocation(MandelbrotJuliaLocation mjLocation);
 	abstract void computePixels(
-			int[] outputPixelArray,  // Where pixels are output
-			//int[] pixelSizeArray, //The size of each pixel's associated block
 			int pixelBlockSize,  // Pixel "blockiness"
 			final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
 			final int xPixelMin,
@@ -870,7 +855,8 @@ abstract class AbstractFractalView extends View {
 			final double pixelSize,
 			final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
 			RenderMode currentRenderMode,
-			FractalSection section
+			final int threadID,
+			final int noOfThreads
 		);
 }
 
