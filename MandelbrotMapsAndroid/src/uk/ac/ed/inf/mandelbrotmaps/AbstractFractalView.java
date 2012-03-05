@@ -194,19 +194,6 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 /*Android life-cycle handling*/   
 /*-----------------------------------------------------------------------------------*/
-	
-   @Override
-   protected Parcelable onSaveInstanceState() { 
-	   super.onSaveInstanceState();
-	   Log.d(TAG, "onSaveInstanceState");
-	   return null;
-   }
-    
-   /*@Override
-   protected void onRestoreInstanceState(Parcelable state) { 
-	   Log.d(TAG, "onRestoreInstanceState");
-	   super.onRestoreInstanceState(state);
-   }*/
      
    @Override
    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
