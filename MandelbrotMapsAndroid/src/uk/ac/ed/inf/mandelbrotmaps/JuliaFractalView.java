@@ -60,7 +60,7 @@ public class JuliaFractalView extends AbstractFractalView{
 	}
 	
 	// Iterate a rectangle of pixels, in range (xPixelMin, yPixelMin) to (xPixelMax, yPixelMax)
-	void computePixels(
+/*	void computePixels(
 		int pixelBlockSize,  // Pixel "blockiness"
 		final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
 		final int xPixelMin,
@@ -85,7 +85,7 @@ public class JuliaFractalView extends AbstractFractalView{
 			int pixelBlockA, pixelBlockB;
 		
 			double x, y;
-			double newX = 0, newY = 0;
+			double x0 = 0, y0 = 0;
 			
 			long initialMillis = System.currentTimeMillis();
 			Log.d(TAG, "Initial time: " + initialMillis);
@@ -165,7 +165,7 @@ public class JuliaFractalView extends AbstractFractalView{
 			notifyCompleteRender(threadID, pixelBlockSize);
 			Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
 			Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));
-		}
+		}*/
 
 
 	@Override
@@ -173,11 +173,13 @@ public class JuliaFractalView extends AbstractFractalView{
 		int iterationNr;
 		double newx, newy;
 		
+		Log.d(TAG, "Running equationIteration");
+		
 		// We don't want the Julia parameter to change under our feet...
 		for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
 			// z^2 + c
-			newx = (x*x) - (y*y) + myJuliaX;
-			newy = (2 * x * y) + myJuliaY;
+			newx = (x*x) - (y*y) + juliaX;
+			newy = (2 * x * y) + juliaY;
 		
 			x = newx;
 			y = newy;
