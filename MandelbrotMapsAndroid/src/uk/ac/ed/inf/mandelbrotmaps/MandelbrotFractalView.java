@@ -108,13 +108,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 						continue;
 					}
 					
-					if(pixelBlockSize == INITIAL_PIXEL_BLOCK) {
-						if(noCrudeRect.contains(xPixel, yPixel)) {
-							Log.d(TAG, "Should be skipping this...");
-							continue;
-						}
-					}
-					
 					// Set x0 (real part of c)
 					x0 = xMin + ( (double)xPixel * pixelSize);
 				

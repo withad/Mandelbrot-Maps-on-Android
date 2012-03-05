@@ -150,8 +150,6 @@ abstract class AbstractFractalView extends View {
 	
 	long renderStartTime;
 	
-	Rect noCrudeRect = new Rect(0,0,0,0);
-	
 	
 	
 	
@@ -279,8 +277,11 @@ abstract class AbstractFractalView extends View {
 		renderStartTime = System.currentTimeMillis();
 		
 		//Schedule a crude rendering, if needed and not small view
-		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE && (totalScaleFactor > 3.5f || totalScaleFactor <= 1.0f))
+		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE && 
+					(totalScaleFactor < 0.8f|| totalScaleFactor == 1.0f || totalScaleFactor > 3.5f)) {
+			
 			scheduleRendering(INITIAL_PIXEL_BLOCK);
+		}
 		totalScaleFactor = 1.0f;
 		
 		// Schedule a high-quality rendering
@@ -558,13 +559,6 @@ abstract class AbstractFractalView extends View {
 		controlmode = ControlMode.DRAGGING;
 		
 		stopAllRendering();
-		
-		RectF rectangle = new RectF(0, 0, fractalBitmap.getHeight(), fractalBitmap.getHeight());
-		matrix.mapRect(rectangle);
-		Log.d("RectChecking", "Rectangle = " + rectangle.toString());
-		
-		noCrudeRect = new Rect((int)rectangle.left, (int)rectangle.top, (int)rectangle.right, (int)rectangle.bottom);
-		Log.d(TAG, "noCrudeRect = " + noCrudeRect.flattenToString());
 		
 		setDrawingCacheEnabled(true);
 		fractalBitmap = Bitmap.createBitmap(getDrawingCache());
