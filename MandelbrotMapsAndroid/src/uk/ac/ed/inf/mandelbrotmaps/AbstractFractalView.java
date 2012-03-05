@@ -676,7 +676,7 @@ abstract class AbstractFractalView extends View {
 	
 	//TODO change function to meet name
 	public boolean isRendering() {
-		return !(upperCompletedRender || lowerCompletedRender);
+		return (!upperCompletedRender || !lowerCompletedRender);
 	}  
 	
 	public void notifyCompleteRender(FractalSection section, int pixelBlockSize) {
@@ -714,6 +714,10 @@ abstract class AbstractFractalView extends View {
 				path.mkdir();
 				
 				FileOutputStream output = new FileOutputStream(imagefile);
+				
+				//Recreate the bitmap - all the render thread completion guarantees is that the arrays
+				//are full. onDraw() may not have run before saving.
+				fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 				fractalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, output);
 
 				output.close();				
