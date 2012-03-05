@@ -343,7 +343,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					if(!cancelledSave) {
 						savingDialog.dismiss();
 						imagefile = fractalView.saveImage();
-						final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
+						String toastText;
+						if(imagefile == null) toastText = "Unable to save fractal - filename already in use.";
+						else toastText = "Saved fractal as " + imagefile.getAbsolutePath();
 						showToastOnUIThread(toastText, Toast.LENGTH_LONG);
 					}
 				}		
@@ -353,7 +355,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	} 
 	else {
 		imagefile = fractalView.saveImage();
-		final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
+		String toastText;
+		if(imagefile == null) toastText = "Unable to save fractal - filename already in use.";
+		else toastText = "Saved fractal as " + imagefile.getAbsolutePath();
 		showToastOnUIThread(toastText, Toast.LENGTH_LONG);
 	}
    }
@@ -388,11 +392,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 						if(!cancelledSave) {
 							savingDialog.dismiss();
 							imagefile = fractalView.saveImage();
-							Intent imageIntent = new Intent(Intent.ACTION_SEND);
-							imageIntent.setType("image/jpg");
-							imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
-							
-							startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+							if(imagefile != null) {
+								Intent imageIntent = new Intent(Intent.ACTION_SEND);
+								imageIntent.setType("image/jpg");
+								imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
+								
+								startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+							}
+							else {
+								showToastOnUIThread("Unable to share image - couldn't save temporary file", Toast.LENGTH_LONG);
+							}
 						}
 					}		
 					return;  
@@ -401,11 +410,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		} 
 		else {
 			imagefile = fractalView.saveImage();
-			Intent imageIntent = new Intent(Intent.ACTION_SEND);
-			imageIntent.setType("image/jpg");
-			imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
-			
-			startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+			if(imagefile != null) {
+				Intent imageIntent = new Intent(Intent.ACTION_SEND);
+				imageIntent.setType("image/jpg");
+				imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
+				
+				startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+			}
+			else {
+				showToastOnUIThread("Unable to share image - couldn't save temporary file", Toast.LENGTH_LONG);
+			}
 		}
    }
    

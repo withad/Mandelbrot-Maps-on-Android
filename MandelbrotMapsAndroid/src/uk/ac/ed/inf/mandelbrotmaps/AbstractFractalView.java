@@ -691,12 +691,23 @@ abstract class AbstractFractalView extends View {
 	
 	public File saveImage()
 	{
-		//TODO: Check if file exists already, add user filename, change to co-ordinates
+		//TODO: Check if file exists already, add user filename
 		//Check if external storage is available
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
 		{
 			File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-			File imagefile = new File(path, "FractalImage" + getFileTag() + ".jpg");
+			String filename = getNewFileName();
+			File imagefile = new File(path, "FractalImage" + filename + ".jpg");
+			
+			//Check if it exists, try extending the names a few times if it does
+			int nameTries = 0;
+			while(imagefile.exists()) {
+				nameTries++;
+				filename += "a";
+				imagefile = new File(path, "FractalImage" + filename + ".jpg");
+				if(nameTries > 1)
+					return null;
+			}
 			
 			try {
 				//Check pictures directory already exists
@@ -728,7 +739,7 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
-	private String getFileTag() {
+	private String getNewFileName() {
 		String datetime = "";
 		
 		Calendar currentTime = Calendar.getInstance();
