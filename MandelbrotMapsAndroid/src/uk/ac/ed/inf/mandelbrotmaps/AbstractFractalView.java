@@ -159,7 +159,7 @@ abstract class AbstractFractalView extends View {
 		setFocusable(true);
 		setFocusableInTouchMode(true);
       	setId(0); 
-      	setBackgroundColor(Color.BLUE);
+      	setBackgroundColor(Color.BLACK);
       	renderStyle = style;
       	fractalViewSize = size;
       	
@@ -276,7 +276,7 @@ abstract class AbstractFractalView extends View {
 		renderStartTime = System.currentTimeMillis();
 		
 		//Schedule a crude rendering, if needed and not small view
-		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE && totalScaleFactor > 3.5f)
+		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE && (totalScaleFactor > 3.5f || totalScaleFactor < 1.0f))
 			scheduleRendering(INITIAL_PIXEL_BLOCK);
 		totalScaleFactor = 1.0f;
 		
