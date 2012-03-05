@@ -1,6 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
@@ -26,8 +27,10 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView.SavedState;
 import android.widget.Toast;
 
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
@@ -81,9 +84,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	double[] littleMandelbrotLocation;
 
-	private boolean cancelledSave;
-
-	private ProgressDialog savingDialog;
+	Boolean cancelledSave;
+	
+	private ProgressBar progressBar;
+	boolean showingSpinner = false;
+	boolean allowSpinner = false;
+	
+	Boolean renderComplete = false;
+	ProgressDialog savingDialog;
 	
 	
 	
@@ -95,9 +103,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       super.onCreate(savedInstanceState);      
       requestWindowFeature(Window.FEATURE_NO_TITLE);
       getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);   
-      Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+      Thread.currentThread().setPriority(Thread.MAX_PRIORITY);      
       
       Bundle bundle = getIntent().getExtras();
+      
+      double juliaX = 0;
+      double juliaY = 0;
+      
+      relativeLayout = new RelativeLayout(this);
       
       //Extract features from bundle, if there is one
       try {     
@@ -113,29 +126,18 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       }
       else if (fractalType == FractalType.JULIA) {
     	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
+    	  juliaX = bundle.getDouble("JULIA_X");
+          juliaY = bundle.getDouble("JULIA_Y");
       }
-      
-      relativeLayout = new RelativeLayout(this);
       
       LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
       relativeLayout.addView(fractalView, lp);
       setContentView(relativeLayout);
       
-      Log.d(TAG, "Width: " + fractalView.getWidth());
-      
-      fractalView.requestFocus();
-      
       mjLocation = new MandelbrotJuliaLocation();
       fractalView.loadLocation(mjLocation);
-      
-      
-      if (fractalType == FractalType.JULIA)
-      {
-    	  double juliaX = bundle.getDouble("JULIA_X");
-          double juliaY = bundle.getDouble("JULIA_Y");
-          
-          ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);          
-      }
+      if(fractalType == FractalType.JULIA)
+    	  ((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);
       
       gestureDetector = new ScaleGestureDetector(this, this);
    }
@@ -199,6 +201,29 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   showingLittle = false;
    }
    
+   public void showProgressSpinner() {
+	    if(showingSpinner || !allowSpinner) return;
+	    
+		LayoutParams progressBarParams = new LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		progressBarParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		progressBar = new ProgressBar(getApplicationContext());
+		relativeLayout.addView(progressBar, progressBarParams);
+		showingSpinner = true;
+   }
+   
+   public void hideProgressSpinner() {
+	   if(!showingSpinner || !allowSpinner) return;
+	   Log.d(TAG, "Remove spinner");
+	   
+	   runOnUiThread(new Runnable() {
+		
+		public void run() {
+			relativeLayout.removeView(progressBar);
+			
+		}
+	});
+	   showingSpinner = false;
+   }
    
    @Override
    protected void onResume() {
@@ -215,6 +240,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   littleFractalView.stopAllRendering();
 	   littleFractalView.interruptThreads();
 	   Log.d(TAG, "Running onDestroy().");
+   }
+   
+   @Override
+   protected void onPause() {
+	   super.onPause();
+	   
+	   if(savingDialog != null) 
+		   savingDialog.dismiss();
    }
    
    
@@ -279,60 +312,101 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 /*-----------------------------------------------------------------------------------*/
 /*Image saving/sharing*/
 /*-----------------------------------------------------------------------------------*/
-   private File saveImage() {
-	   imagefile = null;
+   private void saveImage() {
+    imagefile = null;
 	   
 	cancelledSave = false;
-	savingDialog = new ProgressDialog(this);
-	savingDialog.setMessage("Waiting for render to finish...");
-	savingDialog.setCancelable(true);
-	savingDialog.setIndeterminate(true);
-	savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-		public void onCancel(DialogInterface dialog) {
-			FractalActivity.this.cancelledSave = true;
-		}
-	});
-
-	if(!(fractalView.renderFinished())) {
+	
+	if(fractalView.isRendering()) {
+		savingDialog = new ProgressDialog(this);
+		savingDialog.setMessage("Waiting for render to finish...");
+		savingDialog.setCancelable(true);
+		savingDialog.setIndeterminate(true);
+		savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			public void onCancel(DialogInterface dialog) {
+				FractalActivity.this.cancelledSave = true;
+			}
+		});
 		savingDialog.show();
-		
+
 		//Launch a thread to wait for completion
 		new Thread(new Runnable() {  
 			public void run() {  
-				while (!cancelledSave || !fractalView.renderFinished()) {
-					try {
-						Thread.sleep(1000);
-						Log.d(TAG, "Waiting to save...");
-					} catch (InterruptedException e) {}
-				}
-				savingDialog.dismiss();					
+				if(fractalView.isRendering()) {
+					while (!cancelledSave && fractalView.isRendering()) {
+						try {
+							Thread.sleep(100);
+							Log.d(TAG, "Waiting to save...");
+						} catch (InterruptedException e) {}
+					}
+					
+					if(!cancelledSave) {
+						savingDialog.dismiss();
+						imagefile = fractalView.saveImage();
+						final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
+						showToastOnUIThread(toastText, Toast.LENGTH_LONG);
+					}
+				}		
 				return;  
 			}
 		}).start(); 
-	   }
-	
-	if(!cancelledSave) {
+	} 
+	else {
 		imagefile = fractalView.saveImage();
-
-		String toastText = "Saved fractal as    " + imagefile.getAbsolutePath();
-		Toast toast = Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_LONG);
-		toast.show();
+		final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
+		showToastOnUIThread(toastText, Toast.LENGTH_LONG);
 	}
-	
-	return imagefile;
    }
   
    
    private void shareImage() {
-	   imagefile = fractalView.saveImage();
+	   cancelledSave = false;
 	   
-	   if(imagefile == null) return;
-		
-		Intent imageIntent = new Intent(Intent.ACTION_SEND);
-		imageIntent.setType("image/jpg");
-		imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
-		
-		startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+	   if(fractalView.isRendering()) {
+			savingDialog = new ProgressDialog(this);
+			savingDialog.setMessage("Waiting for render to finish...");
+			savingDialog.setCancelable(true);
+			savingDialog.setIndeterminate(true);
+			savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+				public void onCancel(DialogInterface dialog) {
+					FractalActivity.this.cancelledSave = true;
+				}
+			});
+			savingDialog.show();
+	
+			//Launch a thread to wait for completion
+			new Thread(new Runnable() {  
+				public void run() {  
+					if(fractalView.isRendering()) {
+						while (!cancelledSave && fractalView.isRendering()) {
+							try {
+								Thread.sleep(100);
+								Log.d(TAG, "Waiting to save...");
+							} catch (InterruptedException e) {}
+						}
+						
+						if(!cancelledSave) {
+							savingDialog.dismiss();
+							imagefile = fractalView.saveImage();
+							Intent imageIntent = new Intent(Intent.ACTION_SEND);
+							imageIntent.setType("image/jpg");
+							imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
+							
+							startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+						}
+					}		
+					return;  
+				}
+			}).start(); 
+		} 
+		else {
+			imagefile = fractalView.saveImage();
+			Intent imageIntent = new Intent(Intent.ACTION_SEND);
+			imageIntent.setType("image/jpg");
+			imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
+			
+			startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+		}
    }
    
    @Override
@@ -519,4 +593,17 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   currentlyDragging = true;
 	   fractalView.startDragging();
 	}
+   
+/*-----------------------------------------------------------------------------------*/
+/*Utilities*/
+/*-----------------------------------------------------------------------------------*/
+   //A single method for running toasts on the UI thread, rather than 
+   //creating new Runnables each time.
+   public void showToastOnUIThread(final String toastText, final int length) {
+	    runOnUiThread(new Runnable() {
+			public void run() {
+				Toast.makeText(getApplicationContext(), toastText, length).show();
+			}
+		});
+   }
 }

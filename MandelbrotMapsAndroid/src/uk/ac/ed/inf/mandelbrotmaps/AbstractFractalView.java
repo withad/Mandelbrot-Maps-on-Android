@@ -2,6 +2,7 @@ package uk.ac.ed.inf.mandelbrotmaps;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -22,6 +23,7 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 abstract class AbstractFractalView extends View {
    
@@ -142,6 +144,11 @@ abstract class AbstractFractalView extends View {
 	
 	ProgressDialog savingDialog;
 	
+	boolean upperCompletedRender = true;
+	boolean lowerCompletedRender = true;
+	
+	long renderStartTime;
+	
 	
 	
 	
@@ -253,6 +260,14 @@ abstract class AbstractFractalView extends View {
 	void scheduleNewRenders() {		
 		//Abort future rendering queue.
 		stopAllRendering();
+		
+		if(fractalViewSize == FractalViewSize.LARGE)
+			parentActivity.showProgressSpinner();
+		
+		upperCompletedRender = false;
+		lowerCompletedRender = false;
+		
+		renderStartTime = System.currentTimeMillis();
 		
 		//Schedule a crude rendering, if needed and not small view
 		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE)
@@ -660,10 +675,32 @@ abstract class AbstractFractalView extends View {
 /*Utilities*/
 /*-----------------------------------------------------------------------------------*/
 	
-	public boolean renderFinished() {
-		// TODO Auto-generated method stub
-		return true;
+	//TODO change function to meet name
+	public boolean isRendering() {
+		return (!upperCompletedRender || !lowerCompletedRender);
 	}  
+	
+	public void notifyCompleteRender(FractalSection section, int pixelBlockSize) {
+		if(pixelBlockSize == DEFAULT_PIXEL_SIZE) {
+			if(section == FractalSection.UPPER || section == FractalSection.ALL) {
+				upperCompletedRender = true;
+			}
+			else {
+				lowerCompletedRender = true;
+			}
+		}
+		
+		if (upperCompletedRender && lowerCompletedRender && fractalViewSize == FractalViewSize.LARGE) {
+			Log.d(TAG, "Renders completed.");
+			
+			//Show time in seconds
+			double time = (double)((System.currentTimeMillis() - renderStartTime))/1000;
+			String renderCompleteMessage = "Rendering time: " + new DecimalFormat("#.##").format(time) + " second" + (time == 1d ? "." : "s.");
+			parentActivity.showToastOnUIThread(renderCompleteMessage, Toast.LENGTH_SHORT);	
+			
+			parentActivity.hideProgressSpinner();
+		}
+	}
 	
 	public File saveImage()
 	{
@@ -679,6 +716,10 @@ abstract class AbstractFractalView extends View {
 				path.mkdir();
 				
 				FileOutputStream output = new FileOutputStream(imagefile);
+				
+				//Recreate the bitmap - all the render thread completion guarantees is that the arrays
+				//are full. onDraw() may not have run before saving.
+				fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 				fractalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, output);
 
 				output.close();				
