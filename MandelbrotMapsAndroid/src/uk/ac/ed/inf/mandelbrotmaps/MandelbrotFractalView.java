@@ -54,8 +54,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
 		RenderMode renderMode,
 		final int threadID,
-		final int noOfThreads) {	
-			
+		final int noOfThreads) {				
 			RenderThread callingThread = renderThreadList.get(threadID);
 		
 			int maxIterations = getMaxIterations();
@@ -107,23 +106,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					// Start at x0, y0
 					x = x0;
 					y = y0;
-					
-					boolean inside = true;
 				
-					for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
-						// z^2 + c
-						newx = (x*x) - (y*y) + x0;
-						newy = (2 * x * y) + y0;
-					
-						x = newx;
-						y = newy;
-					
-						// Well known result: if distance is >2, escapes to infinity...
-						if ( (x*x + y*y) > 4) {
-							inside = false;
-							break;
-						}
-					}
+					//Run iterations over this point
+					iterationNr = equationIteration(x, y, x0, y0, maxIterations);
 					
 					// Percentage (0.0 -- 1.0)
 					colourCode = (double)iterationNr / (double)maxIterations;
@@ -170,20 +155,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		}
 	
 	
-	private int boundColour(int colour, int colourRange){
-        if (colour > (colourRange * 2)){ 
-            int i = (int) (colour / (colourRange * 2));
-
-            colour = colour - (colourRange * 2 * i);
-        }
-        if (colour > (colourRange)){
-            colour = colourRange - (colour - colourRange);
-        }
-        
-        return colour;
-    }
-	
-	
 	public double[] getJuliaParams(float touchX, float touchY)
 	{
 		double[] mandelbrotGraphArea = getGraphArea();
@@ -196,5 +167,29 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		juliaParams[1] = mandelbrotGraphArea[1] - ( (double)touchY * pixelSize );
 		
 		return juliaParams;
+	}
+
+
+	
+	
+	int equationIteration(double x, double y, double x0, double y0, int maxIterations) {
+		int iterationNr;
+		double newx, newy;
+		
+		for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
+			// z^2 + c
+			newx = (x*x) - (y*y) + x0;
+			newy = (2 * x * y) + y0;
+		
+			x = newx;
+			y = newy;
+		
+			// Well known result: if distance is >2, escapes to infinity...
+			if ( (x*x + y*y) > 4) {
+				break;
+			}
+		}
+		
+		return iterationNr;
 	}	
 }

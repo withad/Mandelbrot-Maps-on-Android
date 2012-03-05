@@ -40,6 +40,8 @@ public class JuliaFractalView extends AbstractFractalView{
 		juliaX = newJuliaX;
 		juliaY = newJuliaY;
 		scheduleNewRenders();
+		
+		Log.d(TAG, "Setting new Julia param...");
 	}
 	
 	public double[] getJuliaParam() {
@@ -72,10 +74,10 @@ public class JuliaFractalView extends AbstractFractalView{
 		RenderMode renderMode,
 		final int threadID,
 		final int noOfThreads) {	
+			RenderThread callingThread = renderThreadList.get(threadID);
+			
 			int maxIterations = getMaxIterations();
 			int imgWidth = xPixelMax - xPixelMin;
-			
-			RenderThread callingThread = renderThreadList.get(threadID);
 			
 			int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
 			double colourCode;
@@ -85,11 +87,11 @@ public class JuliaFractalView extends AbstractFractalView{
 			double x, y;
 			double newx, newy;
 			
-			// We don't want the Julia parameter to change under our feet...
-			double myJuliaX = juliaX;
-			double myJuliaY = juliaY;
+			long initialMillis = System.currentTimeMillis();
+			Log.d(TAG, "Initial time: " + initialMillis);
 			
 			int pixelIncrement = pixelBlockSize * noOfThreads;
+			int skippedCount = 0;
 			
 			for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
 				yPixel = yIncrement;
@@ -102,27 +104,19 @@ public class JuliaFractalView extends AbstractFractalView{
 			
 				for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 					//Check to see if this pixel is already iterated to the necessary block size
-					if(renderMode == RenderMode.JUST_DRAGGED && 
-							pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize)
-					{
+					if(pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
+						skippedCount++;
 						continue;
 					}
 					
 					// Initial coordinates
 					x = xMin + ( (double)xPixel * pixelSize);
 					y = yMax - ( (double)yPixel * pixelSize);
+					
+					double myJuliaX = juliaX;
+					double myJuliaY = juliaY;
 				
-					for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
-						// z^2 + c
-						newx = (x*x) - (y*y) + myJuliaX;
-						newy = (2 * x * y) + myJuliaY;
-					
-						x = newx;
-						y = newy;
-					
-						// Well known result: if distance is >2, escapes to infinity...
-						if ( (x*x + y*y) > 4) break;
-					}
+					iterationNr = equationIteration(x, y, myJuliaX, myJuliaY, maxIterations);
 					
 					// Percentage (0.0 -- 1.0)
 					colourCode = (double)iterationNr / (double)maxIterations;
@@ -166,7 +160,34 @@ public class JuliaFractalView extends AbstractFractalView{
 						postInvalidate();
 					}
 			}
+			
 			postInvalidate();
-			Log.d("MFV", "Reached end of computation loop");
+			notifyCompleteRender(threadID, pixelBlockSize);
+			Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
+			Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));
 		}
+
+
+	@Override
+	int equationIteration(double x, double y, double myJuliaX, double myJuliaY,	int maxIterations) {
+		int iterationNr;
+		double newx, newy;
+		
+		// We don't want the Julia parameter to change under our feet...
+		for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
+			// z^2 + c
+			newx = (x*x) - (y*y) + myJuliaX;
+			newy = (2 * x * y) + myJuliaY;
+		
+			x = newx;
+			y = newy;
+		
+			// Well known result: if distance is >2, escapes to infinity...
+			if ( (x*x + y*y) > 4) { 
+				break;
+			}
+		}
+		
+		return iterationNr;
+	}
 }

@@ -858,6 +858,7 @@ abstract class AbstractFractalView extends View {
 			final int threadID,
 			final int noOfThreads
 		);
+	abstract int equationIteration(double x, double y, double paramX, double paramY, int maxIterations);
 }
 
 
