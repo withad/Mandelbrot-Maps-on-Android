@@ -3,7 +3,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import uk.ac.ed.inf.mandelbrotmaps.RenderThread.FractalSection;
@@ -73,7 +75,10 @@ abstract class AbstractFractalView extends View {
    
 	protected String viewName;
 	
-	//Upper and lower half rendering queues/threads
+	//Track render queues for each thread
+	int noOfThreads = 2;
+	ArrayList<LinkedBlockingQueue<Rendering>> renderQueueList = new ArrayList<LinkedBlockingQueue<Rendering>>();
+	
 	LinkedBlockingQueue<Rendering> upperRenderQueue = new LinkedBlockingQueue<Rendering>();	
 	RenderThread upperRenderThread = new RenderThread(this, FractalSection.UPPER);
 	
@@ -715,15 +720,15 @@ abstract class AbstractFractalView extends View {
 				//Check pictures directory already exists
 				path.mkdir();
 				
+				//Open file output stream
 				FileOutputStream output = new FileOutputStream(imagefile);
 				
-				//Recreate the bitmap - all the render thread completion guarantees is that the arrays
-				//are full. onDraw() may not have run before saving.
+				/*Recreate the bitmap - all the render thread completion guarantees is that the arrays
+				are full. onDraw() may not have run before saving.*/
 				fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 				fractalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, output);
 
 				output.close();				
-				
 				Log.d(TAG, "Wrote image out to " + imagefile.getAbsolutePath());
 			}
 			catch (IOException ioe)

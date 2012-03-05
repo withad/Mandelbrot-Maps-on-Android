@@ -312,9 +312,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 /*-----------------------------------------------------------------------------------*/
 /*Image saving/sharing*/
 /*-----------------------------------------------------------------------------------*/
+   //Wait for render to finish, then save the fractal image
    private void saveImage() {
-    imagefile = null;
-	   
 	cancelledSave = false;
 	
 	if(fractalView.isRendering()) {
@@ -336,7 +335,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					while (!cancelledSave && fractalView.isRendering()) {
 						try {
 							Thread.sleep(100);
-							Log.d(TAG, "Waiting to save...");
 						} catch (InterruptedException e) {}
 					}
 					
@@ -358,7 +356,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
    }
   
-   
+   //Wait for the render to finish, then share the fractal image
    private void shareImage() {
 	   cancelledSave = false;
 	   
@@ -409,6 +407,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		}
    }
    
+   //Get result of launched activity (only time used is after sharing, so delete temp. image)
    @Override
    protected void onActivityResult(int requestCode, int resultCode, Intent data)
    {

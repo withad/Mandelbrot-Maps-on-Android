@@ -13,7 +13,7 @@ class RenderThread extends Thread {
 	
 	private AbstractFractalView mjCanvas;
 	private volatile boolean abortThisRendering = false;
-	public int currentRender = 0;
+	public boolean isRunning = false;
 	
 	public RenderThread(AbstractFractalView mjCanvasHandle, FractalSection section) {
 		fractalSection = section;
@@ -38,7 +38,6 @@ class RenderThread extends Thread {
 		while(true) {
 			try {
 				Rendering newRendering = mjCanvas.getNextRendering(fractalSection);
-				currentRender = newRendering.getPixelBlockSize();
 				mjCanvas.computeAllPixels(newRendering.getPixelBlockSize(), fractalSection);
 				abortThisRendering = false;
 			} catch (InterruptedException e) {
