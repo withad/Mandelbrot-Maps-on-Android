@@ -121,6 +121,7 @@ abstract class AbstractFractalView extends View {
 	
 	
 	// Scaling state
+	private float totalScaleFactor = 1.0f;
 	public float scaleFactor = 1.0f;
 	public float midX = 0.0f;
 	public float midY = 0.0f;
@@ -275,8 +276,9 @@ abstract class AbstractFractalView extends View {
 		renderStartTime = System.currentTimeMillis();
 		
 		//Schedule a crude rendering, if needed and not small view
-		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE)
+		if(crudeRendering && fractalViewSize != FractalViewSize.LITTLE && totalScaleFactor > 3.5f)
 			scheduleRendering(INITIAL_PIXEL_BLOCK);
+		totalScaleFactor = 1.0f;
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(DEFAULT_PIXEL_SIZE);
@@ -449,7 +451,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 		
 	// Adjust zoom, centred on pixel (xPixel, yPixel)
-	public void zoomChange(int xPixel, int yPixel, float scale) { //int zoomAmount) {
+	public void zoomChange(int xPixel, int yPixel, float scale) {
 		renderMode = RenderMode.JUST_ZOOMED;
 		stopAllRendering();
 		
@@ -480,8 +482,6 @@ abstract class AbstractFractalView extends View {
 		newGraphArea[1] = newMaxY;
 		newGraphArea[2] = oldGraphArea[2] - leftWidthDiff - rightWidthDiff;
 		
-		//clearPixelSizes();
-		
 		setGraphArea(newGraphArea, false);
 	}
 
@@ -501,7 +501,7 @@ abstract class AbstractFractalView extends View {
 		return false;
 	}
 	
-	// Sets zoom, given number in range 0..1000 (logarithmic scale)
+	// Sets zoom, given number in range 0..1000 (logarithmic scale) (never called)
 	public void setZoomLevel(int zoomLevel) {
 		double lnPixelSize = MINZOOM_LN_PIXEL + (zoomLevel * (MAXZOOM_LN_PIXEL-MINZOOM_LN_PIXEL) / (double)ZOOM_SLIDER_SCALING);
 		double newPixelSize = Math.exp(lnPixelSize);
@@ -537,6 +537,7 @@ abstract class AbstractFractalView extends View {
 		midX = focusX;
 		midY = focusY;
 		scaleFactor = newScaleFactor;
+		totalScaleFactor *= newScaleFactor;
 		
 		zoomChange((int)focusX, (int)focusY, 1/newScaleFactor);
 		
@@ -548,6 +549,8 @@ abstract class AbstractFractalView extends View {
 	public void stopZooming()
 	{		
 		clearPixelSizes();
+		
+		Log.d(TAG, "Total scale factor = " + totalScaleFactor);
 		
 		controlmode = ControlMode.DRAGGING;
 		
