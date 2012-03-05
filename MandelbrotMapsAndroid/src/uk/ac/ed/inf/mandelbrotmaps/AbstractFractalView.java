@@ -728,12 +728,14 @@ abstract class AbstractFractalView extends View {
 			{
 				//File writing failed
 				Log.d(TAG, "Could not write image file to " + imagefile.getAbsolutePath());
+				parentActivity.showToastOnUIThread("Unable to write file.", Toast.LENGTH_LONG);
 			}
 			
 			return imagefile;
 		}
 		else
 		{
+			parentActivity.showToastOnUIThread("Unable to write file.", Toast.LENGTH_LONG);
 			return null;
 		}
 	}
