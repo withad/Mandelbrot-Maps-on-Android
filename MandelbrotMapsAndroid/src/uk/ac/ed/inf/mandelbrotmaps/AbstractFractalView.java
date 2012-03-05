@@ -199,15 +199,14 @@ abstract class AbstractFractalView extends View {
    protected Parcelable onSaveInstanceState() { 
 	   super.onSaveInstanceState();
 	   Log.d(TAG, "onSaveInstanceState");
-	   Bundle bundle = new Bundle();
-	   return bundle;
+	   return null;
    }
     
-   @Override
+   /*@Override
    protected void onRestoreInstanceState(Parcelable state) { 
 	   Log.d(TAG, "onRestoreInstanceState");
 	   super.onRestoreInstanceState(state);
-   }
+   }*/
      
    @Override
    protected void onSizeChanged(int w, int h, int oldw, int oldh) {

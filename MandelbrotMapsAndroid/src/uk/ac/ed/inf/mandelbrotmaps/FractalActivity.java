@@ -247,10 +247,24 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    protected void onPause() {
 	   super.onPause();
-	   
+	   Log.d(TAG, "onPause");
 	   if(savingDialog != null) 
 		   savingDialog.dismiss();
    }
+   
+   @Override
+   protected void onSaveInstanceState(Bundle outState) {
+	   super.onSaveInstanceState(outState);
+	   Log.d(TAG, "onSaveInstanceState");
+   }
+   
+   @Override
+   protected void onRestoreInstanceState(Bundle inState) {
+	   super.onRestoreInstanceState(inState);
+	   Log.d(TAG, "onRestoreInstanceState");
+   }
+   
+   
    
    
    
