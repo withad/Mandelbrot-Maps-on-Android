@@ -733,7 +733,7 @@ abstract class AbstractFractalView extends View {
 		
 		Calendar currentTime = Calendar.getInstance();
 		datetime += currentTime.get(Calendar.YEAR) + "-";
-		datetime += currentTime.get(Calendar.MONTH) + "-";
+		datetime += (currentTime.get(Calendar.MONTH) + 1) + "-";	//Add 1 because months start from 0, apparently.
 		datetime += currentTime.get(Calendar.DAY_OF_MONTH) + "-";
 		datetime += currentTime.get(Calendar.HOUR_OF_DAY) + "-";
 		datetime += currentTime.get(Calendar.MINUTE) + "-";
