@@ -85,7 +85,7 @@ public class JuliaFractalView extends AbstractFractalView{
 			int pixelBlockA, pixelBlockB;
 		
 			double x, y;
-			double newx, newy;
+			double newX = 0, newY = 0;
 			
 			long initialMillis = System.currentTimeMillis();
 			Log.d(TAG, "Initial time: " + initialMillis);
@@ -104,7 +104,7 @@ public class JuliaFractalView extends AbstractFractalView{
 			
 				for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 					//Check to see if this pixel is already iterated to the necessary block size
-					if(pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
+					if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
 						skippedCount++;
 						continue;
 					}
@@ -112,11 +112,8 @@ public class JuliaFractalView extends AbstractFractalView{
 					// Initial coordinates
 					x = xMin + ( (double)xPixel * pixelSize);
 					y = yMax - ( (double)yPixel * pixelSize);
-					
-					double myJuliaX = juliaX;
-					double myJuliaY = juliaY;
 				
-					iterationNr = equationIteration(x, y, myJuliaX, myJuliaY, maxIterations);
+					iterationNr = equationIteration(x, y, newX, newY, maxIterations);
 					
 					// Percentage (0.0 -- 1.0)
 					colourCode = (double)iterationNr / (double)maxIterations;
@@ -138,16 +135,19 @@ public class JuliaFractalView extends AbstractFractalView{
 					colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
 					
 					//Note that the pixel being calculated has been calculated in full (upper right of a block)
-					pixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
+					if(fractalViewSize == fractalViewSize.LARGE)
+						pixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
 					
 					// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
 					int p = 0;
 					for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 						for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
-							if(p != 0) {
-								pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+							if(fractalViewSize == fractalViewSize.LARGE) {
+								if(p != 0) {
+									pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+								}
+								p++;
 							}
-							p++;
 							if(fractalPixels == null) return;
 							fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 						}

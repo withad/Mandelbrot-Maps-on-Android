@@ -95,7 +95,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			
 				for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 					//Check to see if this pixel is already iterated to the necessary block size
-					if(pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
+					if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
 						skippedCount++;
 						continue;
 					}
@@ -126,16 +126,19 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
 					
 					//Note that the pixel being calculated has been calculated in full (upper right of a block)
-					pixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
+					if(fractalViewSize == FractalViewSize.LARGE)
+						pixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
 					
 					// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
 					int p = 0;
 					for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 						for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
-							if(p != 0) {
-								pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+							if(fractalViewSize == fractalViewSize.LARGE) {
+								if(p != 0) {
+									pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+								}
+								p++;
 							}
-							p++;
 							if(fractalPixels == null) return;
 							fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 						}

@@ -55,7 +55,7 @@ abstract class AbstractFractalView extends View {
 		LITTLE,
 		HALF
 	}
-	private FractalViewSize fractalViewSize;
+	FractalViewSize fractalViewSize;
 	
 	public int LINES_TO_DRAW_AFTER = 20;
 	
@@ -683,7 +683,7 @@ abstract class AbstractFractalView extends View {
 		}
 		
 		return !allComplete;
-	}  
+	}
 	
 	public void notifyCompleteRender(int threadID, int pixelBlockSize) {
 		if(pixelBlockSize == DEFAULT_PIXEL_SIZE) {
