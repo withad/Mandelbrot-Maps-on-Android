@@ -82,8 +82,15 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			
 			int skippedCount = 0;
 			
-			for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
+			Log.d("yMax", threadID + " yPixelmax = " + yPixelMax);
+			
+			for (yIncrement = yPixelMin; yPixel < yPixelMax+1-pixelBlockSize; yIncrement += pixelIncrement) {			
 				yPixel = yIncrement;
+				
+				//If we've exceeded the bounds of the image (as can happen with many threads), exit the loop.
+				if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length) {
+					break;
+				}
 				
 				if (allowInterruption && (callingThread.abortSignalled())) {
 					Log.d(TAG, "Render aborted.");
@@ -93,7 +100,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				// Set y0 (im part of c)
 				y0 = yMax - ( (double)yPixel * pixelSize );			
 			
-				for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
+				for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {					
 					//Check to see if this pixel is already iterated to the necessary block size
 					if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
 						skippedCount++;
@@ -161,7 +168,13 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					{
 						postInvalidate();
 					}
+				
+				//Stop threads skipping their final section.
+				/*if((yIncrement + pixelIncrement) > yPixelMax)
+					yIncrement = yPixelMax - yIncrement;*/
 			}
+			
+			Log.d("ThreadEnding", "yIncrement of thread " + threadID + " is " + yIncrement + " and yPixel " + yPixel);
 			
 			postInvalidate();
 			notifyCompleteRender(threadID, pixelBlockSize);

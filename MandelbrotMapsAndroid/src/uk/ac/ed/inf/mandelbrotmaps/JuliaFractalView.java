@@ -82,7 +82,7 @@ public class JuliaFractalView extends AbstractFractalView{
 			int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
 			double colourCode;
 			int colourCodeR, colourCodeG, colourCodeB, colourCodeHex;
-			int pixelBlockA, pixelBlockB;
+			int pixelBlockA = 0, pixelBlockB = 0;
 		
 			double x, y;
 			double newx, newy;
@@ -93,8 +93,13 @@ public class JuliaFractalView extends AbstractFractalView{
 			int pixelIncrement = pixelBlockSize * noOfThreads;
 			int skippedCount = 0;
 			
-			for (yIncrement = yPixelMin; yIncrement < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {			
+			for (yIncrement = yPixelMin; yPixel < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {	
 				yPixel = yIncrement;
+				
+				if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length) {
+					//Log.d("Derp", "Should be breaking " + ((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax));
+					break;
+				}
 				
 				// Detect rendering abortion.			
 				if (allowInterruption && (callingThread.abortSignalled())) {
@@ -104,9 +109,14 @@ public class JuliaFractalView extends AbstractFractalView{
 			
 				for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
 					//Check to see if this pixel is already iterated to the necessary block size
-					if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
-						skippedCount++;
-						continue;
+					try {
+						if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
+							skippedCount++;
+							continue;
+						}
+					}
+					catch (ArrayIndexOutOfBoundsException ae) {
+						break;
 					}
 					
 					// Initial coordinates
@@ -152,17 +162,24 @@ public class JuliaFractalView extends AbstractFractalView{
 					
 					// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
 					int p = 0;
-					for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
-						for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
-							if(fractalViewSize == fractalViewSize.LARGE) {
-								if(p != 0) {
-									pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+					try {
+						for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
+							for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
+								if(fractalViewSize == fractalViewSize.LARGE) {
+									if(p != 0) {
+										pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
+									}
+									p++;
 								}
-								p++;
+								if(fractalPixels == null) return;
+								fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 							}
-							if(fractalPixels == null) return;
-							fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 						}
+					} 
+					catch (ArrayIndexOutOfBoundsException ae) {
+						Log.d("Derp", imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA) + "/" + pixelSizes.length);
+						Log.d("Derp", ""+pixelBlockB);
+						break;
 					}
 				}
 				// Show thread's work in progress

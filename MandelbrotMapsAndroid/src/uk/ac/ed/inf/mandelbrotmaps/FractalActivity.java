@@ -435,7 +435,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				else if (displaymode == DisplayMode.ABOUT_TO_JULIA) {
 					launchJulia(evt.getX(), evt.getY());
 				} 
-				else if (showingLittle && fractalType == FractalType.MANDELBROT)	{
+				else if (showingLittle && fractalType == FractalType.MANDELBROT && !gestureDetector.isInProgress())	{
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
 				}
@@ -446,13 +446,15 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				break;
 				
 				
-			case MotionEvent.ACTION_MOVE:						
-				if(currentlyDragging) {
-					dragFractal(evt);
-				}
-				else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT)	{
-					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
-					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+			case MotionEvent.ACTION_MOVE:
+				if(!gestureDetector.isInProgress()) {
+					if(currentlyDragging) {
+						dragFractal(evt);
+					}
+					else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT)	{
+						double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
+						((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+					}
 				}
 				
 				break;

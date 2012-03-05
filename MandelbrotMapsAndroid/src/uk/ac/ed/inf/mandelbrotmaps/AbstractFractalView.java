@@ -75,7 +75,7 @@ abstract class AbstractFractalView extends View {
 	protected String viewName;
 	
 	//Track render queues for each thread
-	int noOfThreads = 4;
+	int noOfThreads = 1;
 	ArrayList<LinkedBlockingQueue<Rendering>> renderQueueList = new ArrayList<LinkedBlockingQueue<Rendering>>();
 	ArrayList<RenderThread> renderThreadList = new ArrayList<RenderThread>();
 	
@@ -158,9 +158,12 @@ abstract class AbstractFractalView extends View {
 		setFocusable(true);
 		setFocusableInTouchMode(true);
       	setId(0); 
-      	setBackgroundColor(Color.BLACK);
+      	setBackgroundColor(Color.BLUE);
       	renderStyle = style;
       	fractalViewSize = size;
+      	
+      	noOfThreads = Runtime.getRuntime().availableProcessors();
+      	Log.d(TAG, "Using " + noOfThreads + " cores");
       
       	parentActivity = (FractalActivity)context;
       	setOnTouchListener(parentActivity);
@@ -287,18 +290,11 @@ abstract class AbstractFractalView extends View {
 			return;
 		
 		int yStart = threadID * pixelBlockSize;
-		int yEnd = getHeight() - (noOfThreads - threadID);
-		boolean showRenderProgress = true;
+		int yEnd = getHeight() - (noOfThreads - (threadID + 1));
+		boolean showRenderProgress = (threadID == 0);
 		
-		if(renderStyle != RenderStyle.SINGLE_THREAD){
-			if (threadID == 0) {
-				yEnd = getHeight() - 1;
-			}
-			else if (threadID == 1) {
-				yEnd = getHeight();
-				showRenderProgress = false;
-			}
-		}
+		if(fractalViewSize == FractalViewSize.LARGE)
+		Log.d("ThreadEnding", "Thread " + threadID + " ending at " + yEnd + "/" + getHeight());
 			
 		if (pixelSizes == null)
 			pixelSizes = new int[getWidth() * getHeight()];
@@ -693,6 +689,7 @@ abstract class AbstractFractalView extends View {
 			//Show time in seconds
 			double time = (double)((System.currentTimeMillis() - renderStartTime))/1000;
 			String renderCompleteMessage = "Rendering time: " + new DecimalFormat("#.##").format(time) + " second" + (time == 1d ? "." : "s.");
+			Log.d(TAG, renderCompleteMessage);
 			parentActivity.showToastOnUIThread(renderCompleteMessage, Toast.LENGTH_SHORT);	
 			
 			parentActivity.hideProgressSpinner();
