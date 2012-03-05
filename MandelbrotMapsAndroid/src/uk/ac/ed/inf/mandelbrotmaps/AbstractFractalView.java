@@ -2,6 +2,7 @@ package uk.ac.ed.inf.mandelbrotmaps;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -692,8 +693,9 @@ abstract class AbstractFractalView extends View {
 		if (upperCompletedRender && lowerCompletedRender && fractalViewSize == FractalViewSize.LARGE) {
 			Log.d(TAG, "Renders completed.");
 			
-			final long time = System.currentTimeMillis() - renderStartTime;
-			String renderCompleteMessage = "Rendering time: " + (int)(time/1000) + " seconds";
+			//Show time in seconds
+			double time = (double)((System.currentTimeMillis() - renderStartTime))/1000;
+			String renderCompleteMessage = "Rendering time: " + new DecimalFormat("#.##").format(time) + " second" + (time == 1d ? "." : "s.");
 			parentActivity.showToastOnUIThread(renderCompleteMessage, Toast.LENGTH_SHORT);	
 			
 			parentActivity.hideProgressSpinner();
