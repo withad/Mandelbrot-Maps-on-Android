@@ -242,6 +242,12 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   Log.d(TAG, "Running onDestroy().");
    }
    
+   @Override
+   protected void onPause() {
+	   super.onPause();
+	   savingDialog.dismiss();
+   }
+   
    
    
 /*-----------------------------------------------------------------------------------*/
@@ -304,11 +310,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 /*-----------------------------------------------------------------------------------*/
 /*Image saving/sharing*/
 /*-----------------------------------------------------------------------------------*/
-   private File saveImage() {
+   private void saveImage() {
     imagefile = null;
 	   
 	cancelledSave = false;
-	
 	
 	if(fractalView.isRendering()) {
 		savingDialog = new ProgressDialog(this);
@@ -349,21 +354,57 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		final String toastText = "Saved fractal as " + imagefile.getAbsolutePath();
 		showToastOnUIThread(toastText, Toast.LENGTH_LONG);
 	}
-	
-	return imagefile;
    }
   
    
    private void shareImage() {
-	   imagefile = fractalView.saveImage();
+	   cancelledSave = false;
 	   
-	   if(imagefile == null) return;
-		
-		Intent imageIntent = new Intent(Intent.ACTION_SEND);
-		imageIntent.setType("image/jpg");
-		imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
-		
-		startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+	   if(fractalView.isRendering()) {
+			savingDialog = new ProgressDialog(this);
+			savingDialog.setMessage("Waiting for render to finish...");
+			savingDialog.setCancelable(true);
+			savingDialog.setIndeterminate(true);
+			savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+				public void onCancel(DialogInterface dialog) {
+					FractalActivity.this.cancelledSave = true;
+				}
+			});
+			savingDialog.show();
+	
+			//Launch a thread to wait for completion
+			new Thread(new Runnable() {  
+				public void run() {  
+					if(fractalView.isRendering()) {
+						while (!cancelledSave && fractalView.isRendering()) {
+							try {
+								Thread.sleep(100);
+								Log.d(TAG, "Waiting to save...");
+							} catch (InterruptedException e) {}
+						}
+						
+						if(!cancelledSave) {
+							savingDialog.dismiss();
+							imagefile = fractalView.saveImage();
+							Intent imageIntent = new Intent(Intent.ACTION_SEND);
+							imageIntent.setType("image/jpg");
+							imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
+							
+							startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+						}
+					}		
+					return;  
+				}
+			}).start(); 
+		} 
+		else {
+			imagefile = fractalView.saveImage();
+			Intent imageIntent = new Intent(Intent.ACTION_SEND);
+			imageIntent.setType("image/jpg");
+			imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
+			
+			startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+		}
    }
    
    @Override
