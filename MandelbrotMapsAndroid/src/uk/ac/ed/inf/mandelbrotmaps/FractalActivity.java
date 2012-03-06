@@ -63,6 +63,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private Boolean cancelledSave = false;	
 	
 	// Little fractal view tracking
+	public boolean showLittleAtStart = false;
 	private boolean showingLittle = false;
 	private boolean littleFractalSelected = false;	
 	
@@ -131,9 +132,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   super.onDestroy();
 	   fractalView.stopAllRendering();
 	   fractalView.interruptThreads();
-	   littleFractalView.stopAllRendering();
-	   littleFractalView.interruptThreads();
-	   Log.d(TAG, "Running onDestroy().");
+	   if (littleFractalView != null) {
+		   littleFractalView.stopAllRendering();
+		   littleFractalView.interruptThreads();
+	   }
    }
    
    /* When paused, dismiss the saving dialog. Might be buggy if mid-save?
@@ -143,7 +145,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    protected void onPause() {
 	   super.onPause();
-	   Log.d(TAG, "onPause");
 	   if(savingDialog != null) 
 		   savingDialog.dismiss();
    }   
@@ -353,51 +354,52 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
    }
   
+   
 	//Wait for the render to finish, then share the fractal image
 	private void shareImage() {
 		cancelledSave = false;
 		   
 		if(fractalView.isRendering()) {
-		savingDialog = new ProgressDialog(this);
-		savingDialog.setMessage("Waiting for render to finish...");
-		savingDialog.setCancelable(true);
-		savingDialog.setIndeterminate(true);
-		savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-			public void onCancel(DialogInterface dialog) {
-				FractalActivity.this.cancelledSave = true;
-			}
-		});
-		savingDialog.show();
-		
-		//Launch a thread to wait for completion
-		new Thread(new Runnable() {  
-			public void run() {  
-				if(fractalView.isRendering()) {
-					while (!cancelledSave && fractalView.isRendering()) {
-						try {
-							Thread.sleep(100);
-							Log.d(TAG, "Waiting to save...");
-						} catch (InterruptedException e) {}
-					}			
-		
-					if(!cancelledSave) {
-						savingDialog.dismiss();
-						imagefile = fractalView.saveImage();
-						if(imagefile != null) {
-							Intent imageIntent = new Intent(Intent.ACTION_SEND);
-							imageIntent.setType("image/jpg");
-							imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
-					
-						startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+			savingDialog = new ProgressDialog(this);
+			savingDialog.setMessage("Waiting for render to finish...");
+			savingDialog.setCancelable(true);
+			savingDialog.setIndeterminate(true);
+			savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+				public void onCancel(DialogInterface dialog) {
+					FractalActivity.this.cancelledSave = true;
+				}
+			});
+			savingDialog.show();
+			
+			//Launch a thread to wait for completion
+			new Thread(new Runnable() {  
+				public void run() {  
+					if(fractalView.isRendering()) {
+						while (!cancelledSave && fractalView.isRendering()) {
+							try {
+								Thread.sleep(100);
+								Log.d(TAG, "Waiting to save...");
+							} catch (InterruptedException e) {}
+						}			
+			
+						if(!cancelledSave) {
+							savingDialog.dismiss();
+							imagefile = fractalView.saveImage();
+							if(imagefile != null) {
+								Intent imageIntent = new Intent(Intent.ACTION_SEND);
+								imageIntent.setType("image/jpg");
+								imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
+						
+							startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
+							}
+							else {
+								showToastOnUIThread("Unable to share image - couldn't save temporary file", Toast.LENGTH_LONG);
+							}
 						}
-						else {
-							showToastOnUIThread("Unable to share image - couldn't save temporary file", Toast.LENGTH_LONG);
-						}
-					}
-				}	
-				return;  
-			}
-		}).start(); 
+					}	
+					return;  
+				}
+			}).start(); 
 		} 
 		else {
 			imagefile = fractalView.saveImage();
@@ -414,6 +416,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			}
 		}
 	}
+	
    
    	//Get result of launched activity (only time used is after sharing, so delete temp. image)
    	@Override

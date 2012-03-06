@@ -23,9 +23,6 @@ import android.widget.Toast;
 abstract class AbstractFractalView extends View {
 	private final String TAG = "MMaps";
 	
-	// How often should the drawing thread redraw the fractal?
-	public int LINES_TO_DRAW_AFTER = 20;
-	
 	// How many different, discrete zoom and contrast levels?
 	public final int ZOOM_SLIDER_SCALING = 300;
 	public final int CONTRAST_SLIDER_SCALING = 200;
@@ -48,6 +45,9 @@ abstract class AbstractFractalView extends View {
 	double ITERATIONSCALING_MIN = 0.01; 
 	double ITERATIONSCALING_MAX = 100;
 	
+	
+	// How often to redraw fractal when rendering. Set to 1/12th screen size in onSizeChanged()
+	public int linesToDrawAfter = 20;
 	
 	// Tracks current control (zooming, dragging, or none)
 	public static enum ControlMode {
@@ -159,15 +159,21 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 /*Android life-cycle handling*/   
 /*-----------------------------------------------------------------------------------*/
-	/* Runs when the view changes size. Used to set the little fractal view once
-	 * large fractal view size has first been determined. */
+	/* Runs when the view changes size. 
+	 * Used to set the little fractal view once large fractal view size has first been determined. 
+	 * Also sets linesToDrawAfter to 1/12th of the screen size. */
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 	   
-		if(fractalViewSize == FractalViewSize.LARGE) parentActivity.addLittleView();
-		LINES_TO_DRAW_AFTER = getHeight()/12;
-		Log.d(TAG, "Drawing every " + LINES_TO_DRAW_AFTER + " lines.");
+		// Show the little view at the start, if allowed.
+		if(fractalViewSize == FractalViewSize.LARGE && parentActivity.showLittleAtStart) {
+			parentActivity.addLittleView();
+		}
+		
+		// Set linesToDrawAfter to a reasonable portion of size (1/12th works nicely).
+		linesToDrawAfter = getHeight()/12;
+		Log.d(TAG, "Drawing every " + linesToDrawAfter + " lines.");
 	}
    
    
