@@ -29,27 +29,27 @@ import android.widget.Toast;
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
 	private final String TAG = "MMaps";
 	
-	//Constants
+	// Constants
 	private int SHARE_IMAGE_REQUEST = 0;
 	
-	//Type of fractal displayed in the main fractal view
+	// Type of fractal displayed in the main fractal view
 	public static enum FractalType {
 		MANDELBROT,
 		JULIA
 	}	
 	private FractalType fractalType = FractalType.MANDELBROT;
 
-	//Layout variables
+	// Layout variables
 	private AbstractFractalView fractalView;
 	private AbstractFractalView littleFractalView;
 	private View borderView;
 	private RelativeLayout relativeLayout;
 	
-	//Fractal locations
+	// Fractal locations
 	private MandelbrotJuliaLocation mjLocation;
 	private double[] littleMandelbrotLocation;
 	   
-	//Dragging/scaling control variables
+	// Dragging/scaling control variables
 	private float dragLastX;
 	private float dragLastY;
 	private int dragID = -1;
@@ -57,16 +57,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	private ScaleGestureDetector gestureDetector;
 	
-	//File saving variables
+	// File saving variables
 	private ProgressDialog savingDialog;
 	private File imagefile;
 	private Boolean cancelledSave = false;	
 	
-	//Little fractal view tracking
+	// Little fractal view tracking
 	private boolean showingLittle = false;
 	private boolean littleFractalSelected = false;	
 	
-	//Loading spinner (currently all disabled due to slowdown)
+	// Loading spinner (currently all disabled due to slowdown)
 	private ProgressBar progressBar;
 	private boolean showingSpinner = false;
 	private boolean allowSpinner = false;
@@ -353,54 +353,55 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
    }
   
-   //Wait for the render to finish, then share the fractal image
-   private void shareImage() {
-	   cancelledSave = false;
-	   
-	   if(fractalView.isRendering()) {
-			savingDialog = new ProgressDialog(this);
-			savingDialog.setMessage("Waiting for render to finish...");
-			savingDialog.setCancelable(true);
-			savingDialog.setIndeterminate(true);
-			savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-				public void onCancel(DialogInterface dialog) {
-					FractalActivity.this.cancelledSave = true;
-				}
-			});
-			savingDialog.show();
-	
-			//Launch a thread to wait for completion
-			new Thread(new Runnable() {  
-				public void run() {  
-					if(fractalView.isRendering()) {
-						while (!cancelledSave && fractalView.isRendering()) {
-							try {
-								Thread.sleep(100);
-								Log.d(TAG, "Waiting to save...");
-							} catch (InterruptedException e) {}
+	//Wait for the render to finish, then share the fractal image
+	private void shareImage() {
+		cancelledSave = false;
+		   
+		if(fractalView.isRendering()) {
+		savingDialog = new ProgressDialog(this);
+		savingDialog.setMessage("Waiting for render to finish...");
+		savingDialog.setCancelable(true);
+		savingDialog.setIndeterminate(true);
+		savingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			public void onCancel(DialogInterface dialog) {
+				FractalActivity.this.cancelledSave = true;
+			}
+		});
+		savingDialog.show();
+		
+		//Launch a thread to wait for completion
+		new Thread(new Runnable() {  
+			public void run() {  
+				if(fractalView.isRendering()) {
+					while (!cancelledSave && fractalView.isRendering()) {
+						try {
+							Thread.sleep(100);
+							Log.d(TAG, "Waiting to save...");
+						} catch (InterruptedException e) {}
+					}			
+		
+					if(!cancelledSave) {
+						savingDialog.dismiss();
+						imagefile = fractalView.saveImage();
+						if(imagefile != null) {
+							Intent imageIntent = new Intent(Intent.ACTION_SEND);
+							imageIntent.setType("image/jpg");
+							imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
+					
+						startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
 						}
-						
-						if(!cancelledSave) {
-							savingDialog.dismiss();
-							imagefile = fractalView.saveImage();
-							if(imagefile != null) {
-								Intent imageIntent = new Intent(Intent.ACTION_SEND);
-								imageIntent.setType("image/jpg");
-								imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
-								
-								startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);
-							}
-							else {
-								showToastOnUIThread("Unable to share image - couldn't save temporary file", Toast.LENGTH_LONG);
-							}
+						else {
+							showToastOnUIThread("Unable to share image - couldn't save temporary file", Toast.LENGTH_LONG);
 						}
-					}		
-					return;  
-				}
-			}).start(); 
+					}
+				}	
+				return;  
+			}
+		}).start(); 
 		} 
 		else {
 			imagefile = fractalView.saveImage();
+			
 			if(imagefile != null) {
 				Intent imageIntent = new Intent(Intent.ACTION_SEND);
 				imageIntent.setType("image/jpg");
@@ -412,17 +413,17 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				showToastOnUIThread("Unable to share image - couldn't save temporary file", Toast.LENGTH_LONG);
 			}
 		}
-   }
+	}
    
-   //Get result of launched activity (only time used is after sharing, so delete temp. image)
-   @Override
-   protected void onActivityResult(int requestCode, int resultCode, Intent data)
-   {
-	   if (requestCode == SHARE_IMAGE_REQUEST) {
-			   Log.d(TAG, "Deleting temporary jpg " + imagefile.getAbsolutePath());
-			   imagefile.delete();
-	   }
-   }
+   	//Get result of launched activity (only time used is after sharing, so delete temp. image)
+   	@Override
+   	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+   	{
+	   	if (requestCode == SHARE_IMAGE_REQUEST) {
+	   		Log.d(TAG, "Deleting temporary jpg " + imagefile.getAbsolutePath());
+			imagefile.delete();
+	   	}
+   	}
 
    
 
@@ -558,7 +559,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 /*-----------------------------------------------------------------------------------*/
 /*Utilities*/
 /*-----------------------------------------------------------------------------------*/
-   /*A single method for running toasts on the UI thread, rather than 
+	/*A single method for running toasts on the UI thread, rather than 
    	creating new Runnables each time. */
 	public void showToastOnUIThread(final String toastText, final int length) {
 	    runOnUiThread(new Runnable() {
