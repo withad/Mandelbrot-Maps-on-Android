@@ -1,16 +1,10 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import java.io.File;
-import java.util.concurrent.CountDownLatch;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
-import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.RenderStyle;
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -30,7 +24,6 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.TextView.SavedState;
 import android.widget.Toast;
 
 public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
@@ -104,17 +97,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       //Extract features from bundle, if there is one
       try {     
 	      fractalType = FractalType.valueOf(bundle.getString("FractalType"));
-	      style = RenderStyle.valueOf(bundle.getString("RenderStyle"));
 	      includeLittle = bundle.getBoolean("SideBySide");
 	      littleMandelbrotLocation = bundle.getDoubleArray("LittleMandelbrotLocation");
       } 
       catch (NullPointerException npe) {}
       
       if (fractalType == FractalType.MANDELBROT) {
-    	  fractalView = new MandelbrotFractalView(this, style, FractalViewSize.LARGE);
+    	  fractalView = new MandelbrotFractalView(this, FractalViewSize.LARGE);
       }
       else if (fractalType == FractalType.JULIA) {
-    	  fractalView = new JuliaFractalView(this, style, FractalViewSize.LARGE);
+    	  fractalView = new JuliaFractalView(this, FractalViewSize.LARGE);
     	  juliaX = bundle.getDouble("JULIA_X");
           juliaY = bundle.getDouble("JULIA_Y");
       }
@@ -138,10 +130,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   
 	   //Show a little Julia next to a Mandelbrot and vice versa
 	   if(fractalType == FractalType.MANDELBROT) {
-		   littleFractalView = new JuliaFractalView(this, style, FractalViewSize.LITTLE);
+		   littleFractalView = new JuliaFractalView(this, FractalViewSize.LITTLE);
 	   }
 	   else {
-		   littleFractalView = new MandelbrotFractalView(this, style, FractalViewSize.LITTLE);
+		   littleFractalView = new MandelbrotFractalView(this, FractalViewSize.LITTLE);
 	   }
 	   
 	   //Set size of border, little view proportional to screen size
@@ -569,7 +561,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		
 		bundle.putDouble("JULIA_X", juliaParams[0]);
 		bundle.putDouble("JULIA_Y", juliaParams[1]);
-		bundle.putString("RenderStyle", style.toString());
 		
 		intent.putExtras(bundle);
 		startActivity(intent);
