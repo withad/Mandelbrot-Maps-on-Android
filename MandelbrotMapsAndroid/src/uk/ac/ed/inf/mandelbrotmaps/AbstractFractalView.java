@@ -1,37 +1,25 @@
 package uk.ac.ed.inf.mandelbrotmaps;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-/**
- * @author Alasdair
- *
- */
+
 abstract class AbstractFractalView extends View {
 	private final String TAG = "MMaps";
 	
@@ -62,7 +50,7 @@ abstract class AbstractFractalView extends View {
 	
 	
 	// Tracks current control (zooming, dragging, or none)
-	public enum ControlMode {
+	public static enum ControlMode {
 		ZOOMING,
 		DRAGGING,
 		STATIC
@@ -70,7 +58,7 @@ abstract class AbstractFractalView extends View {
 	private ControlMode controlmode = ControlMode.STATIC;
 	
 	// The size of the fractal view - whether it's the main one or little and in the corner
-	public enum FractalViewSize{
+	public static enum FractalViewSize{
 		LARGE,
 		LITTLE,
 		HALF
@@ -124,6 +112,7 @@ abstract class AbstractFractalView extends View {
 	
 	// Track number of times bitmap is recreated onDraw (debug info)
 	int bitmapCreations = 0;
+	
 	
 	
 /*-----------------------------------------------------------------------------------*/
@@ -286,7 +275,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 /* Movement */
 /*-----------------------------------------------------------------------------------*/
-	// Set new graph area
+	/* Set new location after movement */
 	public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
 		Log.d(TAG, "moveFractal()");
 		
@@ -301,9 +290,8 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
-	// Begin translating the image relative to the users finger
-	public void startDragging()
-	{			
+	/* Start a dragging motion - clear all the variables, stop any rendering */
+	public void startDragging() {			
 		controlmode = ControlMode.DRAGGING;
 		
 		//Stop current rendering (to not render areas that are offscreen afterwards)
@@ -318,8 +306,7 @@ abstract class AbstractFractalView extends View {
 		hasZoomed = false;
 	}
 	
-	
-	// Update the position of the image on screen as finger moves
+	/* Update the position of the image on screen as dragging happens */
 	public void dragFractal(float dragDiffPixelsX, float dragDiffPixelsY) {		
 		bitmapX = dragDiffPixelsX;
 		bitmapY = dragDiffPixelsY;
@@ -330,13 +317,9 @@ abstract class AbstractFractalView extends View {
 		invalidate();
 	}
 	
-	
-	// Stop moving the image around, calculate new area. Run when finger lifted.
-	public void stopDragging(boolean stoppedOnZoom)
-	{		
+	/* End of a dragging motion. Move the fractal position to match the image. */
+	public void stopDragging(boolean stoppedOnZoom)	{		
 		controlmode = ControlMode.STATIC;
-		
-		Log.d(TAG, "Stopped on zoom: " + stoppedOnZoom);
 		
 		// If no zooming's occured, keep the remaining pixels
 		if(!hasZoomed && !stoppedOnZoom) {
@@ -349,18 +332,17 @@ abstract class AbstractFractalView extends View {
 		if(!stoppedOnZoom) scheduleNewRenders();
 		
 		// Reset all the variables (possibly paranoid)
-		if(!hasZoomed && !stoppedOnZoom) matrix.reset();
-		
-		
+		if(!hasZoomed && !stoppedOnZoom) 
+			matrix.reset();
+
 		hasZoomed = false;
 		
 		invalidate();
 	}
 
 	
-	// Take the current pixel value array and adjust it to keep pixels that have already been calculated
-	public void shiftPixels(int shiftX, int shiftY)
-	{
+	/* Shift values in pixel array to keep pixels that have already been calculated */
+	public void shiftPixels(int shiftX, int shiftY) {
 		Log.d(TAG, "Shifting pixels");
 		
 		int height = getHeight();
@@ -500,6 +482,7 @@ abstract class AbstractFractalView extends View {
 	}
 	
 
+	
 /*-----------------------------------------------------------------------------------*/
 /* Iteration variables */
 /*-----------------------------------------------------------------------------------*/
@@ -551,7 +534,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 /* Graph area */
 /*-----------------------------------------------------------------------------------*/
-	//Set a new graph area, or 
+	/* Set a new graph area, if valid */
 	void setGraphArea(double[] newGraphArea, boolean newRender) {
 		// We have a predefined graphArea, so we can be picky with newGraphArea.
 		if (graphArea != null) {
@@ -561,27 +544,30 @@ abstract class AbstractFractalView extends View {
 			// Zoom level is sane - let's allow this!
 			if (saneZoomLevel()) {
 				if(newRender)scheduleNewRenders();
-			// Zoom level is out of bounds; let's just roll back.
-			} else {
+			}
+			else {
+				// Zoom level is out of bounds, just roll back.
 				graphArea = initialGraphArea;
 			}
-		// There is no predefined graphArea; we'll have to accept whatever newGraphArea is.
-		} else {
+		} 
+		else {
+			// There is no predefined graphArea; we'll have to accept whatever newGraphArea is.
 			graphArea = newGraphArea;
 			if(newRender) scheduleNewRenders();
 		}
 	}
 	
-	// On the complex plane, what is the current length of 1 pixel?
+	/* Compute length of 1 pixel on the complex plane */
 	double getPixelSize() {
 		// Nothing to do - cannot compute a sane pixel size
 		if (getWidth() == 0) return 0.0;
 		if (graphArea == null) return 0.0;
+		
 		// Return the pixel size
 		return (graphArea[2] / (double)getWidth());
 	}
 	
-	// Restore default canvas
+	/* Reset the fractal to the home graph area */
 	public void canvasHome() {
 		// Default max iterations scaling
 		iterationScaling = ITERATIONSCALING_DEFAULT;
@@ -595,40 +581,11 @@ abstract class AbstractFractalView extends View {
 	
 	
 /*-----------------------------------------------------------------------------------*/
-/*Utilities*/
+/* File saving */
 /*-----------------------------------------------------------------------------------*/
-	//Returns true if any threads are still rendering
-	public boolean isRendering() {
-		boolean allComplete = true;
-		
-		for (Boolean b : rendersComplete) {
-			allComplete = allComplete && b;
-		}
-		
-		return !allComplete;
-	}
-	
-	public void notifyCompleteRender(int threadID, int pixelBlockSize) {
-		if(pixelBlockSize == DEFAULT_PIXEL_SIZE) {
-			rendersComplete.set(threadID, true);
-		}
-		
-		if (!(isRendering()) && fractalViewSize == FractalViewSize.LARGE) {
-			Log.d(TAG, "Renders completed.");
-			
-			//Show time in seconds
-			double time = (double)((System.currentTimeMillis() - renderStartTime))/1000;
-			String renderCompleteMessage = "Rendering time: " + new DecimalFormat("#.##").format(time) + " second" + (time == 1d ? "." : "s.");
-			Log.d(TAG, renderCompleteMessage);
-			parentActivity.showToastOnUIThread(renderCompleteMessage, Toast.LENGTH_SHORT);	
-			
-			parentActivity.hideProgressSpinner();
-		}
-	}
-	
-	public File saveImage()
-	{
-		//TODO: Check if file exists already, add user filename
+	/* Saves the current fractal image as an image file 
+	 * (Call in FractalActivity should ensure that image is done rendering) */
+	public File saveImage() {
 		//Check if external storage is available
 		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
 		{
@@ -677,7 +634,7 @@ abstract class AbstractFractalView extends View {
 		}
 	}
 	
-	
+	/* Generates a new filename (currently uses time down to the second) */
 	private String getNewFileName() {
 		String datetime = "";
 		
@@ -691,8 +648,42 @@ abstract class AbstractFractalView extends View {
 		
 		return datetime;
 	}
+	
+	
+	
+/*-----------------------------------------------------------------------------------*/
+/* Utilities */
+/*-----------------------------------------------------------------------------------*/
+	//Returns true if any threads are still rendering
+	public boolean isRendering() {
+		boolean allComplete = true;
+		
+		for (Boolean b : rendersComplete) {
+			allComplete = allComplete && b;
+		}
+		
+		return !allComplete;
+	}
+	
+	public void notifyCompleteRender(int threadID, int pixelBlockSize) {
+		if(pixelBlockSize == DEFAULT_PIXEL_SIZE) {
+			rendersComplete.set(threadID, true);
+		}
+		
+		if (!(isRendering()) && fractalViewSize == FractalViewSize.LARGE) {
+			Log.d(TAG, "Renders completed.");
+			
+			//Show time in seconds
+			double time = (double)((System.currentTimeMillis() - renderStartTime))/1000;
+			String renderCompleteMessage = "Rendering time: " + new DecimalFormat("#.##").format(time) + " second" + (time == 1d ? "." : "s.");
+			Log.d(TAG, renderCompleteMessage);
+			parentActivity.showToastOnUIThread(renderCompleteMessage, Toast.LENGTH_SHORT);	
+			
+			parentActivity.hideProgressSpinner();
+		}
+	}
 
-
+	
 	//Fill the pixel sizes array with a number larger than any reasonable block size
 	private void clearPixelSizes() {
 		Log.d(TAG, "Clearing pixel sizes");
@@ -747,9 +738,7 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
-	/* Sets to a predetermined spot that takes a while to render
-	 * Just used for debugging
-	*/
+	/* Sets to a predetermined spot that takes a while to render (just used for debugging) */
 	public void setToBookmark()
 	{	
 		stopAllRendering();
@@ -776,8 +765,9 @@ abstract class AbstractFractalView extends View {
 	}
 
 	
-	
-	// Abstract methods
+/*-----------------------------------------------------------------------------------*/
+/* Abstract methods */
+/*-----------------------------------------------------------------------------------*/
 	abstract void loadLocation(MandelbrotJuliaLocation mjLocation);
 	abstract void computePixels(
 			int pixelBlockSize,  // Pixel "blockiness"

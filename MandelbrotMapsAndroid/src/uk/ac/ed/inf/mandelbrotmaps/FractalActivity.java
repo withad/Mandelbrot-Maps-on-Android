@@ -33,7 +33,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private int SHARE_IMAGE_REQUEST = 0;
 	
 	//Type of fractal displayed in the main fractal view
-	public enum FractalType {
+	public static enum FractalType {
 		MANDELBROT,
 		JULIA
 	}	
@@ -301,10 +301,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 /*-----------------------------------------------------------------------------------*/
 /*Image saving/sharing*/
 /*-----------------------------------------------------------------------------------*/
-   /*
-    * TODO: Fix the saving/sharing code so that it's not a godawful monstrosity.
+   /* TODO: Fix the saving/sharing code so that it's not a godawful monstrosity.
     * Possibly switch to using Handlers and postDelayed or something.
    */
+   
    //Wait for render to finish, then save the fractal image
    private void saveImage() {
 	cancelledSave = false;

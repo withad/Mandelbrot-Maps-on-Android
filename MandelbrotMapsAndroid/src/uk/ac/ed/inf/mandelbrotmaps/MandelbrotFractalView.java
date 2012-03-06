@@ -148,7 +148,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					int p = 0;
 					for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 						for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
-							if(fractalViewSize == fractalViewSize.LARGE) {
+							if(fractalViewSize == FractalViewSize.LARGE) {
 								if(p != 0) {
 									pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
 								}

@@ -153,7 +153,7 @@ public class JuliaFractalView extends AbstractFractalView{
 					colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
 					
 					//Note that the pixel being calculated has been calculated in full (upper right of a block)
-					if(fractalViewSize == fractalViewSize.LARGE)
+					if(fractalViewSize == FractalViewSize.LARGE)
 						pixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
 					
 					// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
@@ -161,7 +161,7 @@ public class JuliaFractalView extends AbstractFractalView{
 					try {
 						for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
 							for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
-								if(fractalViewSize == fractalViewSize.LARGE) {
+								if(fractalViewSize == FractalViewSize.LARGE) {
 									if(p != 0) {
 										pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
 									}
