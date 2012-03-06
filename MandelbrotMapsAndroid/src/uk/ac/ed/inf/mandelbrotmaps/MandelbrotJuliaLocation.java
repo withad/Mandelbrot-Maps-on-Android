@@ -1,9 +1,5 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import java.lang.reflect.Array;
-
-import android.R.array;
-
 
 class MandelbrotJuliaLocation {
 	//private URL urlBase;
