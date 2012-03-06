@@ -100,6 +100,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		try {     
 			fractalType = FractalType.valueOf(bundle.getString("FractalType"));
 			littleMandelbrotLocation = bundle.getDoubleArray("LittleMandelbrotLocation");
+			showLittleAtStart = bundle.getBoolean("ShowLittleAtStart");
 		} 
 		catch (NullPointerException npe) {}
 		
@@ -128,7 +129,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	* so references aren't kept.
     */
    @Override
-   protected void onDestroy(){
+   protected void onDestroy() {
 	   super.onDestroy();
 	   fractalView.stopAllRendering();
 	   fractalView.interruptThreads();
@@ -603,6 +604,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   	Intent intent = new Intent(this, FractalActivity.class);
 			Bundle bundle = new Bundle();
 			bundle.putString("FractalType", FractalType.JULIA.toString());
+			bundle.putBoolean("ShowLittleAtStart", true);
 			
 			Log.d(TAG, "Mandelbrot Graph Area at launch: " + (mjLocation.getMandelbrotGraphArea())[0]);
 			bundle.putDoubleArray("LittleMandelbrotLocation", fractalView.graphArea);
