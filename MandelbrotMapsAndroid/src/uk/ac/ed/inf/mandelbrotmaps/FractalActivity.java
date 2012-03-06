@@ -44,15 +44,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	private FractalType fractalType = FractalType.MANDELBROT;
 	
-	
-	private enum DisplayMode{
-		MANDELBROT,
-		ABOUT_TO_JULIA,
-		JULIA
-	}
-	
-	private DisplayMode displaymode = DisplayMode.MANDELBROT;
-	
 	private final String TAG = "MMaps";
 
 	private AbstractFractalView fractalView;
@@ -229,8 +220,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    
    @Override
    protected void onResume() {
-      super.onResume();
-      displaymode = DisplayMode.MANDELBROT;      
+      super.onResume();     
       Log.d(TAG, "onResume");
    }
    
@@ -283,16 +273,12 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  fractalView.setToBookmark();
     	  return true;
       case R.id.toggleLittle:
-    	  if(includeLittle) {
-	    	  if(showingLittle) {
-	    		  removeLittleView();
-	    	  }
-	    	  else {
-	    		  addLittleView();
-	    	  }
+    	  if(showingLittle) {
+    		  removeLittleView();
     	  }
-    	  else
-    		  displaymode = DisplayMode.ABOUT_TO_JULIA;
+    	  else {
+    		  addLittleView();
+    	  }
     	  return true;
       case R.id.resetFractal:
     	  fractalView.reset();
@@ -448,9 +434,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					borderView.setBackgroundColor(Color.DKGRAY);
 					littleFractalSelected = true;
 				}
-				else if (displaymode == DisplayMode.ABOUT_TO_JULIA) {
-					launchJulia(evt.getX(), evt.getY());
-				} 
 				else if (showingLittle && fractalType == FractalType.MANDELBROT && !gestureDetector.isInProgress())	{
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
