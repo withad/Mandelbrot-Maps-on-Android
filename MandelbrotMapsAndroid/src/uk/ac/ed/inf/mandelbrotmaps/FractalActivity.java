@@ -56,7 +56,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    
 	private File imagefile;
 
-	private boolean includeLittle = true;
 	FractalViewSize size;
 	
 	RelativeLayout relativeLayout;
@@ -97,7 +96,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       //Extract features from bundle, if there is one
       try {     
 	      fractalType = FractalType.valueOf(bundle.getString("FractalType"));
-	      includeLittle = bundle.getBoolean("SideBySide");
 	      littleMandelbrotLocation = bundle.getDoubleArray("LittleMandelbrotLocation");
       } 
       catch (NullPointerException npe) {}
@@ -123,10 +121,39 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       gestureDetector = new ScaleGestureDetector(this, this);
    }
    
+   /* When destroyed, stop rendering and kill all the threads,
+	* so references aren't kept.
+    */
+   @Override
+   protected void onDestroy(){
+	   super.onDestroy();
+	   fractalView.stopAllRendering();
+	   fractalView.interruptThreads();
+	   littleFractalView.stopAllRendering();
+	   littleFractalView.interruptThreads();
+	   Log.d(TAG, "Running onDestroy().");
+   }
    
+   /* When paused, dismiss the saving dialog. Might be buggy if mid-save?
+    * (non-Javadoc)
+    * @see android.app.Activity#onPause()
+    */
+   @Override
+   protected void onPause() {
+	   super.onPause();
+	   Log.d(TAG, "onPause");
+	   if(savingDialog != null) 
+		   savingDialog.dismiss();
+   }   
+   
+   
+   
+/*-----------------------------------------------------------------------------------*/
+/*Dynamic UI creation*/
+/*-----------------------------------------------------------------------------------*/
    public void addLittleView() {   
 	   //Check to see if view has already or should never be included
-	   if (showingLittle || !includeLittle) return;
+	   if (showingLittle) return;
 	   
 	   //Show a little Julia next to a Mandelbrot and vice versa
 	   if(fractalType == FractalType.MANDELBROT) {
@@ -167,8 +194,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   mjLocation.setMandelbrotGraphArea(littleMandelbrotLocation);
 		   littleFractalView.loadLocation(mjLocation);
 	   }
-	   
-	   
       
 	   setContentView(relativeLayout);
 	   
@@ -184,6 +209,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   showingLittle = false;
    }
    
+   
+   /* Shows the progress spinner. Never used because it causes slowdown,
+    * leaving it in so I can demonstrate it with benchmarks.
+    * Might adapt it to do a progress bar that updates less often. 
+    */
    public void showProgressSpinner() {
 	    if(showingSpinner || !allowSpinner) return;
 	    
@@ -194,6 +224,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		showingSpinner = true;
    }
    
+   /* As above, except for hiding.
+    */
    public void hideProgressSpinner() {
 	   if(!showingSpinner || !allowSpinner) return;
 	   Log.d(TAG, "Remove spinner");
@@ -207,30 +239,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	});
 	   showingSpinner = false;
    }
-   
-   @Override
-   protected void onResume() {
-      super.onResume();     
-      Log.d(TAG, "onResume");
-   }
-   
-   @Override
-   protected void onDestroy(){
-	   super.onDestroy();
-	   fractalView.stopAllRendering();
-	   fractalView.interruptThreads();
-	   littleFractalView.stopAllRendering();
-	   littleFractalView.interruptThreads();
-	   Log.d(TAG, "Running onDestroy().");
-   }
-   
-   @Override
-   protected void onPause() {
-	   super.onPause();
-	   Log.d(TAG, "onPause");
-	   if(savingDialog != null) 
-		   savingDialog.dismiss();
-   }   
    
    
    
@@ -286,6 +294,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       return false;
    }
 
+   
 
 /*-----------------------------------------------------------------------------------*/
 /*Image saving/sharing*/
@@ -554,7 +563,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   	Intent intent = new Intent(this, FractalActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putString("FractalType", FractalType.JULIA.toString());
-		bundle.putBoolean("SideBySide", includeLittle);
 		
 		Log.d(TAG, "Mandelbrot Graph Area at launch: " + (mjLocation.getMandelbrotGraphArea())[0]);
 		bundle.putDoubleArray("LittleMandelbrotLocation", fractalView.graphArea);
