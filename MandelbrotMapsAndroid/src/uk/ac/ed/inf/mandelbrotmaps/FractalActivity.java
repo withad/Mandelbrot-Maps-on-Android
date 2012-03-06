@@ -50,16 +50,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private AbstractFractalView littleFractalView;
 	private MandelbrotJuliaLocation mjLocation;
 	
-	View borderView;
+	//The border around/behind the little fractal view
+	private View borderView;
 	   
 	private float dragLastX;
 	private float dragLastY;
-	   
-	private ScaleGestureDetector gestureDetector;
-	   
 	private int dragID = -1;
 	
-	RenderStyle style = RenderStyle.DUAL_THREAD;
+	private ScaleGestureDetector gestureDetector;
 	
 	private int SHARE_IMAGE_REQUEST = 0;
    
@@ -300,6 +298,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 /*-----------------------------------------------------------------------------------*/
 /*Image saving/sharing*/
 /*-----------------------------------------------------------------------------------*/
+   /*
+    * TODO: Fix the saving/sharing code so that it's not a godawful monstrosity.
+    * Possibly switch to using Handlers and postDelayed or something.
+   */
    //Wait for render to finish, then save the fractal image
    private void saveImage() {
 	cancelledSave = false;
@@ -413,7 +415,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    protected void onActivityResult(int requestCode, int resultCode, Intent data)
    {
-	   if (requestCode == 0) {
+	   if (requestCode == SHARE_IMAGE_REQUEST) {
 			   Log.d(TAG, "Deleting temporary jpg " + imagefile.getAbsolutePath());
 			   imagefile.delete();
 	   }
@@ -474,16 +476,20 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		       
 				
 			case MotionEvent.ACTION_UP:
-				if(currentlyDragging)
+				if(currentlyDragging) {
 					stopDragging();
+				}
 				else if (littleFractalSelected) {
 					borderView.setBackgroundColor(Color.GRAY);
 					littleFractalSelected = false;
-					if (evt.getX() <= borderView.getWidth() && evt.getY() <= borderView.getHeight())
-						if (fractalType == FractalType.MANDELBROT)
+					if (evt.getX() <= borderView.getWidth() && evt.getY() <= borderView.getHeight()) {
+						if (fractalType == FractalType.MANDELBROT) {
 							launchJulia(((JuliaFractalView)littleFractalView).getJuliaParam());
-						else if (fractalType == FractalType.JULIA)
+						}
+						else if (fractalType == FractalType.JULIA) {
 							finish();
+						}
+					}
 				}					
 				
 				break;
@@ -569,11 +575,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		startActivity(intent);
    }
    
-   private void launchJulia(float x, float y) {
-		double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(x, y);
-		launchJulia(juliaParams);
-}
-
 
    public boolean onScaleBegin(ScaleGestureDetector detector) {
 	   fractalView.stopDragging(true);

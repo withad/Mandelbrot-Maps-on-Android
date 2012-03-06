@@ -46,12 +46,6 @@ abstract class AbstractFractalView extends View {
 	}
 	private ControlMode controlmode = ControlMode.STATIC;
 	
-	public enum RenderStyle{
-		SINGLE_THREAD,
-		DUAL_THREAD
-	}
-	private RenderStyle renderStyle;
-	
 	public enum FractalViewSize{
 		LARGE,
 		LITTLE,
@@ -156,13 +150,12 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 /*Constructor*/
 /*-----------------------------------------------------------------------------------*/
-	public AbstractFractalView(Context context, RenderStyle style, FractalViewSize size) {
+	public AbstractFractalView(Context context, FractalViewSize size) {
 		super(context);
 		setFocusable(true);
 		setFocusableInTouchMode(true);
       	setId(0); 
       	setBackgroundColor(Color.BLUE);
-      	renderStyle = style;
       	fractalViewSize = size;
       	
       	noOfThreads = Runtime.getRuntime().availableProcessors();
