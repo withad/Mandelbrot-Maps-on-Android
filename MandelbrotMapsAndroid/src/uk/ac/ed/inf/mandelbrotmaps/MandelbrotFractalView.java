@@ -49,7 +49,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final double yMax,
 		final double pixelSize,
 		final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-		RenderMode renderMode,
 		final int threadID,
 		final int noOfThreads) {				
 			RenderThread callingThread = renderThreadList.get(threadID);

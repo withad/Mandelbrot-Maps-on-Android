@@ -32,13 +32,6 @@ abstract class AbstractFractalView extends View {
    
 	private final String TAG = "MMaps";
 	
-	public enum RenderMode{
-		NEW,
-		JUST_DRAGGED,
-		JUST_ZOOMED
-	}
-	private RenderMode renderMode = RenderMode.NEW;
-	
 	public enum ControlMode {
 		ZOOMING,
 		DRAGGING,
@@ -298,7 +291,6 @@ abstract class AbstractFractalView extends View {
 			graphArea[1],
 			getPixelSize(),
 			true,
-			renderMode,
 			threadID,
 			noOfThreads
 		);
@@ -365,13 +357,9 @@ abstract class AbstractFractalView extends View {
 		Log.d(TAG, "Stopped on zoom: " + stoppedOnZoom);
 		
 		// If no zooming's occured, keep the remaining pixels
-		if(!hasZoomed && !stoppedOnZoom) 
-		{
-			renderMode = RenderMode.JUST_DRAGGED;
+		if(!hasZoomed && !stoppedOnZoom) {
 			shiftPixels((int)totalDragX, (int)totalDragY);
 		}
-		else 
-			renderMode = RenderMode.NEW;
 		
 		//Set the new location for the fractals
 		moveFractal((int)totalDragX, (int)totalDragY);
@@ -435,7 +423,6 @@ abstract class AbstractFractalView extends View {
 		
 	// Adjust zoom, centred on pixel (xPixel, yPixel)
 	public void zoomChange(int xPixel, int yPixel, float scale) {
-		renderMode = RenderMode.JUST_ZOOMED;
 		stopAllRendering();
 		
 		double pixelSize = getPixelSize();
@@ -772,8 +759,6 @@ abstract class AbstractFractalView extends View {
 		clearPixelSizes();
 		canvasHome();
 		
-		renderMode = RenderMode.NEW;
-		
 		postInvalidate();
 	}
 	
@@ -847,7 +832,6 @@ abstract class AbstractFractalView extends View {
 			final double yMax,
 			final double pixelSize,
 			final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-			RenderMode currentRenderMode,
 			final int threadID,
 			final int noOfThreads
 		);
