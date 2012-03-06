@@ -181,7 +181,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 	public double[] getJuliaParams(float touchX, float touchY)
 	{
-		double[] mandelbrotGraphArea = getGraphArea();
+		double[] mandelbrotGraphArea = graphArea;
 		double pixelSize = getPixelSize();
 	
 		double[] juliaParams = new double[2];

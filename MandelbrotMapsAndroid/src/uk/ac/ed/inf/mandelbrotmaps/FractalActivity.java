@@ -286,9 +286,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       case R.id.resetFractal:
     	  fractalView.reset();
     	  return true;
-      case R.id.toggleCrude:
-    	  fractalView.crudeRendering = !fractalView.crudeRendering;
-    	  return true;
       case R.id.saveImage:
     	  saveImage();
     	  return true;
