@@ -599,8 +599,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	
 	/* Launches a new Julia fractal activity with the given parameters */
-	private void launchJulia(double[] juliaParams)
-	   {
+	private void launchJulia(double[] juliaParams) {
 		   	Intent intent = new Intent(this, FractalActivity.class);
 			Bundle bundle = new Bundle();
 			bundle.putString("FractalType", FractalType.JULIA.toString());
