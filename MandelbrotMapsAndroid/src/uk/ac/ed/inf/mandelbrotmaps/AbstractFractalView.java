@@ -100,6 +100,8 @@ abstract class AbstractFractalView extends View {
 	
 	boolean zoomingFractal = false;
 	boolean hasZoomed = false;
+	boolean hasPassedMaxDepth = false;
+	boolean isAtMaxDepth = false;
 	
 	// Tracks scaling/ dragging position
 	private Matrix matrix;	
@@ -189,7 +191,8 @@ abstract class AbstractFractalView extends View {
 			fractalPixels = new int[getWidth() * getHeight()];
 			pixelSizes = new int[getWidth() * getHeight()];
 			clearPixelSizes();
-			scheduleNewRenders();
+			//scheduleNewRenders();
+			setGraphArea(graphArea, true);
 		}
 	
 		//Translation
@@ -394,7 +397,7 @@ abstract class AbstractFractalView extends View {
 		//Set the new location for the fractals
 		moveFractal((int)totalDragX, (int)totalDragY);
 		
-		if(!stoppedOnZoom) scheduleNewRenders();
+		if(!stoppedOnZoom) setGraphArea(graphArea, true);//scheduleNewRenders();
 		
 		// Reset all the variables (possibly paranoid)
 		if(!hasZoomed && !stoppedOnZoom) 
@@ -480,6 +483,8 @@ abstract class AbstractFractalView extends View {
 		newGraphArea[1] = newMaxY;
 		newGraphArea[2] = oldGraphArea[2] - leftWidthDiff - rightWidthDiff;
 		
+		Log.d(TAG, "Just zoomed - zoom level is " + getZoomLevel());
+		
 		setGraphArea(newGraphArea, false);
 	}
 	
@@ -539,11 +544,14 @@ abstract class AbstractFractalView extends View {
 	/* Checks if this zoom level if sane (within the chosen limits) */
 	boolean saneZoomLevel() {
 		int zoomLevel = getZoomLevel();
+		Log.d(TAG, "Zoom level - " + zoomLevel);
 		
-		if ((zoomLevel >= 1) &&	(zoomLevel <= ZOOM_SLIDER_SCALING)) 
+		if ((zoomLevel >= 1) &&	(zoomLevel <= 28 )) { //ZOOM_SLIDER_SCALING)) {
 			return true;
-		else 
+		}
+		else {
 			return false;
+		}
 	}
 	
 
@@ -575,7 +583,8 @@ abstract class AbstractFractalView extends View {
 				(scaledIterationCount * (Math.log(ITERATIONSCALING_MAX) - Math.log(ITERATIONSCALING_MIN))) /
 				CONTRAST_SLIDER_SCALING)
 			);
-			scheduleNewRenders();
+			//scheduleNewRenders();
+			setGraphArea(graphArea, true);
 		}
 	}
 	
@@ -602,17 +611,26 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 	/* Set a new graph area, if valid */
 	void setGraphArea(double[] newGraphArea, boolean newRender) {
-		// We have a predefined graphArea, so we can be picky with newGraphArea.
-		if (graphArea != null) {
+		// If a graph area already exists, be picky. 
+		//Don't bother checking for validity on the little view - zoom never changes
+		if (graphArea != null && fractalViewSize == FractalViewSize.LARGE) {
 			double[] initialGraphArea = graphArea;
 			graphArea = newGraphArea;
 			
-			// Zoom level is sane - let's allow this!
+			// Check for sane zoom level.
 			if (saneZoomLevel()) {
-				if(newRender)scheduleNewRenders();
+				Log.d(TAG, "Scheduling new renders...");
+				if(newRender) { 
+					scheduleNewRenders();
+					if (hasPassedMaxDepth) {
+						parentActivity.showToastOnUIThread("Maximum zoom depth reached.", Toast.LENGTH_SHORT);
+						hasPassedMaxDepth = false;
+					}
+				}
 			}
 			else {
 				// Zoom level is out of bounds, just roll back.
+				hasPassedMaxDepth = true;
 				graphArea = initialGraphArea;
 			}
 		} 
@@ -636,6 +654,9 @@ abstract class AbstractFractalView extends View {
 	
 	/* Reset the fractal to the home graph area */
 	public void canvasHome() {
+		stopAllRendering();
+		clearPixelSizes();
+		
 		// Default max iterations scaling
 		iterationScaling = ITERATIONSCALING_DEFAULT;
 		
@@ -643,6 +664,7 @@ abstract class AbstractFractalView extends View {
 		double[] newGraphArea = new double[homeGraphArea.length];
 		for (int i=0; i<homeGraphArea.length; i++) newGraphArea[i] = homeGraphArea[i];
 		setGraphArea(newGraphArea, true);
+		//scheduleNewRenders();
 	}
 
 	
@@ -781,6 +803,7 @@ abstract class AbstractFractalView extends View {
 		Log.d(TAG, "Jumping to bookmark");
 		
 		setGraphArea(bookmark, true);
+		//scheduleNewRenders();
 	}
 	
 	

@@ -36,7 +36,8 @@ public class JuliaFractalView extends AbstractFractalView{
 		//stopAllRendering();
 		juliaX = newJuliaX;
 		juliaY = newJuliaY;
-		scheduleNewRenders();
+		//scheduleNewRenders();
+		setGraphArea(graphArea, true);
 		
 		Log.d(TAG, "Setting new Julia param...");
 	}
