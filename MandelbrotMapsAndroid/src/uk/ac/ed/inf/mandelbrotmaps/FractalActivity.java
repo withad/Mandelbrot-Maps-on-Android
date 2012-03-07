@@ -64,7 +64,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	// Little fractal view tracking
 	public boolean showLittleAtStart = false;
-	private boolean showingLittle = false;
+	public boolean showingLittle = false;
 	private boolean littleFractalSelected = false;	
 	
 	// Loading spinner (currently all disabled due to slowdown)
@@ -452,7 +452,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					borderView.setBackgroundColor(Color.DKGRAY);
 					littleFractalSelected = true;
 				}
-				else if (showingLittle && fractalType == FractalType.MANDELBROT && !gestureDetector.isInProgress())	{
+				else if (showingLittle && fractalType == FractalType.MANDELBROT && !gestureDetector.isInProgress() 
+						/*&& !fractalView.holdingPin && (touchingPin(evt.getX(), evt.getY()))*/)	{
+					fractalView.holdingPin = true;
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
 				}
@@ -468,7 +470,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					if(currentlyDragging) {
 						dragFractal(evt);
 					}
-					else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT)	{
+					else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT /*&& fractalView.holdingPin*/)	{
 						double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 						((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
 					}
@@ -514,6 +516,22 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
 
 	
+	private boolean touchingPin(float x, float y) {
+		if (fractalType == FractalType.JULIA)
+			return false;
+		
+		boolean touchingPin = false;
+		float pinX = ((MandelbrotFractalView)fractalView).currentJuliaX;
+		float pinY = ((MandelbrotFractalView)fractalView).currentJuliaY;
+			
+		if(x <= pinX + 10 && x >= pinX - 10 && y <= pinY + 10 && y >= pinY - 10)
+			touchingPin = true;
+		
+		Log.d(TAG, "Touching pin = " + touchingPin);
+		
+		return touchingPin;
+}
+
 	private void startDragging(MotionEvent evt) {
 		   dragLastX = (int) evt.getX();
 		   dragLastY = (int) evt.getY();

@@ -3,6 +3,9 @@ package uk.ac.ed.inf.mandelbrotmaps;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.ColouringScheme;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.SpiralRenderer;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
@@ -10,6 +13,13 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	private final String TAG = "MMaps";
 	
 	ColouringScheme colourer = new SpiralRenderer();
+	
+	public float currentJuliaX = 0;
+	public float currentJuliaY = 0;
+	
+	Paint circlePaint;
+	Paint smallDotPaint;
+	
 	
 	public MandelbrotFractalView(Context context, FractalViewSize size) {
 		super(context, size);
@@ -28,9 +38,34 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 		// How deep a zoom do we allow?
 		MAXZOOM_LN_PIXEL = -31; // Beyond -31, "double"s break down(!).
+		
+		circlePaint = new Paint();
+		circlePaint.setColor(Color.BLUE);
+		circlePaint.setAlpha(50);
+		
+		smallDotPaint = new Paint();
+		smallDotPaint.setColor(Color.BLUE);
+		smallDotPaint.setAlpha(100);
 	}
 		
+	
+	@Override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
 		
+		Log.d(TAG, "Mandelbrot onDraw");
+		
+		getPinCoords();
+		
+		if(parentActivity.showingLittle) {
+			canvas.drawCircle(currentJuliaX, currentJuliaY, 5.0f, smallDotPaint);
+			canvas.drawCircle(currentJuliaX, currentJuliaY, 20.0f, circlePaint);
+		}
+		
+		
+	}
+	
+	
 	// Load a location
 	void loadLocation(MandelbrotJuliaLocation mjLocation) {
 		setScaledIterationCount(mjLocation.getMandelbrotContrast());
@@ -181,15 +216,39 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 	public double[] getJuliaParams(float touchX, float touchY)
 	{
+		currentJuliaX = touchX;
+		currentJuliaY = touchY;
+		
 		double[] mandelbrotGraphArea = graphArea;
 		double pixelSize = getPixelSize();
 	
 		double[] juliaParams = new double[2];
 		
-		// Mouse position, on the complex plane (translated from pixels)
+		// Touch position, on the complex plane (translated from pixels)
 		juliaParams[0] = mandelbrotGraphArea[0] + ( (double)touchX * pixelSize );
 		juliaParams[1] = mandelbrotGraphArea[1] - ( (double)touchY * pixelSize );
 		
+		Log.d(TAG, "Getting Julia params - " + mandelbrotGraphArea[0] + " + ("+touchX+"*"+pixelSize);
+		
 		return juliaParams;
+	}
+	
+	
+	public float[] getPinCoords() {
+		float[] pinCoords = new float[2];
+		
+		double[] currentJuliaParams = getJuliaParams(currentJuliaX, currentJuliaY);
+		
+		double pixelSize = getPixelSize();
+		Log.d(TAG, "Pixel size = " + pixelSize);
+		
+		pinCoords[0] = (float) ((currentJuliaParams[0] - graphArea[0]) / pixelSize);
+		pinCoords[1] = (float) (-(currentJuliaParams[1] - graphArea[1]) / pixelSize);
+		
+		Log.d(TAG, "Current Julia X = " + currentJuliaParams[0]);
+		Log.d(TAG, "Tap X = " + currentJuliaX + ". Calculated pin position X = " + pinCoords[0] + ".");
+		Log.d(TAG, "Tap Y = " + currentJuliaY + ". Calculated pin position Y = " + pinCoords[1] + ".");
+		
+		return pinCoords;
 	}
 }

@@ -91,6 +91,7 @@ abstract class AbstractFractalView extends View {
 	// Dragging state
 	private float totalDragX = 0;
 	private float totalDragY = 0;
+	public boolean holdingPin = false;
 	
 	// Scaling state
 	private float totalScaleFactor = 1.0f;
@@ -107,7 +108,7 @@ abstract class AbstractFractalView extends View {
 	private Matrix matrix;	
 	
 	// Handle to activity holding the view
-	private FractalActivity parentActivity;
+	public FractalActivity parentActivity;
 	
 	// Used to track length of a render
 	private long renderStartTime;
@@ -213,6 +214,8 @@ abstract class AbstractFractalView extends View {
 			bitmapCreations++;
 			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		}
+		
+		Log.d(TAG, "onDraw()");
 		
 		//Draw fractal image on screen
 		canvas.drawBitmap(fractalBitmap, matrix, new Paint());
