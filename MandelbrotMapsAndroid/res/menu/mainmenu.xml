@@ -6,6 +6,7 @@
     
     <item android:title="Set to bookmark" android:id="@+id/settobookmark"></item>
     <item android:id="@+id/shareImage" android:title="Share image"></item><item android:id="@+id/saveImage" android:title="Save image"></item>
+    <item android:id="@+id/preferences" android:title="Preferences"></item>
     
     
 </menu>

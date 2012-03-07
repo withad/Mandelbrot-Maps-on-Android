@@ -256,7 +256,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    public boolean onCreateOptionsMenu(Menu menu) {
       super.onCreateOptionsMenu(menu);
       MenuInflater inflater = getMenuInflater();
-      inflater.inflate(R.menu.navigationmenu, menu);
+      inflater.inflate(R.menu.mainmenu, menu);
       
       return true;
    }
@@ -277,6 +277,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       case R.id.settobookmark:
     	  fractalView.setToBookmark();
     	  return true;
+    	  
       case R.id.toggleLittle:
     	  if(showingLittle) {
     		  removeLittleView();
@@ -285,14 +286,21 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     		  addLittleView();
     	  }
     	  return true;
+    	  
       case R.id.resetFractal:
     	  fractalView.reset();
     	  return true;
+    	  
       case R.id.saveImage:
     	  saveImage();
     	  return true;
+    	  
       case R.id.shareImage:
     	  shareImage();
+    	  return true;
+    	  
+      case R.id.preferences:
+    	  startActivity(new Intent(this, Prefs.class));
     	  return true;
       }
       return false;
