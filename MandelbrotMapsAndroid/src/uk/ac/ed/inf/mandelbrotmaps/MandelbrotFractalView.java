@@ -41,11 +41,11 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 		circlePaint = new Paint();
 		circlePaint.setColor(Color.BLUE);
-		circlePaint.setAlpha(50);
+		circlePaint.setAlpha(75);
 		
 		smallDotPaint = new Paint();
 		smallDotPaint.setColor(Color.BLUE);
-		smallDotPaint.setAlpha(100);
+		smallDotPaint.setAlpha(120);
 	}
 		
 	

@@ -209,8 +209,8 @@ abstract class AbstractFractalView extends View {
 		midX = 0.0f;
 		midY = 0.0f;
 		
-		//Create new image only if not dragging or zooming
-		if(controlmode == ControlMode.STATIC) {
+		//Create new image only if not dragging, zooming, or moving the Julia pin
+		if(controlmode == ControlMode.STATIC && !holdingPin) {
 			bitmapCreations++;
 			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		}

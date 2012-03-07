@@ -453,7 +453,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					littleFractalSelected = true;
 				}
 				else if (showingLittle && fractalType == FractalType.MANDELBROT && !gestureDetector.isInProgress() 
-						/*&& !fractalView.holdingPin && (touchingPin(evt.getX(), evt.getY()))*/)	{
+						&& !fractalView.holdingPin && (touchingPin(evt.getX(), evt.getY())))	{
 					fractalView.holdingPin = true;
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
@@ -470,7 +470,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 					if(currentlyDragging) {
 						dragFractal(evt);
 					}
-					else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT /*&& fractalView.holdingPin*/)	{
+					else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT && fractalView.holdingPin)	{
+						fractalView.invalidate();
 						double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 						((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
 					}
@@ -508,7 +509,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 							finish();
 						}
 					}
-				}					
+				}
+				
+				fractalView.holdingPin = false;
 				
 				break;
 		}
@@ -524,7 +527,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		float pinX = ((MandelbrotFractalView)fractalView).currentJuliaX;
 		float pinY = ((MandelbrotFractalView)fractalView).currentJuliaY;
 			
-		if(x <= pinX + 10 && x >= pinX - 10 && y <= pinY + 10 && y >= pinY - 10)
+		if(x <= pinX + 20 && x >= pinX - 20 && y <= pinY + 20 && y >= pinY - 20)
 			touchingPin = true;
 		
 		Log.d(TAG, "Touching pin = " + touchingPin);
