@@ -546,7 +546,7 @@ abstract class AbstractFractalView extends View {
 		int zoomLevel = getZoomLevel();
 		Log.d(TAG, "Zoom level - " + zoomLevel);
 		
-		if ((zoomLevel >= 1) &&	(zoomLevel <= 28 )) { //ZOOM_SLIDER_SCALING)) {
+		if ((zoomLevel >= 1) &&	(zoomLevel <= ZOOM_SLIDER_SCALING)) {
 			return true;
 		}
 		else {
