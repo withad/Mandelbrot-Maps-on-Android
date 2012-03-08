@@ -58,8 +58,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		
-		Log.d(TAG, "Mandelbrot onDraw");
-		
 		if(parentActivity.showingLittle && drawPin) {
 			if(controlmode != ControlMode.ZOOMING) pinCoords = getPinCoords();
 			float[] mappedCoords = new float[2];
