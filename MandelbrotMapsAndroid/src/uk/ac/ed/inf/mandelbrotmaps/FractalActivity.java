@@ -524,8 +524,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			return false;
 		
 		boolean touchingPin = false;
-		float pinX = ((MandelbrotFractalView)fractalView).currentJuliaX;
-		float pinY = ((MandelbrotFractalView)fractalView).currentJuliaY;
+		float[] pinCoords = ((MandelbrotFractalView)fractalView).getPinCoords();
+		float pinX = pinCoords[0];
+		float pinY = pinCoords[1];
 			
 		if(x <= pinX + 20 && x >= pinX - 20 && y <= pinY + 20 && y >= pinY - 20)
 			touchingPin = true;

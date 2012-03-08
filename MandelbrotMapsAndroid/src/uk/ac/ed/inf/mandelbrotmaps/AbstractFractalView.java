@@ -55,7 +55,7 @@ abstract class AbstractFractalView extends View {
 		DRAGGING,
 		STATIC
 	}
-	private ControlMode controlmode = ControlMode.STATIC;
+	public ControlMode controlmode = ControlMode.STATIC;
 	
 	// The size of the fractal view - whether it's the main one or little and in the corner
 	public static enum FractalViewSize{
@@ -89,8 +89,8 @@ abstract class AbstractFractalView extends View {
 	public float bitmapY = 0;
 	
 	// Dragging state
-	private float totalDragX = 0;
-	private float totalDragY = 0;
+	public float totalDragX = 0;
+	public float totalDragY = 0;
 	public boolean holdingPin = false;
 	
 	// Scaling state
@@ -105,7 +105,7 @@ abstract class AbstractFractalView extends View {
 	boolean isAtMaxDepth = false;
 	
 	// Tracks scaling/ dragging position
-	private Matrix matrix;	
+	public Matrix matrix;	
 	
 	// Handle to activity holding the view
 	public FractalActivity parentActivity;
@@ -115,6 +115,8 @@ abstract class AbstractFractalView extends View {
 	
 	// Track number of times bitmap is recreated onDraw (debug info)
 	int bitmapCreations = 0;
+	
+	boolean drawPin = true;
 	
 	
 	
@@ -524,10 +526,12 @@ abstract class AbstractFractalView extends View {
 		
 		stopAllRendering();
 		
+		drawPin = false;
 		setDrawingCacheEnabled(true);
 		fractalBitmap = Bitmap.createBitmap(getDrawingCache());
 		fractalBitmap.getPixels(fractalPixels, 0, getWidth(), 0, 0, getWidth(), getHeight());
 		setDrawingCacheEnabled(false);
+		drawPin = true;
 		
 		bitmapX = 0;
 		bitmapY = 0;

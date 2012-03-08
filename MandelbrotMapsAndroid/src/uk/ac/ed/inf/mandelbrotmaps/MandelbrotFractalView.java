@@ -14,11 +14,16 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 	ColouringScheme colourer = new SpiralRenderer();
 	
-	public float currentJuliaX = 0;
-	public float currentJuliaY = 0;
+	public float lastTouchX = 0;
+	public float lastTouchY = 0;
+	
+	public double[] currentJuliaParams = new double[2];
+	private float[] pinCoords = new float[2];
 	
 	Paint circlePaint;
 	Paint smallDotPaint;
+	
+	
 	
 	
 	public MandelbrotFractalView(Context context, FractalViewSize size) {
@@ -55,14 +60,13 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 		Log.d(TAG, "Mandelbrot onDraw");
 		
-		getPinCoords();
-		
-		if(parentActivity.showingLittle) {
-			canvas.drawCircle(currentJuliaX, currentJuliaY, 5.0f, smallDotPaint);
-			canvas.drawCircle(currentJuliaX, currentJuliaY, 20.0f, circlePaint);
+		if(parentActivity.showingLittle && drawPin) {
+			if(controlmode != ControlMode.ZOOMING) pinCoords = getPinCoords();
+			float[] mappedCoords = new float[2];
+			matrix.mapPoints(mappedCoords, pinCoords);
+			canvas.drawCircle(mappedCoords[0], mappedCoords[1], 5.0f, smallDotPaint);
+			canvas.drawCircle(mappedCoords[0], mappedCoords[1], 20.0f, circlePaint);
 		}
-		
-		
 	}
 	
 	
@@ -216,8 +220,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 	public double[] getJuliaParams(float touchX, float touchY)
 	{
-		currentJuliaX = touchX;
-		currentJuliaY = touchY;
+		lastTouchX = touchX;
+		lastTouchY = touchY;
 		
 		double[] mandelbrotGraphArea = graphArea;
 		double pixelSize = getPixelSize();
@@ -228,26 +232,22 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		juliaParams[0] = mandelbrotGraphArea[0] + ( (double)touchX * pixelSize );
 		juliaParams[1] = mandelbrotGraphArea[1] - ( (double)touchY * pixelSize );
 		
-		Log.d(TAG, "Getting Julia params - " + mandelbrotGraphArea[0] + " + ("+touchX+"*"+pixelSize);
+		currentJuliaParams = juliaParams;
 		
 		return juliaParams;
 	}
 	
 	
-	public float[] getPinCoords() {
+	public float[] getPinCoords() {		
 		float[] pinCoords = new float[2];
-		
-		double[] currentJuliaParams = getJuliaParams(currentJuliaX, currentJuliaY);
-		
 		double pixelSize = getPixelSize();
-		Log.d(TAG, "Pixel size = " + pixelSize);
 		
 		pinCoords[0] = (float) ((currentJuliaParams[0] - graphArea[0]) / pixelSize);
 		pinCoords[1] = (float) (-(currentJuliaParams[1] - graphArea[1]) / pixelSize);
 		
-		Log.d(TAG, "Current Julia X = " + currentJuliaParams[0]);
-		Log.d(TAG, "Tap X = " + currentJuliaX + ". Calculated pin position X = " + pinCoords[0] + ".");
-		Log.d(TAG, "Tap Y = " + currentJuliaY + ". Calculated pin position Y = " + pinCoords[1] + ".");
+/*		Log.d(TAG, "Current Julia X = " + currentJuliaParams[0]);
+		Log.d(TAG, "Tap X = " + lastTouchX + ". Calculated pin position X = " + pinCoords[0] + ".");
+		Log.d(TAG, "Tap Y = " + lastTouchY + ". Calculated pin position Y = " + pinCoords[1] + ".");*/
 		
 		return pinCoords;
 	}
