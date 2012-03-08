@@ -92,8 +92,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	  
 	  	Bundle bundle = getIntent().getExtras();
 	  
-	  	double juliaX = 0;
-	  	double juliaY = 0;
+	  	double[] juliaParams = MandelbrotJuliaLocation.defaultJuliaParams;
+	  	double[] juliaGraphArea = MandelbrotJuliaLocation.defaultJuliaGraphArea;
   
 	  	relativeLayout = new RelativeLayout(this);
       
@@ -110,18 +110,18 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		}
 		else if (fractalType == FractalType.JULIA) {
 			fractalView = new JuliaFractalView(this, FractalViewSize.LARGE);
-			juliaX = bundle.getDouble("JULIA_X");
-			juliaY = bundle.getDouble("JULIA_Y");
+			/*juliaX = bundle.getDouble("JULIA_X");
+			juliaY = bundle.getDouble("JULIA_Y");*/
+			juliaParams = bundle.getDoubleArray("JuliaParams");
+			juliaGraphArea = bundle.getDoubleArray("JuliaGraphArea");
 		}
 		
 		LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 		relativeLayout.addView(fractalView, lp);
 		setContentView(relativeLayout);
 		
-		mjLocation = new MandelbrotJuliaLocation();
+		mjLocation = new MandelbrotJuliaLocation(juliaGraphArea, juliaParams);
 		fractalView.loadLocation(mjLocation);
-		if(fractalType == FractalType.JULIA)
-		((JuliaFractalView)fractalView).setJuliaParameter(juliaX, juliaY);
 		
 		gestureDetector = new ScaleGestureDetector(this, this);
 	}
@@ -675,6 +675,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			
 			bundle.putDouble("JULIA_X", juliaParams[0]);
 			bundle.putDouble("JULIA_Y", juliaParams[1]);
+			bundle.putDoubleArray("JuliaParams", juliaParams);
+			bundle.putDoubleArray("JuliaGraphArea", littleFractalView.graphArea);
 			
 			intent.putExtras(bundle);
 			startActivityForResult(intent, RETURN_FROM_JULIA);
