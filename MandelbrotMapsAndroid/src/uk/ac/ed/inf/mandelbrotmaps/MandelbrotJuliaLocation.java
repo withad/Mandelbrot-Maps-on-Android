@@ -5,7 +5,7 @@ class MandelbrotJuliaLocation {
 	//private URL urlBase;
 	private double[] mandelbrotGraphArea;
 	private double[] juliaGraphArea;
-	private double[] juliaParam;
+	private double[] juliaParams;
 	private int mandelbrotContrast = -1;
 	private int juliaContrast = -1;
 	
@@ -13,7 +13,20 @@ class MandelbrotJuliaLocation {
 	public MandelbrotJuliaLocation() {
 		mandelbrotGraphArea = new double[] {-3.1, 1.45, 5};
 		juliaGraphArea = new double[] {-2.2, 1.25, 4.3};
-		juliaParam = new double[] {0.152, 0.584};
+		juliaParams = new double[] {0.152, 0.584};
+	}
+	
+	public MandelbrotJuliaLocation(double[] _mandelbrotGraphArea, double[] _juliaGraphArea, double[] _juliaParams) {
+		mandelbrotGraphArea = _mandelbrotGraphArea;
+		juliaGraphArea = _juliaGraphArea;
+		juliaParams = _juliaParams;
+	}
+	
+	
+	public MandelbrotJuliaLocation(double[] _juliaGraphArea, double[] _juliaParams) {
+		mandelbrotGraphArea = new double[] {-3.1, 1.45, 5};
+		juliaGraphArea = _juliaGraphArea;
+		juliaParams = _juliaParams;
 	}
 	
 	public void setMandelbrotGraphArea(double[] newMandelbrotGraphArea) {
@@ -29,7 +42,7 @@ class MandelbrotJuliaLocation {
 	}
 	
 	public double[] getJuliaParam() {
-		return juliaParam;
+		return juliaParams;
 	}
 	
 	public int getMandelbrotContrast() {

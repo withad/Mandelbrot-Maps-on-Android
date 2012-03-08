@@ -55,7 +55,7 @@ abstract class AbstractFractalView extends View {
 		DRAGGING,
 		STATIC
 	}
-	private ControlMode controlmode = ControlMode.STATIC;
+	public ControlMode controlmode = ControlMode.STATIC;
 	
 	// The size of the fractal view - whether it's the main one or little and in the corner
 	public static enum FractalViewSize{
@@ -89,8 +89,8 @@ abstract class AbstractFractalView extends View {
 	public float bitmapY = 0;
 	
 	// Dragging state
-	private float totalDragX = 0;
-	private float totalDragY = 0;
+	public float totalDragX = 0;
+	public float totalDragY = 0;
 	public boolean holdingPin = false;
 	
 	// Scaling state
@@ -105,7 +105,7 @@ abstract class AbstractFractalView extends View {
 	boolean isAtMaxDepth = false;
 	
 	// Tracks scaling/ dragging position
-	private Matrix matrix;	
+	public Matrix matrix;	
 	
 	// Handle to activity holding the view
 	public FractalActivity parentActivity;
@@ -115,6 +115,8 @@ abstract class AbstractFractalView extends View {
 	
 	// Track number of times bitmap is recreated onDraw (debug info)
 	int bitmapCreations = 0;
+	
+	boolean drawPin = true;
 	
 	
 	
@@ -215,8 +217,6 @@ abstract class AbstractFractalView extends View {
 			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		}
 		
-		Log.d(TAG, "onDraw()");
-		
 		//Draw fractal image on screen
 		canvas.drawBitmap(fractalBitmap, matrix, new Paint());
 	}
@@ -268,6 +268,9 @@ abstract class AbstractFractalView extends View {
 	void scheduleNewRenders() {		
 		// Abort current and future renders
 		stopAllRendering();
+		
+		// New render won't have passed maximum depth, reset check
+		hasPassedMaxDepth = false;
 		
 		// Try showing the progress spinner (won't show if, as normal, it's disallowed)
 		if(fractalViewSize == FractalViewSize.LARGE)
@@ -524,10 +527,12 @@ abstract class AbstractFractalView extends View {
 		
 		stopAllRendering();
 		
+		drawPin = false;
 		setDrawingCacheEnabled(true);
 		fractalBitmap = Bitmap.createBitmap(getDrawingCache());
 		fractalBitmap.getPixels(fractalPixels, 0, getWidth(), 0, 0, getWidth(), getHeight());
 		setDrawingCacheEnabled(false);
+		drawPin = true;
 		
 		bitmapX = 0;
 		bitmapY = 0;
@@ -539,7 +544,13 @@ abstract class AbstractFractalView extends View {
 	
 	/* Returns zoom level, in range 0..ZOOM_SLIDER_SCALING	(logarithmic scale) */
 	public int getZoomLevel() {
-		double lnPixelSize = Math.log(getPixelSize());
+		double pixelSize = getPixelSize();
+		
+		// If the pixel size = 0, something's wrong (happens at Julia launch). 
+		if (pixelSize == 0.0d)
+			return 1;
+		
+		double lnPixelSize = Math.log(pixelSize);
 		double zoomLevel = (double)ZOOM_SLIDER_SCALING * (lnPixelSize-MINZOOM_LN_PIXEL) / (MAXZOOM_LN_PIXEL-MINZOOM_LN_PIXEL);
 		return (int)zoomLevel;
 	}
@@ -622,13 +633,11 @@ abstract class AbstractFractalView extends View {
 			
 			// Check for sane zoom level.
 			if (saneZoomLevel()) {
-				Log.d(TAG, "Scheduling new renders...");
-				if(newRender) { 
-					scheduleNewRenders();
+				if(newRender) {
 					if (hasPassedMaxDepth) {
 						parentActivity.showToastOnUIThread("Maximum zoom depth reached.", Toast.LENGTH_SHORT);
-						hasPassedMaxDepth = false;
 					}
+					scheduleNewRenders();
 				}
 			}
 			else {

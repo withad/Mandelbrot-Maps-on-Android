@@ -30,7 +30,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private final String TAG = "MMaps";
 	
 	// Constants
-	private int SHARE_IMAGE_REQUEST = 0;
+	private final int SHARE_IMAGE_REQUEST = 0;
+	private final int RETURN_FROM_JULIA = 1;
 	
 	// Type of fractal displayed in the main fractal view
 	public static enum FractalType {
@@ -137,9 +138,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   littleFractalView.stopAllRendering();
 		   littleFractalView.interruptThreads();
 	   }
+	   
+	   
    }
    
-   /* When paused, dismiss the saving dialog. Might be buggy if mid-save?
+   /* When paused, do the following, dismiss the saving dialog. Might be buggy if mid-save?
     * (non-Javadoc)
     * @see android.app.Activity#onPause()
     */
@@ -148,9 +151,51 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   super.onPause();
 	   if(savingDialog != null) 
 		   savingDialog.dismiss();
-   }   
+   }
    
    
+   /* Set the activity result when finishing, if needed
+    * (non-Javadoc)
+    * @see android.app.Activity#finish()
+    */
+   @Override
+   public void finish() {
+	   if(fractalType == FractalType.JULIA) {
+		   double[] juliaParams = ((JuliaFractalView)fractalView).getJuliaParam();
+		   double[] currentGraphArea = fractalView.graphArea;
+		   
+		   Intent result = new Intent();
+		   Log.d(TAG, ""+juliaParams[0]);
+		   result.putExtra("JuliaParams", juliaParams);
+		   result.putExtra("JuliaGraphArea", currentGraphArea);
+		   
+		   setResult(Activity.RESULT_OK, result);
+	   }
+	   
+	   super.finish();
+   }
+   
+   
+   //Get result of launched activity (only time used is after sharing, so delete temp. image)
+   @Override
+   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	   
+	   switch (requestCode) {
+	   case SHARE_IMAGE_REQUEST:
+		   // Delete the temporary image
+		   imagefile.delete();
+		   break;
+		   
+	   case RETURN_FROM_JULIA:
+		   if(showingLittle) {
+			   
+			   double[] juliaGraphArea = data.getDoubleArrayExtra("JuliaGraphArea");
+			   double[] juliaParams = data.getDoubleArrayExtra("JuliaParams");
+			   littleFractalView.loadLocation(new MandelbrotJuliaLocation(juliaGraphArea, juliaParams));
+		   }
+		   break;
+	   }
+  	}
    
 /*-----------------------------------------------------------------------------------*/
 /*Dynamic UI creation*/
@@ -427,17 +472,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
 	
    
-   	//Get result of launched activity (only time used is after sharing, so delete temp. image)
-   	@Override
-   	protected void onActivityResult(int requestCode, int resultCode, Intent data)
-   	{
-	   	if (requestCode == SHARE_IMAGE_REQUEST) {
-	   		Log.d(TAG, "Deleting temporary jpg " + imagefile.getAbsolutePath());
-			imagefile.delete();
-	   	}
-   	}
-
-   
 
 /*-----------------------------------------------------------------------------------*/
 /*Touch controls*/
@@ -455,6 +489,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				else if (showingLittle && fractalType == FractalType.MANDELBROT && !gestureDetector.isInProgress() 
 						&& !fractalView.holdingPin && (touchingPin(evt.getX(), evt.getY())))	{
 					fractalView.holdingPin = true;
+					littleFractalView.graphArea = littleFractalView.homeGraphArea;
 					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
 					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
 				}
@@ -524,8 +559,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			return false;
 		
 		boolean touchingPin = false;
-		float pinX = ((MandelbrotFractalView)fractalView).currentJuliaX;
-		float pinY = ((MandelbrotFractalView)fractalView).currentJuliaY;
+		float[] pinCoords = ((MandelbrotFractalView)fractalView).getPinCoords();
+		float pinX = pinCoords[0];
+		float pinY = pinCoords[1];
 			
 		if(x <= pinX + 20 && x >= pinX - 20 && y <= pinY + 20 && y >= pinY - 20)
 			touchingPin = true;
@@ -641,6 +677,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			bundle.putDouble("JULIA_Y", juliaParams[1]);
 			
 			intent.putExtras(bundle);
-			startActivity(intent);
+			startActivityForResult(intent, RETURN_FROM_JULIA);
 	   }
 }
