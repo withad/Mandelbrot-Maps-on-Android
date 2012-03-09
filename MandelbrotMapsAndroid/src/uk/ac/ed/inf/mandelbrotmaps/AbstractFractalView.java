@@ -5,9 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import uk.ac.ed.inf.mandelbrotmaps.FractalActivity.FractalType;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -627,6 +629,7 @@ abstract class AbstractFractalView extends View {
 	void setGraphArea(double[] newGraphArea, boolean newRender) {
 		// If a graph area already exists, be picky. 
 		//Don't bother checking for validity on the little view - zoom never changes
+		Log.d(TAG, "Default Mandelbrot area at start: " + MandelbrotJuliaLocation.defaultMandelbrotGraphArea[0]);
 		if (graphArea != null && fractalViewSize == FractalViewSize.LARGE) {
 			double[] initialGraphArea = graphArea;
 			graphArea = newGraphArea;
@@ -637,6 +640,7 @@ abstract class AbstractFractalView extends View {
 					if (hasPassedMaxDepth) {
 						parentActivity.showToastOnUIThread("Maximum zoom depth reached.", Toast.LENGTH_SHORT);
 					}
+					Log.d(TAG, "New graph area xmin: " + graphArea[0]);
 					scheduleNewRenders();
 				}
 			}
@@ -645,12 +649,14 @@ abstract class AbstractFractalView extends View {
 				hasPassedMaxDepth = true;
 				graphArea = initialGraphArea;
 			}
-		} 
+		}
 		else {
 			// There is no predefined graphArea; we'll have to accept whatever newGraphArea is.
 			graphArea = newGraphArea;
 			if(newRender) scheduleNewRenders();
 		}
+		
+		Log.d(TAG, "Default Mandelbrot area at end: " + MandelbrotJuliaLocation.defaultMandelbrotGraphArea[0]);
 	}
 	
 	/* Compute length of 1 pixel on the complex plane */
@@ -670,13 +676,21 @@ abstract class AbstractFractalView extends View {
 		clearPixelSizes();
 		
 		// Default max iterations scaling
-		iterationScaling = ITERATIONSCALING_DEFAULT;
+		//iterationScaling = ITERATIONSCALING_DEFAULT;
+		
+		Log.d(TAG, "Reset hit.");
 		
 		// Default graph area
-		double[] newGraphArea = new double[homeGraphArea.length];
-		for (int i=0; i<homeGraphArea.length; i++) newGraphArea[i] = homeGraphArea[i];
-		setGraphArea(newGraphArea, true);
-		//scheduleNewRenders();
+		double[] newGraphArea = new double[3];
+		for (int i = 0; i < newGraphArea.length; i++)
+			newGraphArea[i] = MandelbrotJuliaLocation.defaultMandelbrotGraphArea[i];
+		
+		if (parentActivity.fractalType == FractalType.MANDELBROT) {
+			Log.d(TAG, "Mandelbrot reset. xmin should be: " + newGraphArea[0]);
+			setGraphArea(newGraphArea, true);
+		}
+		else
+			setGraphArea(MandelbrotJuliaLocation.defaultJuliaGraphArea, true);
 	}
 
 	
@@ -796,7 +810,7 @@ abstract class AbstractFractalView extends View {
 		clearPixelSizes();
 		canvasHome();
 		
-		postInvalidate();
+		//postInvalidate();
 	}
 	
 	/* Sets to a predetermined spot that takes a while to render (just used for debugging) */
@@ -815,7 +829,6 @@ abstract class AbstractFractalView extends View {
 		Log.d(TAG, "Jumping to bookmark");
 		
 		setGraphArea(bookmark, true);
-		//scheduleNewRenders();
 	}
 	
 	

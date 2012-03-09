@@ -37,8 +37,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	public static enum FractalType {
 		MANDELBROT,
 		JULIA
-	}	
-	private FractalType fractalType = FractalType.MANDELBROT;
+	}
+	public FractalType fractalType = FractalType.MANDELBROT;
 
 	// Layout variables
 	private AbstractFractalView fractalView;
