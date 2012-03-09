@@ -110,8 +110,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		}
 		else if (fractalType == FractalType.JULIA) {
 			fractalView = new JuliaFractalView(this, FractalViewSize.LARGE);
-			/*juliaX = bundle.getDouble("JULIA_X");
-			juliaY = bundle.getDouble("JULIA_Y");*/
 			juliaParams = bundle.getDoubleArray("JuliaParams");
 			juliaGraphArea = bundle.getDoubleArray("JuliaGraphArea");
 		}
