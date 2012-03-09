@@ -486,10 +486,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				}
 				else if (showingLittle && fractalType == FractalType.MANDELBROT && !gestureDetector.isInProgress() 
 						&& !fractalView.holdingPin && (touchingPin(evt.getX(), evt.getY())))	{
+					// Take hold of the pin, reset the little fractal view.
 					fractalView.holdingPin = true;
-					littleFractalView.graphArea = littleFractalView.homeGraphArea;
-					double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
-					((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+					littleFractalView.graphArea = MandelbrotJuliaLocation.defaultJuliaGraphArea;
+					updateLittleJulia(evt.getX(), evt.getY());
 				}
 				else {
 					startDragging(evt);	
@@ -504,9 +504,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 						dragFractal(evt);
 					}
 					else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT && fractalView.holdingPin)	{
-						fractalView.invalidate();
-						double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(evt.getX(), evt.getY());
-						((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+						updateLittleJulia(evt.getX(), evt.getY());
 					}
 				}
 				
@@ -543,8 +541,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 						}
 					}
 				}
-				
-				fractalView.holdingPin = false;
+				// If holding the pin, drop it, update screen (render won't display while dragging, might've finished in background)
+				else if(fractalView.holdingPin) {
+					fractalView.holdingPin = false;
+					updateLittleJulia(evt.getX(), evt.getY());				
+				}
 				
 				break;
 		}
@@ -663,20 +664,26 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	/* Launches a new Julia fractal activity with the given parameters */
 	private void launchJulia(double[] juliaParams) {
-		   	Intent intent = new Intent(this, FractalActivity.class);
-			Bundle bundle = new Bundle();
-			bundle.putString("FractalType", FractalType.JULIA.toString());
-			bundle.putBoolean("ShowLittleAtStart", true);
-			
-			Log.d(TAG, "Mandelbrot Graph Area at launch: " + (mjLocation.getMandelbrotGraphArea())[0]);
-			bundle.putDoubleArray("LittleMandelbrotLocation", fractalView.graphArea);
-			
-			bundle.putDouble("JULIA_X", juliaParams[0]);
-			bundle.putDouble("JULIA_Y", juliaParams[1]);
-			bundle.putDoubleArray("JuliaParams", juliaParams);
-			bundle.putDoubleArray("JuliaGraphArea", littleFractalView.graphArea);
-			
-			intent.putExtras(bundle);
-			startActivityForResult(intent, RETURN_FROM_JULIA);
-	   }
+	   	Intent intent = new Intent(this, FractalActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("FractalType", FractalType.JULIA.toString());
+		bundle.putBoolean("ShowLittleAtStart", true);
+		
+		Log.d(TAG, "Mandelbrot Graph Area at launch: " + (mjLocation.getMandelbrotGraphArea())[0]);
+		bundle.putDoubleArray("LittleMandelbrotLocation", fractalView.graphArea);
+		
+		bundle.putDouble("JULIA_X", juliaParams[0]);
+		bundle.putDouble("JULIA_Y", juliaParams[1]);
+		bundle.putDoubleArray("JuliaParams", juliaParams);
+		bundle.putDoubleArray("JuliaGraphArea", littleFractalView.graphArea);
+		
+		intent.putExtras(bundle);
+		startActivityForResult(intent, RETURN_FROM_JULIA);
+	}
+	
+	private void updateLittleJulia(float x, float y) {
+		fractalView.invalidate();
+		double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(x, y);
+		((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+	}
 }
