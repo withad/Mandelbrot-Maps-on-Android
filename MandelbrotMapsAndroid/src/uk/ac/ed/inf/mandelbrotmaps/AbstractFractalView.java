@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -119,8 +118,6 @@ abstract class AbstractFractalView extends View {
 	int bitmapCreations = 0;
 	
 	boolean drawPin = true;
-	
-	boolean allowCrudeRendering = true;
 	
 	
 	
@@ -289,7 +286,7 @@ abstract class AbstractFractalView extends View {
 		
 		
 		//Schedule a crude rendering if needed (not the small view, not a small zoom)
-		if(allowCrudeRendering && fractalViewSize != FractalViewSize.LITTLE && (totalScaleFactor < 0.6f|| totalScaleFactor == 1.0f || totalScaleFactor > 3.5f)) {
+		if(Prefs.performCrude(getContext()) && fractalViewSize != FractalViewSize.LITTLE && (totalScaleFactor < 0.6f|| totalScaleFactor == 1.0f || totalScaleFactor > 3.5f)) {
 			scheduleRendering(CRUDE_PIXEL_BLOCK);
 		}
 		totalScaleFactor = 1.0f; // Needs reset once checked, so that next render doesn't account for it.
