@@ -223,8 +223,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   relativeLayout.bringChildToFront(littleFractalView);
 		   return;
 	   }
-	   
-	   
+		   
 	   
 	   //Show a little Julia next to a Mandelbrot and vice versa
 	   if(fractalType == FractalType.MANDELBROT) {
@@ -277,6 +276,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   
 	   relativeLayout.removeView(borderView);
 	   relativeLayout.removeView(littleFractalView);
+	   
+	   littleFractalView.interruptThreads();
 	   
 	   showingLittle = false;
    }
