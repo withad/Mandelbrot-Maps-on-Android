@@ -92,8 +92,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	  
 	  	Bundle bundle = getIntent().getExtras();
 	  
-	  	double[] juliaParams = MandelbrotJuliaLocation.defaultJuliaParams;
-	  	double[] juliaGraphArea = MandelbrotJuliaLocation.defaultJuliaGraphArea;
+	  	mjLocation = new MandelbrotJuliaLocation();
+	  	double[] juliaParams = mjLocation.defaultJuliaParams;
+	  	double[] juliaGraphArea = mjLocation.defaultJuliaGraphArea;
   
 	  	relativeLayout = new RelativeLayout(this);
       
@@ -488,7 +489,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 						&& !fractalView.holdingPin && (touchingPin(evt.getX(), evt.getY())))	{
 					// Take hold of the pin, reset the little fractal view.
 					fractalView.holdingPin = true;
-					littleFractalView.graphArea = MandelbrotJuliaLocation.defaultJuliaGraphArea;
+					littleFractalView.graphArea = new MandelbrotJuliaLocation().defaultJuliaGraphArea;
 					updateLittleJulia(evt.getX(), evt.getY());
 				}
 				else {
