@@ -25,6 +25,14 @@
 	      android:defaultValue="MandelbrotDefault"
 	      android:entries="@array/colourSchemeEntries"
 	      android:entryValues="@array/colourSchemeValues" />
+	      
+      	<ListPreference
+	      android:key="PIN_COLOUR"
+	      android:title="Julia pin colour"
+	      android:summary="The colour of the circles pinpoint the current Julia fractal in the Mandelbrot."
+	      android:defaultValue="@color/"
+	      android:entries="@array/colourSchemeEntries"
+	      android:entryValues="@array/colourSchemeValues" />
    </PreferenceCategory>
       
 </PreferenceScreen>

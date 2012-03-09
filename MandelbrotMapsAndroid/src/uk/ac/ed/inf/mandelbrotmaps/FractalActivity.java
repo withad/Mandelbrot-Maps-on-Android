@@ -721,6 +721,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				littleFractalView.setColouringScheme(mandelbrotScheme, true);
 			}
 		}
+		
 		else if(changedPref.equals("JULIA_COLOURS")) {
 			String juliaScheme = prefs.getString(changedPref, "MandelbrotDefault");
 			
@@ -729,6 +730,17 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			}
 			else if (showingLittle) {
 				littleFractalView.setColouringScheme(juliaScheme, true);
+			}
+		}
+		
+		else if(changedPref.equals("PIN_COLOUR")) {
+			int newColour = prefs.getInt(changedPref, Color.BLUE);
+			
+			if(fractalType == FractalType.MANDELBROT) {
+				((MandelbrotFractalView)fractalView).setPinColour(newColour);
+			}
+			else if (showingLittle) {
+				((MandelbrotFractalView)littleFractalView).setPinColour(newColour);
 			}
 		}
 	}

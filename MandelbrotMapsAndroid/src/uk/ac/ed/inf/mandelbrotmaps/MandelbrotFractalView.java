@@ -51,22 +51,25 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		// How deep a zoom do we allow?
 		MAXZOOM_LN_PIXEL = -31; // Beyond -31, "double"s break down(!).
 		
+		
+		int pinColour = PreferenceManager.getDefaultSharedPreferences(getContext()).getInt("PIN_COLOUR", Color.BLUE);
+		
 		circlePaint = new Paint();
-		circlePaint.setColor(Color.BLUE);
+		circlePaint.setColor(pinColour);
 		circlePaint.setAlpha(75);
 		//circlePaint.setStyle(Style.STROKE);
 		
 		smallDotPaint = new Paint();
-		smallDotPaint.setColor(Color.BLUE);
+		smallDotPaint.setColor(pinColour);
 		smallDotPaint.setAlpha(120);
 		
 		littleViewPaint = new Paint();
-		littleViewPaint.setColor(Color.BLUE);
+		littleViewPaint.setColor(pinColour);
 		littleViewPaint.setAlpha(180);
 		littleViewPaint.setStyle(Style.STROKE);
 		
 		selectedCirclePaint = new Paint();
-		selectedCirclePaint.setColor(Color.BLUE);
+		selectedCirclePaint.setColor(pinColour);
 		selectedCirclePaint.setAlpha(100);
 	}
 		
@@ -295,5 +298,15 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		pinCoords[1] = (float) (-(currentJuliaParams[1] - graphArea[1]) / pixelSize);
 		
 		return pinCoords;
+	}
+	
+	
+	public void setPinColour(int newColour) {
+		circlePaint.setColor(newColour);
+		selectedCirclePaint.setColor(newColour);
+		smallDotPaint.setColor(newColour);
+		littleViewPaint.setColor(newColour);
+		
+		invalidate();
 	}
 }
