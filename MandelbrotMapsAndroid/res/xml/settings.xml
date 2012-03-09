@@ -2,9 +2,9 @@
 <PreferenceScreen
    xmlns:android="http://schemas.android.com/apk/res/android">
    <CheckBoxPreference
-      android:key="example1"
-      android:title="Example1"
-      android:summary="Example preference"
+      android:key="CRUDE"
+      android:title="Use crude rendering"
+      android:summary="Performing a crude render with large pixel blocks gets a rough image faster but makes the full render take longer."
       android:defaultValue="true" />
    <CheckBoxPreference
       android:key="example2"
