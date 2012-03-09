@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -25,6 +26,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	Paint circlePaint;
 	Paint smallDotPaint;
 	Paint selectedCirclePaint;
+	Paint littleViewPaint;
 	
 	private float smallCircleRadius = 5.0f;
 	private float largeCircleRadius = 20.0f;
@@ -53,14 +55,21 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		circlePaint = new Paint();
 		circlePaint.setColor(Color.BLUE);
 		circlePaint.setAlpha(75);
+		circlePaint.setStyle(Style.STROKE);
 		
 		smallDotPaint = new Paint();
 		smallDotPaint.setColor(Color.BLUE);
 		smallDotPaint.setAlpha(120);
 		
+		littleViewPaint = new Paint();
+		littleViewPaint.setColor(Color.BLUE);
+		littleViewPaint.setAlpha(180);
+		littleViewPaint.setStyle(Style.STROKE);
+		
 		selectedCirclePaint = new Paint();
 		selectedCirclePaint.setColor(Color.BLUE);
 		selectedCirclePaint.setAlpha(100);
+		//selectedCirclePaint.setStyle(Style.STROKE);
 	}
 		
 	
@@ -83,7 +92,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					canvas.drawCircle(mappedCoords[0], mappedCoords[1], largeCircleRadius*2, selectedCirclePaint);
 			}
 			else if (fractalViewSize == FractalViewSize.LITTLE) {
-				canvas.drawCircle(mappedCoords[0], mappedCoords[1], smallCircleRadius, smallDotPaint);
+				canvas.drawCircle(mappedCoords[0], mappedCoords[1], smallCircleRadius, littleViewPaint);
 			}
 		}
 	}
