@@ -88,14 +88,22 @@ public class JuliaFractalView extends AbstractFractalView{
 			//Log.d(TAG, "Initial time: " + initialMillis);
 			
 			int pixelIncrement = pixelBlockSize * noOfThreads;
-			int skippedCount = 0;
+			int originalIncrement = pixelIncrement;
 			
-			for (yIncrement = yPixelMin; yPixel < yPixelMax+1-pixelBlockSize; yIncrement+= pixelIncrement) {	
+			int skippedCount = 0;
+			int loopCount = 0;
+			
+			for (yIncrement = yPixelMin; yPixel < yPixelMax+(noOfThreads*pixelBlockSize); yIncrement+= pixelIncrement) {	
 				yPixel = yIncrement;
 				
-				if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length) {
-					//Log.d("Derp", "Should be breaking " + ((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax));
-					break;
+				pixelIncrement = (loopCount * originalIncrement);
+				if(loopCount % 2 == 0)
+					pixelIncrement*=-1;
+				loopCount++;
+				
+				if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length ||
+						 yPixel < 0) {
+					continue;
 				}
 				
 				// Detect rendering abortion.			
