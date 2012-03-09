@@ -120,6 +120,8 @@ abstract class AbstractFractalView extends View {
 	
 	boolean drawPin = true;
 	
+	boolean allowCrudeRendering = true;
+	
 	
 	
 /*-----------------------------------------------------------------------------------*/
@@ -287,7 +289,7 @@ abstract class AbstractFractalView extends View {
 		
 		
 		//Schedule a crude rendering if needed (not the small view, not a small zoom)
-		if(fractalViewSize != FractalViewSize.LITTLE && (totalScaleFactor < 0.6f|| totalScaleFactor == 1.0f || totalScaleFactor > 3.5f)) {
+		if(allowCrudeRendering && fractalViewSize != FractalViewSize.LITTLE && (totalScaleFactor < 0.6f|| totalScaleFactor == 1.0f || totalScaleFactor > 3.5f)) {
 			scheduleRendering(CRUDE_PIXEL_BLOCK);
 		}
 		totalScaleFactor = 1.0f; // Needs reset once checked, so that next render doesn't account for it.
