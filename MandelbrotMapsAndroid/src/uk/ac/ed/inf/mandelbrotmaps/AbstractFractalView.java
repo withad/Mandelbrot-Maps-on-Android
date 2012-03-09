@@ -150,7 +150,7 @@ abstract class AbstractFractalView extends View {
       	matrix.reset();
       	
       	// Create the render threads
-      	noOfThreads = Runtime.getRuntime().availableProcessors();
+      	noOfThreads = 4;//Runtime.getRuntime().availableProcessors();
       	Log.d(TAG, "Using " + noOfThreads + " cores");
       	
       	for (int i = 0; i < noOfThreads; i++) {
@@ -230,12 +230,12 @@ abstract class AbstractFractalView extends View {
 		if (getWidth() <= 0 || graphArea == null)
 			return;
 		
-		int yStart = threadID * pixelBlockSize;
+		int yStart = (getHeight()/2) + (threadID * pixelBlockSize);
 		int yEnd = getHeight() - (noOfThreads - (threadID + 1));
 		boolean showRenderProgress = (threadID == 0);
 		
 		if(fractalViewSize == FractalViewSize.LARGE)
-		Log.d("ThreadEnding", "Thread " + threadID + " ending at " + yEnd + "/" + getHeight());
+			Log.d("ThreadEnding", "Thread " + threadID + " ending at " + yEnd + "/" + getHeight());
 			
 		if (pixelSizes == null)
 			pixelSizes = new int[getWidth() * getHeight()];

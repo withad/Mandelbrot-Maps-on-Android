@@ -161,17 +161,26 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			//Log.d(TAG, "Initial time: " + initialMillis);
 			
 			int pixelIncrement = pixelBlockSize * noOfThreads;
+			int originalIncrement = pixelIncrement;
 			
 			int skippedCount = 0;
 			
 			Log.d("yMax", threadID + " yPixelmax = " + yPixelMax);
 			
-			for (yIncrement = yPixelMin; yPixel < yPixelMax+1-pixelBlockSize; yIncrement += pixelIncrement) {			
+			int loopCount = 1;
+			
+			
+			for (yIncrement = yPixelMin; yPixel < yPixelMax/*+1-pixelBlockSize*/+noOfThreads; yIncrement += pixelIncrement) {			
 				yPixel = yIncrement;
+				pixelIncrement = (loopCount * originalIncrement);
+				if(loopCount % 2 == 0)
+					pixelIncrement*=-1;
+				loopCount++;
 				
 				//If we've exceeded the bounds of the image (as can happen with many threads), exit the loop.
 				if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length) {
-					break;
+					Log.d(TAG, "Breaking due to going past end");
+					continue;
 				}
 				
 				if (allowInterruption && (callingThread.abortSignalled())) {
@@ -246,7 +255,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					}
 				}
 				// Show thread's work in progress
-				if ((showRenderingProgress) && (yPixel % linesToDrawAfter == 0)) 
+				if ((showRenderingProgress) && (loopCount % linesToDrawAfter == 0)) 
 					{
 						postInvalidate();
 					}
