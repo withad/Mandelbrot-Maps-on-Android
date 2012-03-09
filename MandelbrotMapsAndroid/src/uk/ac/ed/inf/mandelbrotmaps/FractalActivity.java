@@ -464,7 +464,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			
 			if(imagefile != null) {
 				Intent imageIntent = new Intent(Intent.ACTION_SEND);
-				imageIntent.setType("image/jpg");
+				imageIntent.setType("image/png");
 				imageIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imagefile));
 				
 				startActivityForResult(Intent.createChooser(imageIntent, "Share picture using:"), SHARE_IMAGE_REQUEST);

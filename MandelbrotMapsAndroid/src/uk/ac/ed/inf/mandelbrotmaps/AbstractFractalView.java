@@ -700,14 +700,14 @@ abstract class AbstractFractalView extends View {
 		{
 			File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 			String filename = getNewFileName();
-			File imagefile = new File(path, "FractalImage" + filename + ".jpg");
+			File imagefile = new File(path, "FractalImage" + filename + ".png");
 			
 			//Check if it exists, try extending the names a few times if it does
 			int nameTries = 0;
 			while(imagefile.exists()) {
 				nameTries++;
 				filename += "a";
-				imagefile = new File(path, "FractalImage" + filename + ".jpg");
+				imagefile = new File(path, "FractalImage" + filename + ".png");
 				if(nameTries > 1)
 					return null;
 			}
@@ -722,7 +722,7 @@ abstract class AbstractFractalView extends View {
 				/*Recreate the bitmap - all the render thread completion guarantees is that the arrays
 				are full. onDraw() may not have run before saving.*/
 				fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
-				fractalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, output);
+				fractalBitmap.compress(Bitmap.CompressFormat.PNG, 90, output);
 
 				output.close();				
 				Log.d(TAG, "Wrote image out to " + imagefile.getAbsolutePath());
