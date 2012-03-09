@@ -196,6 +196,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   }
   	}
    
+
+   
 /*-----------------------------------------------------------------------------------*/
 /*Dynamic UI creation*/
 /*-----------------------------------------------------------------------------------*/
@@ -204,7 +206,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     */
    public void addLittleView() {   
 	   //Check to see if view has already or should never be included
-	   if (showingLittle) return;
+	   if (showingLittle) {
+		   relativeLayout.bringChildToFront(littleFractalView);
+		   return;
+	   }
 	   
 	   //Show a little Julia next to a Mandelbrot and vice versa
 	   if(fractalType == FractalType.MANDELBROT) {

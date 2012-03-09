@@ -69,7 +69,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		selectedCirclePaint = new Paint();
 		selectedCirclePaint.setColor(Color.BLUE);
 		selectedCirclePaint.setAlpha(100);
-		//selectedCirclePaint.setStyle(Style.STROKE);
 	}
 		
 	
