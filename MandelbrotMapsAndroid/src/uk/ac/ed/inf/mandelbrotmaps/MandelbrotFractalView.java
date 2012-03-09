@@ -161,17 +161,27 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			//Log.d(TAG, "Initial time: " + initialMillis);
 			
 			int pixelIncrement = pixelBlockSize * noOfThreads;
+			int originalIncrement = pixelIncrement;
 			
 			int skippedCount = 0;
 			
 			Log.d("yMax", threadID + " yPixelmax = " + yPixelMax);
 			
-			for (yIncrement = yPixelMin; yPixel < yPixelMax+1-pixelBlockSize; yIncrement += pixelIncrement) {			
+			int loopCount = 0;
+			
+			
+			for (yIncrement = yPixelMin; yPixel < yPixelMax+1-pixelBlockSize+8 ; yIncrement += pixelIncrement) {			
 				yPixel = yIncrement;
+				pixelIncrement = (loopCount * originalIncrement);
+				if(loopCount % 2 == 0)
+					pixelIncrement*=-1;
+				loopCount++;
 				
 				//If we've exceeded the bounds of the image (as can happen with many threads), exit the loop.
-				if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length) {
-					break;
+				if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length || 
+						 yPixel < 0) {
+					Log.d(TAG, callingThread.getName() + " breaking due to going past end at yPixel = " + yPixel);
+					continue;
 				}
 				
 				if (allowInterruption && (callingThread.abortSignalled())) {
@@ -246,22 +256,20 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					}
 				}
 				// Show thread's work in progress
-				if ((showRenderingProgress) && (yPixel % linesToDrawAfter == 0)) 
+				if ((showRenderingProgress) && (loopCount % linesToDrawAfter == 0)) 
 					{
 						postInvalidate();
 					}
-				
-				//Stop threads skipping their final section.
-				/*if((yIncrement + pixelIncrement) > yPixelMax)
-					yIncrement = yPixelMax - yIncrement;*/
 			}
 			
 			/*Log.d("ThreadEnding", "yIncrement of thread " + threadID + " is " + yIncrement + " and yPixel " + yPixel);*/
 			
+			
+			//Log.d(TAG, "Ended on yIncrement " + yIncrement);
 			postInvalidate();
 			notifyCompleteRender(threadID, pixelBlockSize);
-			/*Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
-			Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));*/
+			//Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
+			//Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));*/
 		}
 	
 	
