@@ -1,11 +1,13 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.ColouringScheme;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.SpiralRenderer;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
@@ -22,6 +24,10 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 	Paint circlePaint;
 	Paint smallDotPaint;
+	Paint selectedCirclePaint;
+	
+	private float smallCircleRadius = 5.0f;
+	private float largeCircleRadius = 20.0f;
 	
 	
 	
@@ -51,6 +57,10 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		smallDotPaint = new Paint();
 		smallDotPaint.setColor(Color.BLUE);
 		smallDotPaint.setAlpha(120);
+		
+		selectedCirclePaint = new Paint();
+		selectedCirclePaint.setColor(Color.BLUE);
+		selectedCirclePaint.setAlpha(100);
 	}
 		
 	
@@ -62,8 +72,39 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			if(controlmode != ControlMode.ZOOMING) pinCoords = getPinCoords();
 			float[] mappedCoords = new float[2];
 			matrix.mapPoints(mappedCoords, pinCoords);
-			canvas.drawCircle(mappedCoords[0], mappedCoords[1], 5.0f, smallDotPaint);
-			canvas.drawCircle(mappedCoords[0], mappedCoords[1], 20.0f, circlePaint);
+			
+			if(fractalViewSize == FractalViewSize.LARGE) {
+				canvas.drawCircle(mappedCoords[0], mappedCoords[1], smallCircleRadius, smallDotPaint);
+				
+				//Draw larger outer circle if pin is held down.
+				if(!holdingPin)
+					canvas.drawCircle(mappedCoords[0], mappedCoords[1], largeCircleRadius, circlePaint);
+				else
+					canvas.drawCircle(mappedCoords[0], mappedCoords[1], largeCircleRadius*2, selectedCirclePaint);
+			}
+			else if (fractalViewSize == FractalViewSize.LITTLE) {
+				canvas.drawCircle(mappedCoords[0], mappedCoords[1], smallCircleRadius, smallDotPaint);
+			}
+		}
+	}
+	
+	
+	/* Runs when the view changes size. 
+	 * Sets the size of the pin based on screen size. */
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+	   
+		// Show the little view at the start, if allowed.
+		if(fractalViewSize == FractalViewSize.LARGE) {
+			DisplayMetrics currentDisplayMetrics = new DisplayMetrics();
+			parentActivity.getWindowManager().getDefaultDisplay().getMetrics(currentDisplayMetrics);
+			
+			int dpi = currentDisplayMetrics.densityDpi;
+			Log.d(TAG, "Current dpi is " + dpi + " dots per inch");
+			largeCircleRadius = dpi/6; 
+			smallCircleRadius = dpi/30;
+			Log.d(TAG, "Small circle radius is " + smallCircleRadius);
 		}
 	}
 	
@@ -109,7 +150,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			double newx, newy;
 			
 			long initialMillis = System.currentTimeMillis();
-			Log.d(TAG, "Initial time: " + initialMillis);
+			//Log.d(TAG, "Initial time: " + initialMillis);
 			
 			int pixelIncrement = pixelBlockSize * noOfThreads;
 			
@@ -207,12 +248,12 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					yIncrement = yPixelMax - yIncrement;*/
 			}
 			
-			Log.d("ThreadEnding", "yIncrement of thread " + threadID + " is " + yIncrement + " and yPixel " + yPixel);
+			/*Log.d("ThreadEnding", "yIncrement of thread " + threadID + " is " + yIncrement + " and yPixel " + yPixel);*/
 			
 			postInvalidate();
 			notifyCompleteRender(threadID, pixelBlockSize);
-			Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
-			Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));
+			/*Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
+			Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));*/
 		}
 	
 	
@@ -240,12 +281,12 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		float[] pinCoords = new float[2];
 		double pixelSize = getPixelSize();
 		
+		if (fractalViewSize == FractalViewSize.LITTLE) {
+			currentJuliaParams = ((JuliaFractalView)parentActivity.fractalView).getJuliaParam();
+		}
+
 		pinCoords[0] = (float) ((currentJuliaParams[0] - graphArea[0]) / pixelSize);
 		pinCoords[1] = (float) (-(currentJuliaParams[1] - graphArea[1]) / pixelSize);
-		
-/*		Log.d(TAG, "Current Julia X = " + currentJuliaParams[0]);
-		Log.d(TAG, "Tap X = " + lastTouchX + ". Calculated pin position X = " + pinCoords[0] + ".");
-		Log.d(TAG, "Tap Y = " + lastTouchY + ". Calculated pin position Y = " + pinCoords[1] + ".");*/
 		
 		return pinCoords;
 	}

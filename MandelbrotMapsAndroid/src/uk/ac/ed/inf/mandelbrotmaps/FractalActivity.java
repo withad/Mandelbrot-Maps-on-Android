@@ -41,7 +41,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	public FractalType fractalType = FractalType.MANDELBROT;
 
 	// Layout variables
-	private AbstractFractalView fractalView;
+	public AbstractFractalView fractalView;
 	private AbstractFractalView littleFractalView;
 	private View borderView;
 	private RelativeLayout relativeLayout;

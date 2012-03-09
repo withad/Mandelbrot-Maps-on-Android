@@ -85,7 +85,7 @@ public class JuliaFractalView extends AbstractFractalView{
 			double newx, newy;
 			
 			long initialMillis = System.currentTimeMillis();
-			Log.d(TAG, "Initial time: " + initialMillis);
+			//Log.d(TAG, "Initial time: " + initialMillis);
 			
 			int pixelIncrement = pixelBlockSize * noOfThreads;
 			int skippedCount = 0;
@@ -189,7 +189,7 @@ public class JuliaFractalView extends AbstractFractalView{
 			
 			postInvalidate();
 			notifyCompleteRender(threadID, pixelBlockSize);
-			Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
-			Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));
+			/*Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
+			Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));*/
 		}
 }
