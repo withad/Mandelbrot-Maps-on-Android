@@ -150,7 +150,7 @@ abstract class AbstractFractalView extends View {
       	matrix.reset();
       	
       	// Create the render threads
-      	noOfThreads = 4;//Runtime.getRuntime().availableProcessors();
+      	noOfThreads = Runtime.getRuntime().availableProcessors();
       	Log.d(TAG, "Using " + noOfThreads + " cores");
       	
       	for (int i = 0; i < noOfThreads; i++) {
