@@ -1,5 +1,9 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import uk.ac.ed.inf.mandelbrotmaps.colouring.ColouringScheme;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.DefaultColouringScheme;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.JuliaDefaultColouringScheme;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.RGBWalkColouringScheme;
 import android.content.Context;
 import android.util.Log;
 
@@ -128,6 +132,8 @@ public class JuliaFractalView extends AbstractFractalView{
 					x = xMin + ( (double)xPixel * pixelSize);
 					y = yMax - ( (double)yPixel * pixelSize);
 				
+					boolean inside = true;
+					
 					for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
 						// z^2 + c
 						newx = (x*x) - (y*y) + juliaX;
@@ -138,28 +144,16 @@ public class JuliaFractalView extends AbstractFractalView{
 					
 						// Well known result: if distance is >2, escapes to infinity...
 						if ( (x*x + y*y) > 4) { 
+							inside = false;
 							break;
 						}
 					}
 					
-					// Percentage (0.0 -- 1.0)
-					colourCode = (double)iterationNr / (double)maxIterations;
+					if(inside)
+						colourCodeHex = colourer.colourInsidePoint();
+					else
+						colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);
 					
-					// Red
-					colourCodeR = Math.min((int)(255 * 2*colourCode), 255);
-					
-					// Green
-					colourCodeG = (int)(255*colourCode);
-					
-					// Blue
-					colourCodeB = (int)(
-						127.5 - 127.5*Math.cos(
-							3 * Math.PI * colourCode
-						)
-					);
-					
-					//Compute colour from the three components
-					colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
 					
 					//Note that the pixel being calculated has been calculated in full (upper right of a block)
 					if(fractalViewSize == FractalViewSize.LARGE)

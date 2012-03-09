@@ -9,13 +9,20 @@ import java.util.Calendar;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import uk.ac.ed.inf.mandelbrotmaps.FractalActivity.FractalType;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.ColouringScheme;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.DefaultColouringScheme;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.JuliaDefaultColouringScheme;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.PsychadelicColouringScheme;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.RGBWalkColouringScheme;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -118,6 +125,8 @@ abstract class AbstractFractalView extends View {
 	int bitmapCreations = 0;
 	
 	boolean drawPin = true;
+	
+	public ColouringScheme colourer = new DefaultColouringScheme();
 	
 	
 	
@@ -782,7 +791,7 @@ abstract class AbstractFractalView extends View {
 	 * (Fills it with 1000s) */
 	private void clearPixelSizes() {
 		Log.d(TAG, "Clearing pixel sizes");
-		//pixelSizes = new int[getWidth() * getHeight()];
+		
 		
 		for (int i = 0; i < pixelSizes.length; i++)
 		{
@@ -823,6 +832,14 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
+	private void reloadCurrentLocation() {
+		stopAllRendering();
+		
+		clearPixelSizes();
+		setGraphArea(graphArea, true);
+	}
+	
+	
 	
 /*-----------------------------------------------------------------------------------*/
 /* Abstract methods */
@@ -842,6 +859,22 @@ abstract class AbstractFractalView extends View {
 			final int threadID,
 			final int noOfThreads
 		);
+
+
+
+	public void setColouringScheme(String newScheme, boolean reload) {		
+		if(newScheme.equals("MandelbrotDefault"))
+			colourer = new DefaultColouringScheme();
+		else if(newScheme.equals("JuliaDefault"))
+			colourer = new JuliaDefaultColouringScheme();
+		else if(newScheme.equals("RGBWalk"))
+			colourer = new RGBWalkColouringScheme();
+		else if(newScheme.equals("Psychadelic"))
+			colourer = new PsychadelicColouringScheme();
+		
+		if(reload)
+			reloadCurrentLocation();
+	}
 }
 
 

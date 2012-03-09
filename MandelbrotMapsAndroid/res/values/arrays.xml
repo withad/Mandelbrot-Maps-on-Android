@@ -8,4 +8,16 @@
  ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
 -->
 <resources>
+    <string-array name="colourSchemeEntries">
+        <item>Default</item>
+        <item>Julia Default</item>
+        <item>RGB Walk</item>
+        <item>Psychadelic</item>
+    </string-array>
+    <string-array name="colourSchemeValues">
+        <item>MandelbrotDefault</item>
+        <item>JuliaDefault</item>
+        <item>RGBWalk</item>
+        <item>Psychadelic</item>
+    </string-array>
 </resources>

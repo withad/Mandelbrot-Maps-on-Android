@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
    xmlns:android="http://schemas.android.com/apk/res/android">
-   <CheckBoxPreference
-      android:key="CRUDE"
-      android:title="Use crude rendering"
-      android:summary="Performing a crude render with large pixel blocks gets a rough image faster but makes the full render take longer."
-      android:defaultValue="true" />
-   <CheckBoxPreference
-      android:key="example2"
-      android:title="Example2"
-      android:summary="Example preference"
-      android:defaultValue="true" />
+   <PreferenceCategory android:title="Rendering">
+	   <CheckBoxPreference
+	      android:key="CRUDE"
+	      android:title="Use crude rendering"
+	      android:summary="Performing a crude render with large pixel blocks gets a rough image faster but makes the full render take longer."
+	      android:defaultValue="true" />
+   </PreferenceCategory>
+   
+   <PreferenceCategory android:title="Colours">
+	   <ListPreference
+	      android:key="MANDELBROT_COLOURS"
+	      android:title="Mandelbrot Set colouring scheme"
+	      android:summary="Colours are determined by how many iterations it takes to eliminate a point from the Mandelbrot Set."
+	      android:defaultValue="MandelbrotDefault"
+	      android:entries="@array/colourSchemeEntries"
+	      android:entryValues="@array/colourSchemeValues" />
+   </PreferenceCategory>
+      
 </PreferenceScreen>

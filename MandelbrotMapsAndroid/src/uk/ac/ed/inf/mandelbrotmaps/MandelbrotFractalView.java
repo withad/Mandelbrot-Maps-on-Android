@@ -1,22 +1,19 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.ColouringScheme;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.DefaultColouringScheme;
-import uk.ac.ed.inf.mandelbrotmaps.colouring.PsychadelicColouringScheme;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
 
 	private final String TAG = "MMaps";
-	
-	ColouringScheme colourer = new DefaultColouringScheme();
 	
 	public float lastTouchX = 0;
 	public float lastTouchY = 0;
@@ -36,6 +33,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	public MandelbrotFractalView(Context context, FractalViewSize size) {
 		super(context, size);
 		
+		setColouringScheme(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("MANDELBROT_COLOURS", "MandelbrotDefault")
+							, false);
+		
 		for(int i = 0; i < noOfThreads; i++) {
 			renderThreadList.get(i).setName("Mandelbrot thread " + i);
 		}
@@ -54,7 +54,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		circlePaint = new Paint();
 		circlePaint.setColor(Color.BLUE);
 		circlePaint.setAlpha(75);
-		circlePaint.setStyle(Style.STROKE);
+		//circlePaint.setStyle(Style.STROKE);
 		
 		smallDotPaint = new Paint();
 		smallDotPaint.setColor(Color.BLUE);

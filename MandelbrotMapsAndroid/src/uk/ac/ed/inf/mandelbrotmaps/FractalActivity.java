@@ -7,9 +7,12 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,7 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
 
-public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
+public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener, OnSharedPreferenceChangeListener {
 	private final String TAG = "MMaps";
 	
 	// Constants
@@ -152,6 +155,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   savingDialog.dismiss();
    }
    
+   
+   @Override
+   protected void onResume() {
+	   super.onResume();
+	   
+	   Log.d(TAG, "Running onResume()");
+	   
+	   SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	   prefs.registerOnSharedPreferenceChangeListener(this);
+   }
    
    /* Set the activity result when finishing, if needed
     * (non-Javadoc)
@@ -691,5 +704,19 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		fractalView.invalidate();
 		double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(x, y);
 		((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+	}
+
+	
+	public void onSharedPreferenceChanged(SharedPreferences prefs, String changedPref) {
+		if(changedPref.equals("MANDELBROT_COLOURS")) {
+			String mandelbrotScheme = prefs.getString(changedPref, "MandelbrotDefault");
+			
+			if(fractalType == FractalType.MANDELBROT) {
+				fractalView.setColouringScheme(mandelbrotScheme, true);
+			}
+			else if (showingLittle) {
+				littleFractalView.setColouringScheme(mandelbrotScheme, true);
+			}
+		}
 	}
 }

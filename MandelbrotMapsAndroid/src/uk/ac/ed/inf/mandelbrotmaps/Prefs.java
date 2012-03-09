@@ -18,9 +18,12 @@ public class Prefs extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.settings);
+		
 	}
 	
 	public static boolean performCrude(Context context) {
 		return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(CRUDE_OPTION, CRUDE_OPT_DEFAULT);
 	}
+	
+	
 }
