@@ -9,10 +9,10 @@
 -->
 <resources>
     <string-array name="colourSchemeEntries">
-        <item>Default</item>
-        <item>Julia Default</item>
-        <item>RGB Walk</item>
-        <item>Psychadelic</item>
+        <item>Purple and Red</item>
+        <item>Purple and Yellow</item>
+        <item>RGB</item>
+        <item>Pastels</item>
     </string-array>
     <string-array name="colourSchemeValues">
         <item>MandelbrotDefault</item>

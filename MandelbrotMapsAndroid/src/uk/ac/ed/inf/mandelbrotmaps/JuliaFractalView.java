@@ -5,6 +5,7 @@ import uk.ac.ed.inf.mandelbrotmaps.colouring.DefaultColouringScheme;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.JuliaDefaultColouringScheme;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.RGBWalkColouringScheme;
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class JuliaFractalView extends AbstractFractalView{
@@ -18,6 +19,9 @@ public class JuliaFractalView extends AbstractFractalView{
 	
 	public JuliaFractalView(Context context, FractalViewSize size) {
 		super(context, size);
+		
+		setColouringScheme(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("JULIA_COLOURS", "MandelbrotDefault")
+				, false);
 
 		for(int i = 0; i < noOfThreads; i++) {
 			renderThreadList.get(i).setName("Julia thread " + i);

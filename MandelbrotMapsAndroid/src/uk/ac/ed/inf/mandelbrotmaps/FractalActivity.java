@@ -224,6 +224,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   return;
 	   }
 	   
+	   
+	   
 	   //Show a little Julia next to a Mandelbrot and vice versa
 	   if(fractalType == FractalType.MANDELBROT) {
 		   littleFractalView = new JuliaFractalView(this, FractalViewSize.LITTLE);
@@ -716,6 +718,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			}
 			else if (showingLittle) {
 				littleFractalView.setColouringScheme(mandelbrotScheme, true);
+			}
+		}
+		else if(changedPref.equals("JULIA_COLOURS")) {
+			String juliaScheme = prefs.getString(changedPref, "MandelbrotDefault");
+			
+			if(fractalType == FractalType.JULIA) {
+				fractalView.setColouringScheme(juliaScheme, true);
+			}
+			else if (showingLittle) {
+				littleFractalView.setColouringScheme(juliaScheme, true);
 			}
 		}
 	}

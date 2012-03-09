@@ -10,10 +10,18 @@
    </PreferenceCategory>
    
    <PreferenceCategory android:title="Colours">
-	   <ListPreference
+   	<ListPreference
 	      android:key="MANDELBROT_COLOURS"
 	      android:title="Mandelbrot Set colouring scheme"
 	      android:summary="Colours are determined by how many iterations it takes to eliminate a point from the Mandelbrot Set."
+	      android:defaultValue="MandelbrotDefault"
+	      android:entries="@array/colourSchemeEntries"
+	      android:entryValues="@array/colourSchemeValues" />
+	      
+	<ListPreference
+	      android:key="JULIA_COLOURS"
+	      android:title="Julia Set colouring scheme"
+	      android:summary="Colours are determined by how many iterations it takes to eliminate a point from the Julia Set."
 	      android:defaultValue="MandelbrotDefault"
 	      android:entries="@array/colourSchemeEntries"
 	      android:entryValues="@array/colourSchemeValues" />
