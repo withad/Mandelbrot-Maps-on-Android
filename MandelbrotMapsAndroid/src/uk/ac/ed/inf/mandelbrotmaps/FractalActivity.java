@@ -734,7 +734,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		}
 		
 		else if(changedPref.equals("PIN_COLOUR")) {
-			int newColour = prefs.getInt(changedPref, Color.BLUE);
+			int newColour = Color.parseColor(prefs.getString(changedPref, "blue"));
 			
 			if(fractalType == FractalType.MANDELBROT) {
 				((MandelbrotFractalView)fractalView).setPinColour(newColour);

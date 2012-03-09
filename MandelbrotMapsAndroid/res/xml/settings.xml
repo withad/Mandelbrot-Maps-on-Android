@@ -2,10 +2,16 @@
 <PreferenceScreen
    xmlns:android="http://schemas.android.com/apk/res/android">
    <PreferenceCategory android:title="Rendering">
-	   <CheckBoxPreference
+	<CheckBoxPreference
 	      android:key="CRUDE"
 	      android:title="Use crude rendering"
 	      android:summary="Performing a crude render with large pixel blocks gets a rough image faster but makes the full render take longer."
+	      android:defaultValue="true" />
+	      
+	<CheckBoxPreference
+	      android:key="SHOW_TIMES"
+	      android:title="Show render times"
+	      android:summary="Display the time of each render once complete."
 	      android:defaultValue="true" />
    </PreferenceCategory>
    
@@ -30,9 +36,9 @@
 	      android:key="PIN_COLOUR"
 	      android:title="Julia pin colour"
 	      android:summary="The colour of the circles pinpoint the current Julia fractal in the Mandelbrot."
-	      android:defaultValue="@color/"
-	      android:entries="@array/colourSchemeEntries"
-	      android:entryValues="@array/colourSchemeValues" />
+	      android:defaultValue="blue"
+	      android:entries="@array/pinColourEntries"
+	      android:entryValues="@array/pinColourValues" />
    </PreferenceCategory>
       
 </PreferenceScreen>

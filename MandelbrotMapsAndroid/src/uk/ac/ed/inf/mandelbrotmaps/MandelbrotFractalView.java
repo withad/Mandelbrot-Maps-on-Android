@@ -52,7 +52,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		MAXZOOM_LN_PIXEL = -31; // Beyond -31, "double"s break down(!).
 		
 		
-		int pinColour = PreferenceManager.getDefaultSharedPreferences(getContext()).getInt("PIN_COLOUR", Color.BLUE);
+		int pinColour = Color.parseColor(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("PIN_COLOUR", "blue"));
 		
 		circlePaint = new Paint();
 		circlePaint.setColor(pinColour);
@@ -306,6 +306,12 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		selectedCirclePaint.setColor(newColour);
 		smallDotPaint.setColor(newColour);
 		littleViewPaint.setColor(newColour);
+		
+		// This somehow resets the alphas as well, so reset those.
+		circlePaint.setAlpha(75);
+		smallDotPaint.setAlpha(120);
+		littleViewPaint.setAlpha(180);		
+		selectedCirclePaint.setAlpha(100);
 		
 		invalidate();
 	}

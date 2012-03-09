@@ -348,7 +348,9 @@ abstract class AbstractFractalView extends View {
 			double time = (double)((System.currentTimeMillis() - renderStartTime))/1000;
 			String renderCompleteMessage = "Rendering time: " + new DecimalFormat("#.##").format(time) + " second" + (time == 1d ? "." : "s.");
 			Log.d(TAG, renderCompleteMessage);
-			parentActivity.showToastOnUIThread(renderCompleteMessage, Toast.LENGTH_SHORT);	
+			
+			if(PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("SHOW_TIMES", true))
+				parentActivity.showToastOnUIThread(renderCompleteMessage, Toast.LENGTH_SHORT);	
 			
 			parentActivity.hideProgressSpinner();
 		}
@@ -840,6 +842,21 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
+	public void setColouringScheme(String newScheme, boolean reload) {		
+		if(newScheme.equals("MandelbrotDefault"))
+			colourer = new DefaultColouringScheme();
+		else if(newScheme.equals("JuliaDefault"))
+			colourer = new JuliaDefaultColouringScheme();
+		else if(newScheme.equals("RGBWalk"))
+			colourer = new RGBWalkColouringScheme();
+		else if(newScheme.equals("Psychadelic"))
+			colourer = new PsychadelicColouringScheme();
+		
+		if(reload)
+			reloadCurrentLocation();
+	}
+	
+	
 	
 /*-----------------------------------------------------------------------------------*/
 /* Abstract methods */
@@ -860,21 +877,6 @@ abstract class AbstractFractalView extends View {
 			final int noOfThreads
 		);
 
-
-
-	public void setColouringScheme(String newScheme, boolean reload) {		
-		if(newScheme.equals("MandelbrotDefault"))
-			colourer = new DefaultColouringScheme();
-		else if(newScheme.equals("JuliaDefault"))
-			colourer = new JuliaDefaultColouringScheme();
-		else if(newScheme.equals("RGBWalk"))
-			colourer = new RGBWalkColouringScheme();
-		else if(newScheme.equals("Psychadelic"))
-			colourer = new PsychadelicColouringScheme();
-		
-		if(reload)
-			reloadCurrentLocation();
-	}
 }
 
 
