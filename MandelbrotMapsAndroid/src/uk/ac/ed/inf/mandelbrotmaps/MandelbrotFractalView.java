@@ -1,21 +1,19 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.ColouringScheme;
-import uk.ac.ed.inf.mandelbrotmaps.colouring.SpiralRenderer;
+import uk.ac.ed.inf.mandelbrotmaps.colouring.DefaultColouringScheme;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
 
 	private final String TAG = "MMaps";
-	
-	ColouringScheme colourer = new SpiralRenderer();
 	
 	public float lastTouchX = 0;
 	public float lastTouchY = 0;
@@ -32,10 +30,11 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	private float largeCircleRadius = 20.0f;
 	
 	
-	
-	
 	public MandelbrotFractalView(Context context, FractalViewSize size) {
 		super(context, size);
+		
+		setColouringScheme(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("MANDELBROT_COLOURS", "MandelbrotDefault")
+							, false);
 		
 		for(int i = 0; i < noOfThreads; i++) {
 			renderThreadList.get(i).setName("Mandelbrot thread " + i);
@@ -52,22 +51,25 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		// How deep a zoom do we allow?
 		MAXZOOM_LN_PIXEL = -31; // Beyond -31, "double"s break down(!).
 		
+		
+		int pinColour = Color.parseColor(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("PIN_COLOUR", "blue"));
+		
 		circlePaint = new Paint();
-		circlePaint.setColor(Color.BLUE);
+		circlePaint.setColor(pinColour);
 		circlePaint.setAlpha(75);
-		circlePaint.setStyle(Style.STROKE);
+		//circlePaint.setStyle(Style.STROKE);
 		
 		smallDotPaint = new Paint();
-		smallDotPaint.setColor(Color.BLUE);
+		smallDotPaint.setColor(pinColour);
 		smallDotPaint.setAlpha(120);
 		
 		littleViewPaint = new Paint();
-		littleViewPaint.setColor(Color.BLUE);
+		littleViewPaint.setColor(pinColour);
 		littleViewPaint.setAlpha(180);
 		littleViewPaint.setStyle(Style.STROKE);
 		
 		selectedCirclePaint = new Paint();
-		selectedCirclePaint.setColor(Color.BLUE);
+		selectedCirclePaint.setColor(pinColour);
 		selectedCirclePaint.setAlpha(100);
 	}
 		
@@ -204,6 +206,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					x = x0;
 					y = y0;
 				
+					boolean inside = true;
+					
 					//Run iterations over this point
 					for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
 						// z^2 + c
@@ -215,24 +219,15 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					
 						// Well known result: if distance is >2, escapes to infinity...
 						if ( (x*x + y*y) > 4) {
+							inside = false;
 							break;
 						}
 					}
 					
-					// Percentage (0.0 -- 1.0)
-					colourCode = (double)iterationNr / (double)maxIterations;
-					
-					// Red
-					colourCodeR = Math.min((int)(255 * 6*colourCode), 255);
-					
-					// Green
-					colourCodeG = (int)(255*colourCode);
-					
-					// Blue
-					colourCodeB = (int)(127.5 - 127.5*Math.cos(7 * Math.PI * colourCode));
-					
-			        //Compute colour from the three components
-					colourCodeHex = (0xFF << 24) + (colourCodeR << 16) + (colourCodeG << 8) + (colourCodeB);
+					if(inside)
+						colourCodeHex = colourer.colourInsidePoint();
+					else
+						colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);
 					
 					//Note that the pixel being calculated has been calculated in full (upper right of a block)
 					if(fractalViewSize == FractalViewSize.LARGE)
@@ -303,5 +298,21 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		pinCoords[1] = (float) (-(currentJuliaParams[1] - graphArea[1]) / pixelSize);
 		
 		return pinCoords;
+	}
+	
+	
+	public void setPinColour(int newColour) {
+		circlePaint.setColor(newColour);
+		selectedCirclePaint.setColor(newColour);
+		smallDotPaint.setColor(newColour);
+		littleViewPaint.setColor(newColour);
+		
+		// This somehow resets the alphas as well, so reset those.
+		circlePaint.setAlpha(75);
+		smallDotPaint.setAlpha(120);
+		littleViewPaint.setAlpha(180);		
+		selectedCirclePaint.setAlpha(100);
+		
+		invalidate();
 	}
 }

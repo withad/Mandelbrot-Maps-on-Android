@@ -7,9 +7,12 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,7 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
 
-public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener {
+public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener, OnSharedPreferenceChangeListener {
 	private final String TAG = "MMaps";
 	
 	// Constants
@@ -153,6 +156,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    }
    
    
+   @Override
+   protected void onResume() {
+	   super.onResume();
+	   
+	   Log.d(TAG, "Running onResume()");
+	   
+	   SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	   prefs.registerOnSharedPreferenceChangeListener(this);
+   }
+   
    /* Set the activity result when finishing, if needed
     * (non-Javadoc)
     * @see android.app.Activity#finish()
@@ -210,6 +223,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   relativeLayout.bringChildToFront(littleFractalView);
 		   return;
 	   }
+		   
 	   
 	   //Show a little Julia next to a Mandelbrot and vice versa
 	   if(fractalType == FractalType.MANDELBROT) {
@@ -262,6 +276,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   
 	   relativeLayout.removeView(borderView);
 	   relativeLayout.removeView(littleFractalView);
+	   
+	   littleFractalView.interruptThreads();
 	   
 	   showingLittle = false;
    }
@@ -691,5 +707,41 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		fractalView.invalidate();
 		double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(x, y);
 		((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+	}
+
+	
+	public void onSharedPreferenceChanged(SharedPreferences prefs, String changedPref) {
+		if(changedPref.equals("MANDELBROT_COLOURS")) {
+			String mandelbrotScheme = prefs.getString(changedPref, "MandelbrotDefault");
+			
+			if(fractalType == FractalType.MANDELBROT) {
+				fractalView.setColouringScheme(mandelbrotScheme, true);
+			}
+			else if (showingLittle) {
+				littleFractalView.setColouringScheme(mandelbrotScheme, true);
+			}
+		}
+		
+		else if(changedPref.equals("JULIA_COLOURS")) {
+			String juliaScheme = prefs.getString(changedPref, "MandelbrotDefault");
+			
+			if(fractalType == FractalType.JULIA) {
+				fractalView.setColouringScheme(juliaScheme, true);
+			}
+			else if (showingLittle) {
+				littleFractalView.setColouringScheme(juliaScheme, true);
+			}
+		}
+		
+		else if(changedPref.equals("PIN_COLOUR")) {
+			int newColour = Color.parseColor(prefs.getString(changedPref, "blue"));
+			
+			if(fractalType == FractalType.MANDELBROT) {
+				((MandelbrotFractalView)fractalView).setPinColour(newColour);
+			}
+			else if (showingLittle) {
+				((MandelbrotFractalView)littleFractalView).setPinColour(newColour);
+			}
+		}
 	}
 }
