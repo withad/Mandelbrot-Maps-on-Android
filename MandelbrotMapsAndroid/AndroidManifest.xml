@@ -17,8 +17,7 @@
               
         <activity android:name=".Prefs"
               android:label="@string/settings_title"
-              android:screenOrientation="landscape"
-              android:configChanges="orientation"/>
+              />
               
         <activity android:name=".FractalActivity"
               android:label="Mandelbrot Maps"
