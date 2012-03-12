@@ -28,6 +28,7 @@
         <item>Green</item><item>Blue</item>
         <item>Yellow</item>
         <item>Magenta</item>
+        <item>Black</item>
     </string-array>
     
     <string-array name="pinColourValues">
@@ -36,5 +37,6 @@
         <item>blue</item>
         <item>yellow</item>
         <item>magenta</item>
+        <item>black</item>
     </string-array>
 </resources>

@@ -36,6 +36,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private final int SHARE_IMAGE_REQUEST = 0;
 	private final int RETURN_FROM_JULIA = 1;
 	
+	private final String PREVIOUS_MAIN_GRAPH_AREA = "prevMainGraphArea";
+	private final String PREVIOUS_LITTLE_GRAPH_AREA = "prevLittleGraphArea";
+	private final String PREVIOUS_JULIA_PARAMS = "prevJuliaParams";
+	private final String PREVIOUS_SHOWING_LITTLE = "prevShowingLittle";
+	
 	// Type of fractal displayed in the main fractal view
 	public static enum FractalType {
 		MANDELBROT,
@@ -165,6 +170,52 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	   prefs.registerOnSharedPreferenceChangeListener(this);
    }
+   
+   
+   @Override
+   protected void onSaveInstanceState(Bundle outState) {
+	   super.onSaveInstanceState(outState);
+	   
+	   Log.d(TAG, "Running onSaveInstanceState");
+	   outState.putDoubleArray(PREVIOUS_MAIN_GRAPH_AREA, fractalView.graphArea);
+	   if(showingLittle) {
+		   outState.putDoubleArray(PREVIOUS_LITTLE_GRAPH_AREA, littleFractalView.graphArea);
+	   }
+	   if(fractalType == FractalType.MANDELBROT) {
+		   outState.putDoubleArray(PREVIOUS_JULIA_PARAMS, ((MandelbrotFractalView)fractalView).currentJuliaParams);
+	   }
+	   else {
+		   
+	   }
+	   
+	   outState.putBoolean(PREVIOUS_SHOWING_LITTLE, showingLittle);
+   }
+   
+   
+   @Override
+   protected void onRestoreInstanceState(Bundle savedInstanceState) {
+	   super.onRestoreInstanceState(savedInstanceState);
+	   
+	   double[] mainGraphArea = savedInstanceState.getDoubleArray(PREVIOUS_MAIN_GRAPH_AREA);
+	   double[] littleGraphArea = savedInstanceState.getDoubleArray(PREVIOUS_LITTLE_GRAPH_AREA);
+	   double[] juliaParams = savedInstanceState.getDoubleArray(PREVIOUS_JULIA_PARAMS);
+	   
+	   MandelbrotJuliaLocation restoredLoc;
+	   
+	   if(fractalType == FractalType.MANDELBROT) {
+		   restoredLoc = new MandelbrotJuliaLocation(mainGraphArea, littleGraphArea, juliaParams);
+		   ((MandelbrotFractalView)fractalView).currentJuliaParams = juliaParams;
+	   }
+	   else {
+		   restoredLoc = new MandelbrotJuliaLocation(littleGraphArea, mainGraphArea, juliaParams);
+	   }
+	   
+	   restoredLoc.setMandelbrotGraphArea(mainGraphArea);
+	   fractalView.loadLocation(restoredLoc);
+	   
+	   showLittleAtStart = savedInstanceState.getBoolean(PREVIOUS_SHOWING_LITTLE);
+   }
+   
    
    /* Set the activity result when finishing, if needed
     * (non-Javadoc)

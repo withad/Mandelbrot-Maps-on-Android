@@ -1,7 +1,5 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import uk.ac.ed.inf.mandelbrotmaps.colouring.ColouringScheme;
-import uk.ac.ed.inf.mandelbrotmaps.colouring.DefaultColouringScheme;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,13 +19,20 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	public double[] currentJuliaParams = new double[2];
 	private float[] pinCoords = new float[2];
 	
-	Paint circlePaint;
-	Paint smallDotPaint;
-	Paint selectedCirclePaint;
-	Paint littleViewPaint;
+	Paint outerPinPaint;
+	Paint innerPinPaint;
+	Paint selectedPinPaint;
+	Paint littlePinPaint;
 	
-	private float smallCircleRadius = 5.0f;
-	private float largeCircleRadius = 20.0f;
+	int outerPinAlpha = 150;
+	int innerPinAlpha = 150;
+	int selectedPinAlpha = 150;
+	int littlePinAlpha = 180;
+	
+	private float smallPinRadius = 5.0f;
+	private float largePinRadius = 20.0f;
+	
+	
 	
 	
 	public MandelbrotFractalView(Context context, FractalViewSize size) {
@@ -54,23 +59,23 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		
 		int pinColour = Color.parseColor(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("PIN_COLOUR", "blue"));
 		
-		circlePaint = new Paint();
-		circlePaint.setColor(pinColour);
-		circlePaint.setAlpha(75);
-		//circlePaint.setStyle(Style.STROKE);
+		outerPinPaint = new Paint();
+		outerPinPaint.setColor(pinColour);
+		outerPinPaint.setAlpha(outerPinAlpha);
+		//outerPinPaint.setStyle(Style.STROKE);
 		
-		smallDotPaint = new Paint();
-		smallDotPaint.setColor(pinColour);
-		smallDotPaint.setAlpha(120);
+		innerPinPaint = new Paint();
+		innerPinPaint.setColor(pinColour);
+		innerPinPaint.setAlpha(innerPinAlpha);
 		
-		littleViewPaint = new Paint();
-		littleViewPaint.setColor(pinColour);
-		littleViewPaint.setAlpha(180);
-		littleViewPaint.setStyle(Style.STROKE);
+		littlePinPaint = new Paint();
+		littlePinPaint.setColor(pinColour);
+		littlePinPaint.setAlpha(littlePinAlpha);
+		littlePinPaint.setStyle(Style.STROKE);
 		
-		selectedCirclePaint = new Paint();
-		selectedCirclePaint.setColor(pinColour);
-		selectedCirclePaint.setAlpha(100);
+		selectedPinPaint = new Paint();
+		selectedPinPaint.setColor(pinColour);
+		selectedPinPaint.setAlpha(selectedPinAlpha);
 	}
 		
 	
@@ -84,16 +89,16 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			matrix.mapPoints(mappedCoords, pinCoords);
 			
 			if(fractalViewSize == FractalViewSize.LARGE) {
-				canvas.drawCircle(mappedCoords[0], mappedCoords[1], smallCircleRadius, smallDotPaint);
+				canvas.drawCircle(mappedCoords[0], mappedCoords[1], smallPinRadius, innerPinPaint);
 				
 				//Draw larger outer circle if pin is held down.
 				if(!holdingPin)
-					canvas.drawCircle(mappedCoords[0], mappedCoords[1], largeCircleRadius, circlePaint);
+					canvas.drawCircle(mappedCoords[0], mappedCoords[1], largePinRadius, outerPinPaint);
 				else
-					canvas.drawCircle(mappedCoords[0], mappedCoords[1], largeCircleRadius*2, selectedCirclePaint);
+					canvas.drawCircle(mappedCoords[0], mappedCoords[1], largePinRadius*2, selectedPinPaint);
 			}
 			else if (fractalViewSize == FractalViewSize.LITTLE) {
-				canvas.drawCircle(mappedCoords[0], mappedCoords[1], smallCircleRadius, littleViewPaint);
+				canvas.drawCircle(mappedCoords[0], mappedCoords[1], smallPinRadius, littlePinPaint);
 			}
 		}
 	}
@@ -112,9 +117,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			
 			int dpi = currentDisplayMetrics.densityDpi;
 			Log.d(TAG, "Current dpi is " + dpi + " dots per inch");
-			largeCircleRadius = dpi/6; 
-			smallCircleRadius = dpi/30;
-			Log.d(TAG, "Small circle radius is " + smallCircleRadius);
+			largePinRadius = dpi/6; 
+			smallPinRadius = dpi/30;
+			Log.d(TAG, "Small circle radius is " + smallPinRadius);
 		}
 	}
 	
@@ -302,16 +307,16 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 	
 	public void setPinColour(int newColour) {
-		circlePaint.setColor(newColour);
-		selectedCirclePaint.setColor(newColour);
-		smallDotPaint.setColor(newColour);
-		littleViewPaint.setColor(newColour);
+		outerPinPaint.setColor(newColour);
+		selectedPinPaint.setColor(newColour);
+		innerPinPaint.setColor(newColour);
+		littlePinPaint.setColor(newColour);
 		
 		// This somehow resets the alphas as well, so reset those.
-		circlePaint.setAlpha(75);
-		smallDotPaint.setAlpha(120);
-		littleViewPaint.setAlpha(180);		
-		selectedCirclePaint.setAlpha(100);
+		outerPinPaint.setAlpha(outerPinAlpha);
+		innerPinPaint.setAlpha(innerPinAlpha);
+		littlePinPaint.setAlpha(littlePinAlpha);		
+		selectedPinPaint.setAlpha(selectedPinAlpha);
 		
 		invalidate();
 	}
