@@ -48,8 +48,8 @@ abstract class AbstractFractalView extends View {
 	double ITERATION_CONSTANT_FACTOR;
 	
 	// Scaling factor for maxIterations() calculations
-	double iterationScaling = 0.3;
-	double ITERATIONSCALING_DEFAULT = 0.3;
+	double iterationScaling = 1.0;
+	double ITERATIONSCALING_DEFAULT = 1.0;
 	double ITERATIONSCALING_MIN = 0.01; 
 	double ITERATIONSCALING_MAX = 100;
 	
