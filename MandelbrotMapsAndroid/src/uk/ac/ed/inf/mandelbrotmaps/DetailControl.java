@@ -5,7 +5,7 @@ import uk.ac.ed.inf.mandelbrotmaps.R;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class About extends Activity {
+public class DetailControl extends Activity {
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);

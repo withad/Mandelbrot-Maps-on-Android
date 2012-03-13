@@ -21,7 +21,7 @@
 
    <string name="mmaps_title">Mandelbrot Maps</string>
    
-   <string name="about_title">About Mandelbrot Maps</string>
+   <string name="detail_title">Detail</string>
    <string name="about_text">\
 An Android port of Mandelbrot Maps,
 currently capable of displaying and
