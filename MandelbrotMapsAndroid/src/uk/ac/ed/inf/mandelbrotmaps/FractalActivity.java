@@ -418,6 +418,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       case R.id.preferences:
     	  startActivity(new Intent(this, Prefs.class));
     	  return true;
+    	  
+      case R.id.details:
+    	  startActivity(new Intent(this, DetailControl.class));
+    	  return true;
       }
       return false;
    }
