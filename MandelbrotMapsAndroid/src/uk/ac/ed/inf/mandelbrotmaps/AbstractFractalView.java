@@ -15,7 +15,6 @@ import uk.ac.ed.inf.mandelbrotmaps.colouring.JuliaDefaultColouringScheme;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.PsychadelicColouringScheme;
 import uk.ac.ed.inf.mandelbrotmaps.colouring.RGBWalkColouringScheme;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -150,7 +149,6 @@ abstract class AbstractFractalView extends View {
       	//Up the iteration count a bit for the little view (decent value, seems to work)
       	if (fractalViewSize == FractalViewSize.LITTLE) {
       		iterationScaling *= 1.5;
-      		ITERATIONSCALING_DEFAULT *= 1.5;
       	}
       
       	// Initialise the matrix (not nearly as sinister as it sounds)
@@ -609,7 +607,6 @@ abstract class AbstractFractalView extends View {
 				(scaledIterationCount * (Math.log(ITERATIONSCALING_MAX) - Math.log(ITERATIONSCALING_MIN))) /
 				CONTRAST_SLIDER_SCALING)
 			);
-			//scheduleNewRenders();
 			setGraphArea(graphArea, true);
 		}
 	}

@@ -28,9 +28,12 @@ android:layout_height="fill_parent">
 			android:id="@+id/mandelbrot_seekbar"
 			android:paddingRight="20dip"/>
 			
-			<EditText android:layout_width="wrap_content"
+			<TextView android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="100"/>
+			android:text="100"
+			android:id="@+id/mandelbrotText"
+			android:inputType="number"
+			android:ems="3"/>
 			
 		</LinearLayout>
 		
@@ -52,9 +55,12 @@ android:layout_height="fill_parent">
 			android:id="@+id/julia_seekbar"
 			android:paddingRight="20dip"/>
 			
-			<EditText android:layout_width="wrap_content"
+			<TextView android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="100"/>
+			android:text="100"
+			android:id="@+id/juliaText"
+			android:inputType="number"
+			android:ems="3"/>
 			
 		</LinearLayout>
 		
