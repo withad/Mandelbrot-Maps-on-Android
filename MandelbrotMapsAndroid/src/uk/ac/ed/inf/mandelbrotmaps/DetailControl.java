@@ -73,8 +73,8 @@ public class DetailControl extends Activity implements OnClickListener, OnSeekBa
 			finish();
 		}
 		else if(button == R.id.default_detail_button) {
-			juliaBar.setProgress(30);
-			mandelbrotBar.setProgress(30);
+			juliaBar.setProgress((int)AbstractFractalView.DEFAULT_DETAIL_LEVEL);
+			mandelbrotBar.setProgress((int)AbstractFractalView.DEFAULT_DETAIL_LEVEL);
 		}
 		else if(button == R.id.detail_apply_button) {
 			//Set shared prefs and return value (to indicate if shared prefs have changed)

@@ -43,7 +43,8 @@ abstract class AbstractFractalView extends View {
 	
 	// Constants for iteration number calculations
 	private static final double LITTLE_DETAIL_BOOST = 1.5; //Need to bump up the scaling on the little view so it looks better.
-	public static final double DEFAULT_DETAIL_LEVEL = 30;
+	private static final double DETAIL_DIVISOR = 50;
+	public static final double DEFAULT_DETAIL_LEVEL = 15;
 	public static final double ITERATIONSCALING_MIN = 0.01;
 	public static final double ITERATIONSCALING_MAX = 100;
 	double ITERATION_BASE;
@@ -597,7 +598,7 @@ abstract class AbstractFractalView extends View {
 		if(fractalViewSize == FractalViewSize.LITTLE)
 			detailForCalc *= LITTLE_DETAIL_BOOST;
 		
-		double dblIterations = (detailForCalc/100) * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
+		double dblIterations = (detailForCalc/DETAIL_DIVISOR) * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
 		
 		int iterationsToPerform = (int)dblIterations;
 		
