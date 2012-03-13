@@ -16,7 +16,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	public float lastTouchX = 0;
 	public float lastTouchY = 0;
 	
-	public double[] currentJuliaParams = new double[2];
+	public double[] currentJuliaParams = null;//new double[2];
 	private float[] pinCoords = new float[2];
 	
 	Paint outerPinPaint;
@@ -128,6 +128,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	void loadLocation(MandelbrotJuliaLocation mjLocation) {
 		//setScaledIterationCount(mjLocation.getMandelbrotContrast());
 		setGraphArea(mjLocation.getMandelbrotGraphArea(), true);
+		currentJuliaParams = mjLocation.getJuliaParam();
 	}
 	
 	// Iterate a rectangle of pixels, in range (xPixelMin, yPixelMin) to (xPixelMax, yPixelMax)
@@ -284,6 +285,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		// Touch position, on the complex plane (translated from pixels)
 		juliaParams[0] = mandelbrotGraphArea[0] + ( (double)touchX * pixelSize );
 		juliaParams[1] = mandelbrotGraphArea[1] - ( (double)touchY * pixelSize );
+		
+		Log.d(TAG, "Getting new Julia...");
 		
 		currentJuliaParams = juliaParams;
 		

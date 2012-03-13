@@ -322,7 +322,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   
 	   if(fractalType == FractalType.MANDELBROT) {
 		   littleFractalView.loadLocation(mjLocation); 
-		   double[] jParams = ((MandelbrotFractalView)fractalView).getJuliaParams(fractalView.getWidth()/2, fractalView.getHeight()/2);
+		   
+		   double[] jParams;		   
+		   if(((MandelbrotFractalView)fractalView).currentJuliaParams != null) {
+			   jParams = ((MandelbrotFractalView)fractalView).currentJuliaParams;
+		   }
+		   else
+			   jParams = ((MandelbrotFractalView)fractalView).getJuliaParams(fractalView.getWidth()/2, fractalView.getHeight()/2);
+			   Log.d(TAG, "jParams: " + jParams[0] + " " + jParams[1]);
 		   ((JuliaFractalView)littleFractalView).setJuliaParameter(jParams[0], jParams[1]);
 	   }
 	   else {
