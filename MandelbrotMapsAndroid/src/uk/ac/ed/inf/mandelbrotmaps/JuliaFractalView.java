@@ -59,7 +59,7 @@ public class JuliaFractalView extends AbstractFractalView{
 	
 	// Load a location
 	void loadLocation(MandelbrotJuliaLocation mjLocation) {
-		setScaledIterationCount(mjLocation.getJuliaContrast());
+		//setScaledIterationCount(mjLocation.getJuliaContrast());
 		double[] juliaParam = mjLocation.getJuliaParam();
 		setGraphArea(mjLocation.getJuliaGraphArea(), true);
 		setJuliaParameter(juliaParam[0], juliaParam[1]);

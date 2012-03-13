@@ -52,6 +52,8 @@ abstract class AbstractFractalView extends View {
 	double ITERATIONSCALING_MIN = 0.01; 
 	double ITERATIONSCALING_MAX = 100;
 	
+	double detailLevel = 30;
+	
 	
 	// How often to redraw fractal when rendering. Set to 1/12th screen size in onSizeChanged()
 	public int linesToDrawAfter = 20;
@@ -147,9 +149,9 @@ abstract class AbstractFractalView extends View {
       	fractalViewSize = size;
       	
       	//Up the iteration count a bit for the little view (decent value, seems to work)
-      	if (fractalViewSize == FractalViewSize.LITTLE) {
+      	/*if (fractalViewSize == FractalViewSize.LITTLE) {
       		iterationScaling *= 1.5;
-      	}
+      	}*/
       
       	// Initialise the matrix (not nearly as sinister as it sounds)
       	matrix = new Matrix();
@@ -587,28 +589,10 @@ abstract class AbstractFractalView extends View {
 	 * Log scale, with values ITERATIONSCALING_MIN .. ITERATIONSCALING_MAX
 	 * represented by values in range 0..CONTRAST_SLIDER_SCALING */
 	public int getScaledIterationCount() {
-		return (int)(
-			CONTRAST_SLIDER_SCALING *
-			( Math.log(iterationScaling) - Math.log(ITERATIONSCALING_MIN) ) /
+		return (int)(CONTRAST_SLIDER_SCALING *
+			( Math.log(detailLevel/100) - Math.log(ITERATIONSCALING_MIN) ) /
 			( Math.log(ITERATIONSCALING_MAX) - Math.log(ITERATIONSCALING_MIN) )
 		);
-	}
-	
-	/* Set the iteration scaling factor.
-	 * Log scale, with values ITERATIONSCALING_MIN .. ITERATIONSCALING_MAX
-	 * represented by values in range 0..CONTRAST_SLIDER_SCALING */
-	public void setScaledIterationCount(int scaledIterationCount) {
-		if (
-			(scaledIterationCount >= 0) &&
-			(scaledIterationCount <= CONTRAST_SLIDER_SCALING)
-		) {
-			iterationScaling = Math.exp(
-				Math.log(ITERATIONSCALING_MIN) + (
-				(scaledIterationCount * (Math.log(ITERATIONSCALING_MAX) - Math.log(ITERATIONSCALING_MIN))) /
-				CONTRAST_SLIDER_SCALING)
-			);
-			setGraphArea(graphArea, true);
-		}
 	}
 	
 	/* How many iterations to perform?
@@ -620,7 +604,7 @@ abstract class AbstractFractalView extends View {
 	int getMaxIterations() {
 		// How many iterations to perform?
 		double absLnPixelSize = Math.abs(Math.log(getPixelSize()));
-		double dblIterations = iterationScaling * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
+		double dblIterations = (detailLevel/100) * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
 		
 		int iterationsToPerform = (int)dblIterations;
 		

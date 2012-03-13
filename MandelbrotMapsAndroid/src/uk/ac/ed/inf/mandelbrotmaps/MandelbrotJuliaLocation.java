@@ -1,5 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
+import android.util.Log;
+
 
 class MandelbrotJuliaLocation {
 	//private URL urlBase;
@@ -54,6 +56,7 @@ class MandelbrotJuliaLocation {
 	}
 	
 	public int getJuliaContrast() {
+		Log.d("MMaps", "Julia contrast is - " + juliaContrast);
 		return juliaContrast;
 	}
 }
