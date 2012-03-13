@@ -128,6 +128,8 @@ abstract class AbstractFractalView extends View {
 	
 	public ColouringScheme colourer = new DefaultColouringScheme();
 	
+	boolean completedLastRender = false;
+	
 	
 	
 /*-----------------------------------------------------------------------------------*/
@@ -278,6 +280,8 @@ abstract class AbstractFractalView extends View {
 		// Abort current and future renders
 		stopAllRendering();
 		
+		completedLastRender = false;
+		
 		// New render won't have passed maximum depth, reset check
 		hasPassedMaxDepth = false;
 		
@@ -294,7 +298,8 @@ abstract class AbstractFractalView extends View {
 		
 		
 		//Schedule a crude rendering if needed (not the small view, not a small zoom)
-		if(Prefs.performCrude(getContext()) && fractalViewSize != FractalViewSize.LITTLE && (totalScaleFactor < 0.6f|| totalScaleFactor == 1.0f || totalScaleFactor > 3.5f)) {
+		if(Prefs.performCrude(getContext()) && fractalViewSize != FractalViewSize.LITTLE && 
+				(totalScaleFactor < 0.6f || totalScaleFactor == 1.0f || totalScaleFactor > 3.5f || !completedLastRender))  {
 			scheduleRendering(CRUDE_PIXEL_BLOCK);
 		}
 		totalScaleFactor = 1.0f; // Needs reset once checked, so that next render doesn't account for it.
@@ -341,7 +346,7 @@ abstract class AbstractFractalView extends View {
 		
 		// If all threads are done and you're the main view, show time.
 		if (!(isRendering()) && fractalViewSize == FractalViewSize.LARGE) {
-			Log.d(TAG, "Renders completed.");
+			completedLastRender = true;
 			
 			//Show time in seconds
 			double time = (double)((System.currentTimeMillis() - renderStartTime))/1000;
@@ -624,7 +629,6 @@ abstract class AbstractFractalView extends View {
 					if (hasPassedMaxDepth) {
 						parentActivity.showToastOnUIThread("Maximum zoom depth reached.", Toast.LENGTH_SHORT);
 					}
-					Log.d(TAG, "New graph area xmin: " + graphArea[0]);
 					scheduleNewRenders();
 				}
 			}
