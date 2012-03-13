@@ -8,8 +8,6 @@ class MandelbrotJuliaLocation {
 	private double[] mandelbrotGraphArea;
 	private double[] juliaGraphArea;
 	private double[] juliaParams;
-	private int mandelbrotContrast = -1;
-	private int juliaContrast = -1;
 	
 	public double[] defaultMandelbrotGraphArea = new double[] {-3.1, 1.45, 5};
 	public double[] defaultJuliaGraphArea = new double[] {-2.2, 1.25, 4.3};
@@ -49,14 +47,5 @@ class MandelbrotJuliaLocation {
 	
 	public double[] getJuliaParam() {
 		return juliaParams;
-	}
-	
-	public int getMandelbrotContrast() {
-		return mandelbrotContrast;
-	}
-	
-	public int getJuliaContrast() {
-		Log.d("MMaps", "Julia contrast is - " + juliaContrast);
-		return juliaContrast;
 	}
 }
