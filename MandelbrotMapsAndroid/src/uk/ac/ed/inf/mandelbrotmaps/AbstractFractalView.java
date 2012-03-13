@@ -585,16 +585,6 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 /* Iteration variables */
 /*-----------------------------------------------------------------------------------*/
-	/* Get the iteration scaling factor.
-	 * Log scale, with values ITERATIONSCALING_MIN .. ITERATIONSCALING_MAX
-	 * represented by values in range 0..CONTRAST_SLIDER_SCALING */
-	public int getScaledIterationCount() {
-		return (int)(CONTRAST_SLIDER_SCALING *
-			( Math.log(detailLevel/100) - Math.log(ITERATIONSCALING_MIN) ) /
-			( Math.log(ITERATIONSCALING_MAX) - Math.log(ITERATIONSCALING_MIN) )
-		);
-	}
-	
 	/* How many iterations to perform?
 	 * Empirically determined to be generally exponentially rising, as a function of x = |ln(pixelSize)|
 	 * ie, maxIterations ~ a(b^x)
