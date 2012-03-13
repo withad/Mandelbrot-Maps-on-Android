@@ -182,16 +182,17 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    protected void onSaveInstanceState(Bundle outState) {
 	   super.onSaveInstanceState(outState);
 	   
-	   Log.d(TAG, "Running onSaveInstanceState");
 	   outState.putDoubleArray(PREVIOUS_MAIN_GRAPH_AREA, fractalView.graphArea);
+	   
 	   if(showingLittle) {
 		   outState.putDoubleArray(PREVIOUS_LITTLE_GRAPH_AREA, littleFractalView.graphArea);
 	   }
+	   
 	   if(fractalType == FractalType.MANDELBROT) {
 		   outState.putDoubleArray(PREVIOUS_JULIA_PARAMS, ((MandelbrotFractalView)fractalView).currentJuliaParams);
 	   }
 	   else {
-		   
+		   outState.putDoubleArray(PREVIOUS_JULIA_PARAMS, ((JuliaFractalView)fractalView).getJuliaParam());
 	   }
 	   
 	   outState.putBoolean(PREVIOUS_SHOWING_LITTLE, showingLittle);
