@@ -2,7 +2,7 @@
 <menu
   xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/resetFractal" android:enabled="true" android:visible="true" android:title="Reset"></item>
-    <item android:checkable="true" android:visible="true" android:title="Show Julia" android:id="@+id/toggleLittle" android:checked="true"></item>
+    <item android:checkable="true" android:visible="true" android:id="@+id/toggleLittle" android:checked="true" android:title="Add Julia"></item>
     
     <item android:id="@+id/settobookmark" android:title="Speed test location" android:visible="true"></item>
     <item android:id="@+id/preferences" android:title="Preferences"></item>

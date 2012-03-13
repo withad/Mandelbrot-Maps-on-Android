@@ -398,15 +398,26 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       return true;
    }
    
-   @Override
-   public boolean onPrepareOptionsMenu(Menu menu) {
-	   if (fractalType == FractalType.JULIA) {
-	    	  MenuItem showLittle = menu.findItem(R.id.toggleLittle);
-	    	  showLittle.setTitle("Show Mandelbrot");
-	      }
-	   
-	   return true;
-   }
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		String verb;
+		String fractal;
+		
+		if(!showingLittle)
+			verb = "Add";
+		else 
+			verb = "Remove";
+		
+		if (fractalType == FractalType.MANDELBROT)
+			fractal = "Julia";
+		else
+			fractal = "Mandelbrot";
+		
+		MenuItem showLittle = menu.findItem(R.id.toggleLittle);
+		showLittle.setTitle(verb+" "+fractal);
+		
+		return true;
+	}
 
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
