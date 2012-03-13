@@ -30,9 +30,8 @@ import android.widget.Toast;
 abstract class AbstractFractalView extends View {
 	private final String TAG = "MMaps";
 	
-	// How many different, discrete zoom and contrast levels?
+	// How many different discrete zoom levels?
 	public final int ZOOM_SLIDER_SCALING = 300;
-	public final int CONTRAST_SLIDER_SCALING = 200;
    
 	// Default pixel block sizes for crude, detailed renders
 	final int CRUDE_PIXEL_BLOCK = 3;
@@ -42,17 +41,16 @@ abstract class AbstractFractalView extends View {
 	// How many iterations, at the very fewest, will we do?
 	int MIN_ITERATIONS = 10;
 	
-	// Constants for calculating maxIterations()
+	// Constants for iteration number calculations
+	private static final double LITTLE_DETAIL_BOOST = 1.5; //Need to bump up the scaling on the little view so it looks better.
+	public static final double DEFAULT_DETAIL_LEVEL = 30;
+	public static final double ITERATIONSCALING_MIN = 0.01;
+	public static final double ITERATIONSCALING_MAX = 100;
 	double ITERATION_BASE;
 	double ITERATION_CONSTANT_FACTOR;
 	
-	// Scaling factor for maxIterations() calculations
-	double iterationScaling = 0.3;
-	double ITERATIONSCALING_DEFAULT = 0.3;
-	double ITERATIONSCALING_MIN = 0.01; 
-	double ITERATIONSCALING_MAX = 100;
-	
-	double detailLevel = 30;
+	// Level of detail (abstracted for convenience - dividing by 100 gets the useful number).
+	public double detailLevel = 30;
 	
 	
 	// How often to redraw fractal when rendering. Set to 1/12th screen size in onSizeChanged()
@@ -583,7 +581,7 @@ abstract class AbstractFractalView extends View {
 
 	
 /*-----------------------------------------------------------------------------------*/
-/* Iteration variables */
+/* Iteration */
 /*-----------------------------------------------------------------------------------*/
 	/* How many iterations to perform?
 	 * Empirically determined to be generally exponentially rising, as a function of x = |ln(pixelSize)|
@@ -594,7 +592,12 @@ abstract class AbstractFractalView extends View {
 	int getMaxIterations() {
 		// How many iterations to perform?
 		double absLnPixelSize = Math.abs(Math.log(getPixelSize()));
-		double dblIterations = (detailLevel/100) * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
+		
+		double detailForCalc = parentActivity.getDetailFromPrefs(fractalViewSize);
+		if(fractalViewSize == FractalViewSize.LITTLE)
+			detailForCalc *= LITTLE_DETAIL_BOOST;
+		
+		double dblIterations = (detailForCalc/100) * ITERATION_CONSTANT_FACTOR * Math.pow(ITERATION_BASE, absLnPixelSize);
 		
 		int iterationsToPerform = (int)dblIterations;
 		
@@ -805,7 +808,7 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
-	private void reloadCurrentLocation() {
+	public void reloadCurrentLocation() {
 		stopAllRendering();
 		
 		clearPixelSizes();

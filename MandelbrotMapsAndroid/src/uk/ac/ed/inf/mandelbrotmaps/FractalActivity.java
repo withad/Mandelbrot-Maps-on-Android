@@ -35,11 +35,17 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	// Constants
 	private final int SHARE_IMAGE_REQUEST = 0;
 	private final int RETURN_FROM_JULIA = 1;
+	private final int RETURN_FROM_DETAIL_CHANGE = 2;
 	
+	// Shared pref keys
+	public static final String mandelbrotDetailKey = "MANDELBROT_DETAIL";
+	public static final String juliaDetailKey = "JULIA_DETAIL";
+	public static final String DETAIL_CHANGED_KEY = "DETAIL_CHANGED";
 	private final String PREVIOUS_MAIN_GRAPH_AREA = "prevMainGraphArea";
 	private final String PREVIOUS_LITTLE_GRAPH_AREA = "prevLittleGraphArea";
 	private final String PREVIOUS_JULIA_PARAMS = "prevJuliaParams";
 	private final String PREVIOUS_SHOWING_LITTLE = "prevShowingLittle";
+
 	
 	// Type of fractal displayed in the main fractal view
 	public static enum FractalType {
@@ -228,7 +234,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   double[] currentGraphArea = fractalView.graphArea;
 		   
 		   Intent result = new Intent();
-		   Log.d(TAG, ""+juliaParams[0]);
 		   result.putExtra("JuliaParams", juliaParams);
 		   result.putExtra("JuliaGraphArea", currentGraphArea);
 		   
@@ -251,10 +256,18 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   
 	   case RETURN_FROM_JULIA:
 		   if(showingLittle) {
-			   
 			   double[] juliaGraphArea = data.getDoubleArrayExtra("JuliaGraphArea");
 			   double[] juliaParams = data.getDoubleArrayExtra("JuliaParams");
 			   littleFractalView.loadLocation(new MandelbrotJuliaLocation(juliaGraphArea, juliaParams));
+		   }
+		   break;
+		   
+	   case RETURN_FROM_DETAIL_CHANGE:
+		   boolean changed = data.getBooleanExtra(DETAIL_CHANGED_KEY, false);
+		   if(changed) {
+			   fractalView.reloadCurrentLocation();
+			   if(showingLittle)
+				   littleFractalView.reloadCurrentLocation();
 		   }
 		   break;
 	   }
@@ -420,7 +433,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  return true;
     	  
       case R.id.details:
-    	  startActivity(new Intent(this, DetailControl.class));
+    	  startActivityForResult(new Intent(this, DetailControl.class), RETURN_FROM_DETAIL_CHANGE);
     	  return true;
       }
       return false;
@@ -798,5 +811,26 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				((MandelbrotFractalView)littleFractalView).setPinColour(newColour);
 			}
 		}
+	}
+
+	
+	public double getDetailFromPrefs(FractalViewSize fractalViewSize) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String keyToUse = mandelbrotDetailKey;
+		
+		if(fractalType == FractalType.MANDELBROT) {
+			if(fractalViewSize == FractalViewSize.LARGE)
+				keyToUse = mandelbrotDetailKey;
+			else
+				keyToUse = juliaDetailKey;
+		}
+		else {
+			if(fractalViewSize == FractalViewSize.LARGE)
+				keyToUse = juliaDetailKey;
+			else
+				keyToUse = mandelbrotDetailKey;
+		}
+		
+		return (double)prefs.getFloat(keyToUse, (float)AbstractFractalView.DEFAULT_DETAIL_LEVEL);
 	}
 }

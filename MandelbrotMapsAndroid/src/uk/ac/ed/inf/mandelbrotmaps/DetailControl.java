@@ -1,7 +1,11 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -29,29 +33,36 @@ public class DetailControl extends Activity implements OnClickListener, OnSeekBa
 	int returnMandelbrot = 0;
 	int returnJulia = 0;
 	
+	boolean changed = false;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.detailcontrol);
 		
+		// Get references to UI elements
 		applyButton = (Button)findViewById(R.id.detail_apply_button);
 		applyButton.setOnClickListener(this);
-		
 		defaultsButton = (Button) findViewById(R.id.default_detail_button);
 		defaultsButton.setOnClickListener(this);
-		
 		cancelButton = (Button) findViewById(R.id.detail_cancel_button);
 		cancelButton.setOnClickListener(this);
 		
+		// Assign TextViews before their values are set when the SeekBars change
+		mandelbrotText = (TextView)findViewById(R.id.mandelbrotText);		
+		juliaText = (TextView)findViewById(R.id.juliaText);
+		
+		// Get references to SeekBars, set their value from the prefs
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		
 		mandelbrotBar = (SeekBar) findViewById(R.id.mandelbrot_seekbar);
 		mandelbrotBar.setOnSeekBarChangeListener(this);
+		mandelbrotBar.setProgress((int)prefs.getFloat(FractalActivity.mandelbrotDetailKey, (float) AbstractFractalView.DEFAULT_DETAIL_LEVEL));
 		
 		juliaBar = (SeekBar) findViewById(R.id.julia_seekbar);
 		juliaBar.setOnSeekBarChangeListener(this);
-		
-		mandelbrotText = (TextView)findViewById(R.id.mandelbrotText);		
-		juliaText = (TextView)findViewById(R.id.juliaText);
+		juliaBar.setProgress((int)prefs.getFloat(FractalActivity.juliaDetailKey, (float) AbstractFractalView.DEFAULT_DETAIL_LEVEL));
 	}
 	
 
@@ -67,11 +78,26 @@ public class DetailControl extends Activity implements OnClickListener, OnSeekBa
 		}
 		else if(button == R.id.detail_apply_button) {
 			//Set shared prefs and return value (to indicate if shared prefs have changed)
-			boolean changed = (originalMandelbrot == mandelbrotBar.getProgress()) 
-								&& (originalJulia == juliaBar.getProgress());
-
+			SharedPreferences.Editor prefsEditor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+			prefsEditor.putFloat(FractalActivity.mandelbrotDetailKey, (float)mandelbrotBar.getProgress());
+			prefsEditor.putFloat(FractalActivity.juliaDetailKey, (float)juliaBar.getProgress());
+			
+			prefsEditor.commit();
+			
+			changed = true;
+			
 			finish();
 		}
+	}
+	
+	@Override
+	public void finish() {
+		Intent result = new Intent();
+		result.putExtra(FractalActivity.DETAIL_CHANGED_KEY, changed);
+	   
+		setResult(Activity.RESULT_OK, result);
+		
+		super.finish();
 	}
 
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
