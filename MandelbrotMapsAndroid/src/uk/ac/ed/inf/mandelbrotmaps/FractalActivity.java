@@ -868,29 +868,21 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
 
 
-	private void firstTime() {
-		SpannableString welcomeText = new SpannableString(getText(R.string.nice_html));		
-		Linkify.addLinks(welcomeText, Linkify.WEB_URLS);
+	private void firstTime() {		
+		TextView text = new TextView(this);
+        text.setMovementMethod(LinkMovementMethod.getInstance());
+        text.setText(Html.fromHtml(getString(R.string.nice_html)));
 
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder//.setMessage(welcomeText)
-				.setCancelable(true)
+		builder	.setCancelable(true)
+				.setView(text)
 				.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
 		           public void onClick(DialogInterface dialog, int id) {
 		                dialog.cancel();
 		           }
-		       });
-		
-		TextView text = new TextView(this);
-        text.setMovementMethod(LinkMovementMethod.getInstance());
-        text.setText(Html.fromHtml(getString(R.string.nice_html)));
-        builder.setView(text);
-
-		
-		AlertDialog alert = builder.create();
-		
-		alert.show();
+		       });;
+		builder.create().show();
 
 		
 		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
