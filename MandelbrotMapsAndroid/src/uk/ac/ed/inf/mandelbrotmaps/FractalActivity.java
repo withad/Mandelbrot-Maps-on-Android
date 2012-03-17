@@ -4,7 +4,9 @@ import java.io.File;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +15,10 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +32,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
 
@@ -45,6 +52,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private final String PREVIOUS_LITTLE_GRAPH_AREA = "prevLittleGraphArea";
 	private final String PREVIOUS_JULIA_PARAMS = "prevJuliaParams";
 	private final String PREVIOUS_SHOWING_LITTLE = "prevShowingLittle";
+	private final String FIRST_TIME_KEY = "FirstTime";
 
 	
 	// Type of fractal displayed in the main fractal view
@@ -99,10 +107,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);      
+		super.onCreate(savedInstanceState);  
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);   
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);      
+		
+		// Check for first time launch
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		//if(prefs.getBoolean(FIRST_TIME_KEY, true)) firstTime();
+		firstTime();
 	  
 	  	Bundle bundle = getIntent().getExtras();
 	  
@@ -138,8 +152,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		
 		gestureDetector = new ScaleGestureDetector(this, this);
 	}
-   
-   /* When destroyed, stop rendering and kill all the threads,
+
+/* When destroyed, stop rendering and kill all the threads,
 	* so references aren't kept.
     */
    @Override
@@ -851,5 +865,36 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		}
 		
 		return (double)prefs.getFloat(keyToUse, (float)AbstractFractalView.DEFAULT_DETAIL_LEVEL);
+	}
+
+
+	private void firstTime() {
+		SpannableString welcomeText = new SpannableString(getText(R.string.nice_html));		
+		Linkify.addLinks(welcomeText, Linkify.WEB_URLS);
+
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder//.setMessage(welcomeText)
+				.setCancelable(true)
+				.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });
+		
+		TextView text = new TextView(this);
+        text.setMovementMethod(LinkMovementMethod.getInstance());
+        text.setText(Html.fromHtml(getString(R.string.nice_html)));
+        builder.setView(text);
+
+		
+		AlertDialog alert = builder.create();
+		
+		alert.show();
+
+		
+		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+		editor.putBoolean(FIRST_TIME_KEY, false);
+		editor.commit();
 	}
 }

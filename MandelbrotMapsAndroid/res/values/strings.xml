@@ -8,26 +8,38 @@
  ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
 -->
 <resources>
-   <string name="app_name">MandelbrotMaps</string>
-   <string name="main_title">Mandelbrot Maps</string>
-   <string name="continue_label">Continue</string>
-   <string name="fractal_label">Fractal - single thread</string>
-   <string name="bitmap_test_label">Fractal - dual threads</string>
-   <string name="exit_label">Exit</string>
+	<string name="app_name">MandelbrotMaps</string>
+	<string name="main_title">Mandelbrot Maps</string>
+	<string name="continue_label">Continue</string>
+	<string name="fractal_label">Fractal - single thread</string>
+	<string name="bitmap_test_label">Fractal - dual threads</string>
+	<string name="exit_label">Exit</string>
+	
+	<string name="settings_label">Settings...</string>
+	<string name="settings_title">Mandelbrot Maps settings</string>
+	<string name="settings_shortcut">s</string>
+	
+	<string name="mmaps_title">Mandelbrot Maps</string>
+	
+	<string name="detail_title">Detail</string>
+	
+   	<string name="about_text">\
+	An Android port of Mandelbrot Maps,
+	currently capable of displaying and
+	moving a Mandelbrot fractal. 
+	</string>
+	
+	<string name="nice_html">
+	<![CDATA[
+	<h2>Welcome to <span style="font-style: italic;">Mandelbrot Maps</span>!</h2>
+	<p>This app is designed to showcase the relationship between the Mandelbrot set and Julia set fractals.
+	<p>Move around the fractals with one finger and pinch to zoom. When you zoom, the fractal will rerender with more detail.
+	<p><b>Mandelbrot Maps</b> is open-source software, relased under the GNU General Public License (v3). The source code can be
+	found <a href="https://github.com/withad/Mandelbrot-Maps-on-Android">here</a>.
+	]]>
+	</string>
 
-   <string name="settings_label">Settings...</string>
-   <string name="settings_title">Mandelbrot Maps settings</string>
-   <string name="settings_shortcut">s</string>
-
-   <string name="mmaps_title">Mandelbrot Maps</string>
-   
-   <string name="detail_title">Detail</string>
-   <string name="about_text">\
-An Android port of Mandelbrot Maps,
-currently capable of displaying and
-moving a Mandelbrot fractal. 
-</string>
-   <string name="about_label">About</string>
-   <string name="bitmap_label">Bitmap (not implemented)</string>
-   <string name="side_by_side_label">Side-by-side fractals</string>
+	<string name="about_label">About</string>
+	<string name="bitmap_label">Bitmap (not implemented)</string>
+	<string name="side_by_side_label">Side-by-side fractals</string>
 </resources>
