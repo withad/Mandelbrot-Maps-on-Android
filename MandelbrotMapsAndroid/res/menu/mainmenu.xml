@@ -6,7 +6,13 @@
     
     <item android:id="@+id/settobookmark" android:title="Speed test location" android:visible="true"></item>
     <item android:id="@+id/preferences" android:title="Preferences"></item>
-    <item android:id="@+id/details" android:title="Detail level"></item><item android:id="@+id/saveImage" android:title="Save image"></item><item android:id="@+id/shareImage" android:title="Share image"></item>
+    <item android:id="@+id/details" android:title="Detail level"></item>
+    <item android:id="@+id/saveShare" android:title="Save/Share">
+        <menu>
+	        <item android:id="@+id/saveImage" android:title="Save image"></item>
+	   	<item android:id="@+id/shareImage" android:title="Share image"></item>
+        </menu>
+    </item>
     
     
     
