@@ -34,7 +34,7 @@ package uk.ac.ed.inf.mandelbrotmaps.colouring;
  *  
  * @author mallia
  */
-public class SpiralRenderer implements ColouringScheme {
+public class PsychadelicColouringScheme implements ColouringScheme {
 
     /**
      * Colours a point which is bound to the set.  All points are coloured white.
@@ -50,7 +50,7 @@ public class SpiralRenderer implements ColouringScheme {
      * @param iterations the number of iterations the point escaped at
      * @return The RGB colour for the point
      */
-    public int colourOutsidePoint(int iterations){
+    public int colourOutsidePoint(int iterations, int maxIterations){
         //return black if the point escaped after 0 iterations
         if (iterations == 0){
             return 0xFF000000;

@@ -1,22 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
- ! Excerpted from "Hello, Android! 3e",
- ! published by The Pragmatic Bookshelf.
- ! Copyrights apply to this code. It may not be used to create training material, 
- ! courses, books, articles, and the like. Contact us if you are in doubt.
- ! We make no guarantees that this code is fit for any purpose. 
- ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
--->
 <PreferenceScreen
    xmlns:android="http://schemas.android.com/apk/res/android">
-   <CheckBoxPreference
-      android:key="music"
-      android:title="Example1"
-      android:summary="Example preference"
-      android:defaultValue="true" />
-   <CheckBoxPreference
-      android:key="hints"
-      android:title="Example2"
-      android:summary="Example preference"
-      android:defaultValue="true" />
+   <PreferenceCategory android:title="Rendering">
+	<CheckBoxPreference
+	      android:key="CRUDE"
+	      android:title="Use initial blocky rendering"
+	      android:summary="Performing a first pass with large pixel blocks gets a rough image faster but makes the full render take longer."
+	      android:defaultValue="true" />
+	      
+	<CheckBoxPreference
+	      android:key="SHOW_TIMES"
+	      android:title="Show render times"
+	      android:summary="Display the time of each render once complete."
+	      android:defaultValue="true" />
+   </PreferenceCategory>
+   
+   <PreferenceCategory android:title="Colours">
+   	<ListPreference
+	      android:key="MANDELBROT_COLOURS"
+	      android:title="Mandelbrot Set colouring scheme"
+	      android:summary="Colours are determined by how many iterations it takes to eliminate a point from the Mandelbrot Set."
+	      android:defaultValue="MandelbrotDefault"
+	      android:entries="@array/colourSchemeEntries"
+	      android:entryValues="@array/colourSchemeValues" />
+	      
+	<ListPreference
+	      android:key="JULIA_COLOURS"
+	      android:title="Julia Set colouring scheme"
+	      android:summary="Colours are determined by how many iterations it takes to eliminate a point from the Julia Set."
+	      android:defaultValue="MandelbrotDefault"
+	      android:entries="@array/colourSchemeEntries"
+	      android:entryValues="@array/colourSchemeValues" />
+	      
+      	<ListPreference
+	      android:key="PIN_COLOUR"
+	      android:title="Julia pin colour"
+	      android:summary="The colour of the circles pinpoint the current Julia fractal in the Mandelbrot."
+	      android:defaultValue="blue"
+	      android:entries="@array/pinColourEntries"
+	      android:entryValues="@array/pinColourValues" />
+   </PreferenceCategory>
+      
 </PreferenceScreen>

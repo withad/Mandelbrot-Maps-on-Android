@@ -8,4 +8,35 @@
  ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
 -->
 <resources>
+    <string-array name="colourSchemeEntries">
+        <item>Purple and Red</item>
+        <item>Purple and Yellow</item>
+        <item>RGB</item>
+        <item>Pastels</item>
+    </string-array>
+    
+    <string-array name="colourSchemeValues">
+        <item>MandelbrotDefault</item>
+        <item>JuliaDefault</item>
+        <item>RGBWalk</item>
+        <item>Psychadelic</item>
+    </string-array>
+    
+    <string-array name="pinColourEntries">
+        
+        <item>Red</item>
+        <item>Green</item><item>Blue</item>
+        <item>Yellow</item>
+        <item>Magenta</item>
+        <item>Black</item>
+    </string-array>
+    
+    <string-array name="pinColourValues">
+        <item>red</item>
+        <item>green</item>
+        <item>blue</item>
+        <item>yellow</item>
+        <item>magenta</item>
+        <item>black</item>
+    </string-array>
 </resources>

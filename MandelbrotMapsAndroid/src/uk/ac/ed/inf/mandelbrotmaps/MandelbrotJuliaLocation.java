@@ -1,23 +1,33 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import java.lang.reflect.Array;
-
-import android.R.array;
-
 
 class MandelbrotJuliaLocation {
-	//private URL urlBase;
 	private double[] mandelbrotGraphArea;
 	private double[] juliaGraphArea;
-	private double[] juliaParam;
-	private int mandelbrotContrast = -1;
-	private int juliaContrast = -1;
+	private double[] juliaParams;
+	
+	public double[] defaultMandelbrotGraphArea = new double[] {-3.1, 1.45, 5};
+	public double[] defaultJuliaGraphArea = new double[] {-2.2, 1.25, 4.3};
+	public double[] defaultJuliaParams = new double[] {-0.6, -0.01875}; //Julia params place it right in the middle of the Mandelbrot home.
 	
 	// Constructor. Defaults - some semi-arbitrary, pretty values
 	public MandelbrotJuliaLocation() {
+		mandelbrotGraphArea = defaultMandelbrotGraphArea;
+		juliaGraphArea = defaultJuliaGraphArea;
+		juliaParams = defaultJuliaParams;
+	}
+	
+	public MandelbrotJuliaLocation(double[] _mandelbrotGraphArea, double[] _juliaGraphArea, double[] _juliaParams) {
+		mandelbrotGraphArea = _mandelbrotGraphArea;
+		juliaGraphArea = _juliaGraphArea;
+		juliaParams = _juliaParams;
+	}
+	
+	
+	public MandelbrotJuliaLocation(double[] _juliaGraphArea, double[] _juliaParams) {
 		mandelbrotGraphArea = new double[] {-3.1, 1.45, 5};
-		juliaGraphArea = new double[] {-2.2, 1.25, 4.3};
-		juliaParam = new double[] {0.152, 0.584};
+		juliaGraphArea = _juliaGraphArea;
+		juliaParams = _juliaParams;
 	}
 	
 	public void setMandelbrotGraphArea(double[] newMandelbrotGraphArea) {
@@ -33,14 +43,6 @@ class MandelbrotJuliaLocation {
 	}
 	
 	public double[] getJuliaParam() {
-		return juliaParam;
-	}
-	
-	public int getMandelbrotContrast() {
-		return mandelbrotContrast;
-	}
-	
-	public int getJuliaContrast() {
-		return juliaContrast;
+		return juliaParams;
 	}
 }

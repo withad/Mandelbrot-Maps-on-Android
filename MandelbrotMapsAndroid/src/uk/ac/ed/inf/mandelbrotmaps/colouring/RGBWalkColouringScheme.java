@@ -44,7 +44,7 @@ public class RGBWalkColouringScheme implements ColouringScheme {
      * @param iterations
      * @return RGB colour as int
      */
-    public int colourOutsidePoint(int iterations){
+    public int colourOutsidePoint(int iterations, int maxIterations){
         if (iterations <= 0){
             return 0xFF000000;
         }   

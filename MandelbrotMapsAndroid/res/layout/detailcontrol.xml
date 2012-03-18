@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent">
+
+	<LinearLayout
+	android:padding="10dip" 
+	android:layout_height="fill_parent" 
+	android:orientation="vertical" 
+	android:layout_width="400dip"
+	android:focusable="true"
+	android:focusableInTouchMode="true">
+		
+		<TextView android:layout_width="wrap_content" 
+		android:text="Mandelbrot detail level" 
+		android:layout_height="wrap_content"/>
+		
+		<LinearLayout android:layout_width="fill_parent" 
+		android:orientation="horizontal" 
+		android:layout_height="wrap_content"
+		android:paddingBottom="10dip">
+		
+			<SeekBar android:layout_weight="1" 
+			android:layout_width="fill_parent" 
+			android:max="100" 
+			android:layout_height="wrap_content" 
+			android:id="@+id/mandelbrot_seekbar"
+			android:paddingRight="20dip"/>
+			
+			<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="100"
+			android:id="@+id/mandelbrotText"
+			android:inputType="number"
+			android:ems="3"/>
+			
+		</LinearLayout>
+		
+		
+		<TextView android:layout_width="wrap_content" 
+		android:text="Julia detail level"
+		android:layout_height="wrap_content"/>
+		
+		
+		<LinearLayout android:layout_width="fill_parent" 
+		android:orientation="horizontal" 
+		android:layout_height="wrap_content"
+		android:paddingBottom="30dip">
+		
+			<SeekBar android:layout_weight="1" 
+			android:layout_width="fill_parent" 
+			android:max="100" 
+			android:layout_height="wrap_content" 
+			android:id="@+id/julia_seekbar"
+			android:paddingRight="20dip"/>
+			
+			<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="100"
+			android:id="@+id/juliaText"
+			android:inputType="number"
+			android:ems="3"/>
+			
+		</LinearLayout>
+		
+		<Button android:text="Apply" 
+		android:layout_width="fill_parent" 
+		android:id="@+id/detail_apply_button" 
+		android:layout_height="wrap_content"/>
+		
+		<Button android:id="@+id/default_detail_button"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="Set to default"/>
+		
+		<Button android:text="Cancel" 
+		android:layout_width="fill_parent" 
+		android:id="@+id/detail_cancel_button" 
+		android:layout_height="wrap_content"/>
+		
+		
+	</LinearLayout>
+
+</ScrollView>
