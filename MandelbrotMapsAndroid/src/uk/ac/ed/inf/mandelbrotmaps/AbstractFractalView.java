@@ -232,6 +232,9 @@ abstract class AbstractFractalView extends View {
 		
 		//Draw fractal image on screen
 		canvas.drawBitmap(fractalBitmap, matrix, new Paint());
+		
+		// Brings little view to front if it's hidden but shouldn't be, as can happen.
+		if(parentActivity.showingLittle) parentActivity.addLittleView(false);
 	}
 	
 	
