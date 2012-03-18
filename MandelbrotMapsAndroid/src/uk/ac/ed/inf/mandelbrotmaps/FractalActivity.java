@@ -98,6 +98,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private boolean showingSpinner = false;
 	private boolean allowSpinner = false;
 	
+	private boolean justDroppedPin = false;
+	
 	
 	
 	
@@ -355,7 +357,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   setContentView(relativeLayout);
 	   
 	   showingLittle = true;
-	   fractalView.holdingPin = false; // Might fix an intermittent bug where the circle stays large.
    }
    
    /* Hides the little fractal view, if showing */
@@ -617,11 +618,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 						&& !fractalView.holdingPin && (touchingPin(evt.getX(), evt.getY())))	{
 					// Take hold of the pin, reset the little fractal view.
 					fractalView.holdingPin = true;
-					//littleFractalView.graphArea = new MandelbrotJuliaLocation().defaultJuliaGraphArea;
 					updateLittleJulia(evt.getX(), evt.getY());
 				}
 				else {
-					startDragging(evt);	
+					startDragging(evt);
 				}
 				
 				break;
@@ -824,6 +824,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			((MandelbrotFractalView)fractalView).getJuliaParams(x, y);
 			addLittleView(false);
 		}
+		
+		//fractalView.holdingPin = true;
 	}
 
 	
@@ -931,6 +933,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		// Check that it's not scaling, dragging (check for dragging is a little hacky, but seems to work), or already holding the pin
 		if(!gestureDetector.isInProgress() && fractalView.totalDragX < 1 && fractalView.totalDragY < 1 && !fractalView.holdingPin) {
 			updateLittleJulia((float)dragLastX, (float)dragLastY);
+			currentlyDragging = false;
 			return true;
 		}
 		

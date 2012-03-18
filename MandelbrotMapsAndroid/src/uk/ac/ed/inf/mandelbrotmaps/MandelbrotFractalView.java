@@ -191,7 +191,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				}
 				
 				if (allowInterruption && (callingThread.abortSignalled())) {
-					Log.d(TAG, "Render aborted.");
 					return;
 				}
 				
