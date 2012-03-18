@@ -32,6 +32,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
@@ -896,14 +897,15 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	
 	private void showHelpDialog() {
+		ScrollView scrollView = new ScrollView(this);
 		TextView text = new TextView(this);
-        //text.setMovementMethod(LinkMovementMethod.getInstance());
         text.setText(Html.fromHtml(getString(R.string.help_text)));
+        scrollView.addView(text);
 
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder	.setCancelable(true)
-				.setView(text)
+				.setView(scrollView)
 				.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
 		           public void onClick(DialogInterface dialog, int id) {
 		                dialog.cancel();
