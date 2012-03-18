@@ -1,14 +1,12 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import java.io.File;
-import java.security.acl.LastOwnerException;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -18,7 +16,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -79,7 +76,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private float dragLastY;
 	private int dragID = -1;
 	private boolean currentlyDragging = false;
-	private boolean isMoving = false;
 	
 	private ScaleGestureDetector gestureDetector;
 	
@@ -97,8 +93,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private ProgressBar progressBar;
 	private boolean showingSpinner = false;
 	private boolean allowSpinner = false;
-	
-	private boolean justDroppedPin = false;
 	
 	
 	
@@ -627,7 +621,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			case MotionEvent.ACTION_MOVE:
 				if(!gestureDetector.isInProgress()) {
 					if(currentlyDragging) {
-						isMoving = true;
 						dragFractal(evt);
 					}
 					else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT && fractalView.holdingPin)	{
@@ -654,7 +647,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			case MotionEvent.ACTION_UP:
 				if(currentlyDragging) {
 					stopDragging();
-					isMoving = false;
 				}
 				else if (littleFractalSelected) {
 					borderView.setBackgroundColor(Color.GRAY);

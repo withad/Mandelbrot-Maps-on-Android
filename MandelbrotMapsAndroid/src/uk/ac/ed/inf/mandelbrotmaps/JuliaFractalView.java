@@ -1,12 +1,7 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
-import uk.ac.ed.inf.mandelbrotmaps.colouring.ColouringScheme;
-import uk.ac.ed.inf.mandelbrotmaps.colouring.DefaultColouringScheme;
-import uk.ac.ed.inf.mandelbrotmaps.colouring.JuliaDefaultColouringScheme;
-import uk.ac.ed.inf.mandelbrotmaps.colouring.RGBWalkColouringScheme;
 import android.content.Context;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class JuliaFractalView extends AbstractFractalView{
 
@@ -82,8 +77,7 @@ public class JuliaFractalView extends AbstractFractalView{
 			int imgWidth = xPixelMax - xPixelMin;
 			
 			int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
-			double colourCode;
-			int colourCodeR, colourCodeG, colourCodeB, colourCodeHex;
+			int colourCodeHex;
 			int pixelBlockA = 0, pixelBlockB = 0;
 		
 			double x, y;

@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
 
@@ -149,8 +148,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			int imgWidth = xPixelMax - xPixelMin;
 			
 			int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
-			double colourCode;
-			int colourCodeR, colourCodeG, colourCodeB, colourCodeHex;
+			int colourCodeHex;
 			int pixelBlockA, pixelBlockB;
 		
 			// c = (x0) + (y0)i

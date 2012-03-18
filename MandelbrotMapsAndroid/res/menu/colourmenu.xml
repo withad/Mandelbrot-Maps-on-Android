@@ -1,5 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:alphabeticShortcut="b" android:id="@+id/Blue" android:checkable="true" android:title="Blue"></item>
-    <item android:id="@+id/Green" android:checkable="true" android:checked="false" android:title="Green"></item>
-    <item android:id="@+id/Red" android:checkable="true" android:checked="false" android:title="Red"></item>
-</menu>
