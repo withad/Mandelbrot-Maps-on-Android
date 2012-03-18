@@ -190,8 +190,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    protected void onResume() {
 	   super.onResume();
 	   
-	   Log.d(TAG, "Running onResume()");
-	   
 	   SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	   prefs.registerOnSharedPreferenceChangeListener(this);
    }
@@ -344,9 +342,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   if(((MandelbrotFractalView)fractalView).currentJuliaParams != null || centre) {
 			   jParams = ((MandelbrotFractalView)fractalView).currentJuliaParams;
 		   }
-		   else
+		   else {
 			   jParams = ((MandelbrotFractalView)fractalView).getJuliaParams(fractalView.getWidth()/2, fractalView.getHeight()/2);
-			   Log.d(TAG, "jParams: " + jParams[0] + " " + jParams[1]);
+		   }
+		   
 		   ((JuliaFractalView)littleFractalView).setJuliaParameter(jParams[0], jParams[1]);
 	   }
 	   else {
@@ -390,7 +389,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     */
    public void hideProgressSpinner() {
 	   if(!showingSpinner || !allowSpinner) return;
-	   Log.d(TAG, "Remove spinner");
 	   
 	   runOnUiThread(new Runnable() {
 		
@@ -560,7 +558,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 						while (!cancelledSave && fractalView.isRendering()) {
 							try {
 								Thread.sleep(100);
-								Log.d(TAG, "Waiting to save...");
 							} catch (InterruptedException e) {}
 						}			
 			
@@ -692,7 +689,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		float pinX = pinCoords[0];
 		float pinY = pinCoords[1];
 		
-		float radius = MandelbrotFractalView.largePinRadius;
+		float radius = ((MandelbrotFractalView)fractalView).largePinRadius;
 			
 		if(x <= pinX + radius && x >= pinX - radius && y <= pinY + radius && y >= pinY - radius)
 			touchingPin = true;
@@ -781,7 +778,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			dragLastY = (int) evt.getY(dragID);
 			   
 			if (pointerId == dragID) {
-				Log.d(TAG, "Choosing new active pointer");
+				//Log.d(TAG, "Choosing new active pointer");
 				final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
 				dragLastX = (int) evt.getX(newPointerIndex);
 				dragLastY = (int) evt.getY(newPointerIndex);

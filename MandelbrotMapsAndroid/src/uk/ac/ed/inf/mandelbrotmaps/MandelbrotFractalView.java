@@ -29,8 +29,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	int selectedPinAlpha = 150;
 	int littlePinAlpha = 180;
 	
-	public static float smallPinRadius = 5.0f;
-	public static float largePinRadius = 20.0f;
+	public float smallPinRadius = 5.0f;
+	public float largePinRadius = 20.0f;
 	
 	
 	
@@ -116,10 +116,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			parentActivity.getWindowManager().getDefaultDisplay().getMetrics(currentDisplayMetrics);
 			
 			int dpi = currentDisplayMetrics.densityDpi;
-			Log.d(TAG, "Current dpi is " + dpi + " dots per inch");
 			largePinRadius = dpi/6; 
 			smallPinRadius = dpi/30;
-			Log.d(TAG, "Small circle radius is " + smallPinRadius);
 		}
 	}
 	

@@ -162,7 +162,7 @@ abstract class AbstractFractalView extends View {
       	
       	// Create the render threads
       	noOfThreads = Runtime.getRuntime().availableProcessors();
-      	Log.d(TAG, "Using " + noOfThreads + " cores");
+      	//Log.d(TAG, "Using " + noOfThreads + " cores");
       	
       	for (int i = 0; i < noOfThreads; i++) {
       		rendersComplete.add(false);
@@ -191,7 +191,7 @@ abstract class AbstractFractalView extends View {
 		
 		// Set linesToDrawAfter to a reasonable portion of size (1/12th works nicely).
 		linesToDrawAfter = getHeight()/12;
-		Log.d(TAG, "Drawing every " + linesToDrawAfter + " lines.");
+		//Log.d(TAG, "Drawing every " + linesToDrawAfter + " lines.");
 	}
    
    
@@ -248,8 +248,8 @@ abstract class AbstractFractalView extends View {
 		int yEnd = getHeight() - (noOfThreads - (threadID + 1));
 		boolean showRenderProgress = (threadID == 0);
 		
-		if(fractalViewSize == FractalViewSize.LARGE)
-			Log.d("ThreadEnding", "Thread " + threadID + " ending at " + yEnd + "/" + getHeight());
+		/*if(fractalViewSize == FractalViewSize.LARGE)
+			Log.d("ThreadEnding", "Thread " + threadID + " ending at " + yEnd + "/" + getHeight());*/
 			
 		if (pixelSizes == null)
 			pixelSizes = new int[getWidth() * getHeight()];
@@ -357,7 +357,7 @@ abstract class AbstractFractalView extends View {
 			//Show time in seconds
 			double time = (double)((System.currentTimeMillis() - renderStartTime))/1000;
 			String renderCompleteMessage = "Rendering time: " + new DecimalFormat("#.##").format(time) + " second" + (time == 1d ? "." : "s.");
-			Log.d(TAG, renderCompleteMessage);
+			//Log.d(TAG, renderCompleteMessage);
 			
 			if(PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("SHOW_TIMES", true))
 				parentActivity.showToastOnUIThread(renderCompleteMessage, Toast.LENGTH_SHORT);	
@@ -373,7 +373,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 	/* Set new location after movement */
 	public void moveFractal(int dragDiffPixelsX, int dragDiffPixelsY) {
-		Log.d(TAG, "moveFractal()");
+		//Log.d(TAG, "moveFractal()");
 		
 		// What does each pixel correspond to, on the complex plane?
 		double pixelSize = getPixelSize();
@@ -439,7 +439,7 @@ abstract class AbstractFractalView extends View {
 	
 	/* Shift values in pixel array to keep pixels that have already been calculated */
 	public void shiftPixels(int shiftX, int shiftY) {
-		Log.d(TAG, "Shifting pixels");
+		//Log.d(TAG, "Shifting pixels");
 		
 		int height = getHeight();
 		int width = getWidth();
@@ -511,7 +511,7 @@ abstract class AbstractFractalView extends View {
 		newGraphArea[1] = newMaxY;
 		newGraphArea[2] = oldGraphArea[2] - leftWidthDiff - rightWidthDiff;
 		
-		Log.d(TAG, "Just zoomed - zoom level is " + getZoomLevel());
+		//Log.d(TAG, "Just zoomed - zoom level is " + getZoomLevel());
 		
 		setGraphArea(newGraphArea, false);
 	}
@@ -543,7 +543,7 @@ abstract class AbstractFractalView extends View {
 	{		
 		clearPixelSizes();
 		
-		Log.d(TAG, "Total scale factor = " + totalScaleFactor);
+		//Log.d(TAG, "Total scale factor = " + totalScaleFactor);
 		
 		controlmode = ControlMode.DRAGGING;
 		
@@ -580,7 +580,6 @@ abstract class AbstractFractalView extends View {
 	/* Checks if this zoom level if sane (within the chosen limits) */
 	boolean saneZoomLevel() {
 		int zoomLevel = getZoomLevel();
-		Log.d(TAG, "Zoom level - " + zoomLevel);
 		
 		if ((zoomLevel >= 1) &&	(zoomLevel <= ZOOM_SLIDER_SCALING)) {
 			return true;
@@ -670,8 +669,6 @@ abstract class AbstractFractalView extends View {
 		// Default max iterations scaling
 		//iterationScaling = ITERATIONSCALING_DEFAULT;
 		
-		Log.d(TAG, "Reset hit.");
-		
 		// Default graph area		
 		if (parentActivity.fractalType == FractalType.MANDELBROT) {
 			setGraphArea(new MandelbrotJuliaLocation().defaultMandelbrotGraphArea, true);
@@ -718,12 +715,12 @@ abstract class AbstractFractalView extends View {
 				fractalBitmap.compress(Bitmap.CompressFormat.PNG, 90, output);
 
 				output.close();				
-				Log.d(TAG, "Wrote image out to " + imagefile.getAbsolutePath());
+				//Log.d(TAG, "Wrote image out to " + imagefile.getAbsolutePath());
 			}
 			catch (IOException ioe)
 			{
 				//File writing failed
-				Log.d(TAG, "Could not write image file to " + imagefile.getAbsolutePath());
+				//Log.d(TAG, "Could not write image file to " + imagefile.getAbsolutePath());
 				parentActivity.showToastOnUIThread("Unable to write file.", Toast.LENGTH_LONG);
 			}
 			
@@ -777,9 +774,6 @@ abstract class AbstractFractalView extends View {
 	/* Clear the sizes array of its current values, so anything new is smaller
 	 * (Fills it with 1000s) */
 	private void clearPixelSizes() {
-		Log.d(TAG, "Clearing pixel sizes");
-		
-		
 		for (int i = 0; i < pixelSizes.length; i++)
 		{
 			pixelSizes[i] = 1000;
@@ -812,8 +806,6 @@ abstract class AbstractFractalView extends View {
 		bookmark[0] = -1.631509065569354;
 		bookmark[1] = 0.0008548063308817164;
 		bookmark[2] = 0.0027763525271276013;
-		
-		Log.d(TAG, "Jumping to bookmark");
 		
 		setGraphArea(bookmark, true);
 	}

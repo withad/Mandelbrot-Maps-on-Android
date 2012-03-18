@@ -176,8 +176,6 @@ public class JuliaFractalView extends AbstractFractalView{
 						}
 					} 
 					catch (ArrayIndexOutOfBoundsException ae) {
-						Log.d("Derp", imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA) + "/" + pixelSizes.length);
-						Log.d("Derp", ""+pixelBlockB);
 						break;
 					}
 				}
