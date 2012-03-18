@@ -691,11 +691,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		float[] pinCoords = ((MandelbrotFractalView)fractalView).getPinCoords();
 		float pinX = pinCoords[0];
 		float pinY = pinCoords[1];
-			
-		if(x <= pinX + 20 && x >= pinX - 20 && y <= pinY + 20 && y >= pinY - 20)
-			touchingPin = true;
 		
-		Log.d(TAG, "Touching pin = " + touchingPin);
+		float radius = MandelbrotFractalView.largePinRadius;
+			
+		if(x <= pinX + radius && x >= pinX - radius && y <= pinY + radius && y >= pinY - radius)
+			touchingPin = true;
 		
 		return touchingPin;
 }

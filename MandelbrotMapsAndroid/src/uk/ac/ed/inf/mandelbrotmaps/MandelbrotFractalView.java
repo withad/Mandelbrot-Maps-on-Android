@@ -29,8 +29,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	int selectedPinAlpha = 150;
 	int littlePinAlpha = 180;
 	
-	private float smallPinRadius = 5.0f;
-	private float largePinRadius = 20.0f;
+	public static float smallPinRadius = 5.0f;
+	public static float largePinRadius = 20.0f;
 	
 	
 	
