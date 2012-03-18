@@ -5,8 +5,8 @@
     <item android:checkable="true" android:visible="true" android:id="@+id/toggleLittle" android:checked="true" android:title="Add Julia"></item>
     
     <item android:id="@+id/settobookmark" android:title="Speed test location" android:visible="false"></item>
-    <item android:id="@+id/preferences" android:title="Preferences"></item>
-    <item android:id="@+id/details" android:title="Detail level"></item>
+    
+    <item android:id="@+id/preferences" android:title="Preferences"></item><item android:id="@+id/details" android:title="Detail level"></item>
     <item android:id="@+id/saveShare" android:title="Save/Share">
         <menu>
 	        <item android:id="@+id/saveImage" android:title="Save image"></item>
