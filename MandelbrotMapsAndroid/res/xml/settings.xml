@@ -4,8 +4,8 @@
    <PreferenceCategory android:title="Rendering">
 	<CheckBoxPreference
 	      android:key="CRUDE"
-	      android:title="Use crude rendering"
-	      android:summary="Performing a crude render with large pixel blocks gets a rough image faster but makes the full render take longer."
+	      android:title="Use initial blocky rendering"
+	      android:summary="Performing a first pass with large pixel blocks gets a rough image faster but makes the full render take longer."
 	      android:defaultValue="true" />
 	      
 	<CheckBoxPreference
