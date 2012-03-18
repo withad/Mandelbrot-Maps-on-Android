@@ -115,8 +115,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		
 		// Check for first time launch
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		//if(prefs.getBoolean(FIRST_TIME_KEY, true)) firstTime();
-		firstTime();
+		if(prefs.getBoolean(FIRST_TIME_KEY, true)) firstTime();
+		//firstTime();
 	  
 	  	Bundle bundle = getIntent().getExtras();
 	  
@@ -131,7 +131,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			fractalType = FractalType.valueOf(bundle.getString("FractalType"));
 			littleMandelbrotLocation = bundle.getDoubleArray("LittleMandelbrotLocation");
 			showLittleAtStart = bundle.getBoolean("ShowLittleAtStart");
-		} 
+		}
 		catch (NullPointerException npe) {}
 		
 		if (fractalType == FractalType.MANDELBROT) {
@@ -467,6 +467,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  
       case R.id.details:
     	  startActivityForResult(new Intent(this, DetailControl.class), RETURN_FROM_DETAIL_CHANGE);
+    	  return true;
+    	  
+      case R.id.help:
+    	  showHelpDialog();
     	  return true;
       }
       return false;
@@ -871,7 +875,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private void firstTime() {		
 		TextView text = new TextView(this);
         text.setMovementMethod(LinkMovementMethod.getInstance());
-        text.setText(Html.fromHtml(getString(R.string.nice_html)));
+        text.setText(Html.fromHtml(getString(R.string.intro_text)));
 
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -888,5 +892,23 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
 		editor.putBoolean(FIRST_TIME_KEY, false);
 		editor.commit();
+	}
+	
+	
+	private void showHelpDialog() {
+		TextView text = new TextView(this);
+        //text.setMovementMethod(LinkMovementMethod.getInstance());
+        text.setText(Html.fromHtml(getString(R.string.help_text)));
+
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder	.setCancelable(true)
+				.setView(text)
+				.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                dialog.cancel();
+		           }
+		       });;
+		builder.create().show();
 	}
 }

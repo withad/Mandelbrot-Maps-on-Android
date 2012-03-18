@@ -29,13 +29,30 @@
 	moving a Mandelbrot fractal. 
 	</string>
 	
-	<string name="nice_html">
+	<string name="intro_text">
 	<![CDATA[
 	<h2>Welcome to <span style="font-style: italic;">Mandelbrot Maps</span>!</h2>
 	<p>This app is designed to showcase the relationship between the Mandelbrot set and Julia set fractals.
-	<p>Move around the fractals with one finger and pinch to zoom. When you zoom, the fractal will rerender with more detail.
-	<p>Select \"Set Julia\" from the menu to add a Julia fractal. Change the point defining it by dragging the coloured pin. Tap it to see
-	it in more detail.
+	<p>Move around the fractals with one finger and pinch to zoom. When you zoom, the fractal will re-render with more detail.
+	<p>Select \"Set Julia\" from the menu to add the Julia fractal to the screen. There\'s a unique Julia fractal for each point in the 
+	Mandelbrot set - change the point defining it by dragging the coloured pin. Tap it to see it in more detail.
+	<p><b>Mandelbrot Maps</b> is being developed as my undergraduate dissertation project, so any feedback you leave on the Google Play Store page
+	is greatly appreciated.
+	<p><b>Mandelbrot Maps</b> is open-source software, relased under the GNU General Public License (v3). The source code can be
+	found <a href="https://github.com/withad/Mandelbrot-Maps-on-Android">here</a>.
+	]]>
+	</string>
+	
+	<string name="help_text">
+	<![CDATA[
+	<h1>Movement</h1>
+	<p>Drag with a single finger to move around the fractals. Any new areas will fill themselves in once you stop.
+	<p>Use two fingers to zoom in and out. Again, the fractal will re-render once you stop.
+	<h1>Saving and Sharing</h1>
+	<p>This app is designed to showcase the relationship between the Mandelbrot set and Julia set fractals.
+	<p>Move around the fractals with one finger and pinch to zoom. When you zoom, the fractal will re-render with more detail.
+	<p>Select \"Set Julia\" from the menu to add the Julia fractal to the screen. There\'s a unique Julia fractal for each point in the 
+	Mandelbrot set - change the point defining it by dragging the coloured pin. Tap it to see it in more detail.
 	<p><b>Mandelbrot Maps</b> is being developed as my undergraduate dissertation project, so any feedback you leave on the Google Play Store page
 	is greatly appreciated.
 	<p><b>Mandelbrot Maps</b> is open-source software, relased under the GNU General Public License (v3). The source code can be

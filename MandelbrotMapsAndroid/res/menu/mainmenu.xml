@@ -4,7 +4,7 @@
     <item android:id="@+id/resetFractal" android:enabled="true" android:visible="true" android:title="Reset"></item>
     <item android:checkable="true" android:visible="true" android:id="@+id/toggleLittle" android:checked="true" android:title="Add Julia"></item>
     
-    <item android:id="@+id/settobookmark" android:title="Speed test location" android:visible="true"></item>
+    <item android:id="@+id/settobookmark" android:title="Speed test location" android:visible="false"></item>
     <item android:id="@+id/preferences" android:title="Preferences"></item>
     <item android:id="@+id/details" android:title="Detail level"></item>
     <item android:id="@+id/saveShare" android:title="Save/Share">
@@ -13,6 +13,7 @@
 	   	<item android:id="@+id/shareImage" android:title="Share image"></item>
         </menu>
     </item>
+    <item android:id="@+id/help" android:title="Help"></item>
     
     
     
