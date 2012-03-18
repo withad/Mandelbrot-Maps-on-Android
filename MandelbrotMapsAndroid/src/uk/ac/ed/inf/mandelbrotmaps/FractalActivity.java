@@ -1,12 +1,14 @@
 package uk.ac.ed.inf.mandelbrotmaps;
 
 import java.io.File;
+import java.security.acl.LastOwnerException;
 
 import uk.ac.ed.inf.mandelbrotmaps.AbstractFractalView.FractalViewSize;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -24,6 +26,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
@@ -34,7 +37,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener, OnSharedPreferenceChangeListener {
+public class FractalActivity extends Activity implements OnTouchListener, OnScaleGestureListener, 
+														OnSharedPreferenceChangeListener, OnLongClickListener{
 	private final String TAG = "MMaps";
 	
 	// Constants
@@ -613,7 +617,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 						&& !fractalView.holdingPin && (touchingPin(evt.getX(), evt.getY())))	{
 					// Take hold of the pin, reset the little fractal view.
 					fractalView.holdingPin = true;
-					littleFractalView.graphArea = new MandelbrotJuliaLocation().defaultJuliaGraphArea;
+					//littleFractalView.graphArea = new MandelbrotJuliaLocation().defaultJuliaGraphArea;
 					updateLittleJulia(evt.getX(), evt.getY());
 				}
 				else {
@@ -644,7 +648,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 						chooseNewActivePointer(evt);
 					} 
 					catch (IllegalArgumentException iae) {} 
-					
 				}
 				
 				break;
@@ -674,7 +677,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				
 				break;
 		}
-		return true;
+		return false;
 	}
 
 	
@@ -806,7 +809,11 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		startActivityForResult(intent, RETURN_FROM_JULIA);
 	}
 	
+	
 	private void updateLittleJulia(float x, float y) {
+		if(fractalType != FractalType.MANDELBROT || littleFractalView == null)
+			return;
+		
 		fractalView.invalidate();
 		double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(x, y);
 		((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
@@ -909,5 +916,16 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		           }
 		       });;
 		builder.create().show();
+	}
+
+	
+	
+	public boolean onLongClick(View v) {
+		if(!gestureDetector.isInProgress()) {
+			updateLittleJulia((float)dragLastX, (float)dragLastY);
+			return true;
+		}
+		
+		return false;
 	}
 }

@@ -146,6 +146,8 @@ abstract class AbstractFractalView extends View {
       
       	parentActivity = (FractalActivity)context;
       	setOnTouchListener(parentActivity);
+      	setOnLongClickListener(parentActivity);
+      	setLongClickable(true);
       	
       	fractalViewSize = size;
       	
@@ -280,7 +282,7 @@ abstract class AbstractFractalView extends View {
 		// Abort current and future renders
 		stopAllRendering();
 		
-		completedLastRender = false;
+		
 		
 		// New render won't have passed maximum depth, reset check
 		hasPassedMaxDepth = false;
@@ -303,6 +305,7 @@ abstract class AbstractFractalView extends View {
 			scheduleRendering(CRUDE_PIXEL_BLOCK);
 		}
 		totalScaleFactor = 1.0f; // Needs reset once checked, so that next render doesn't account for it.
+		completedLastRender = false;
 		
 		// Schedule a high-quality rendering
 		scheduleRendering(DEFAULT_PIXEL_SIZE);
