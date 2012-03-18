@@ -20,7 +20,7 @@ public class JuliaFractalView extends AbstractFractalView{
 	public JuliaFractalView(Context context, FractalViewSize size) {
 		super(context, size);
 		
-		setColouringScheme(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("JULIA_COLOURS", "MandelbrotDefault")
+		setColouringScheme(PreferenceManager.getDefaultSharedPreferences(getContext()).getString("JULIA_COLOURS", "JuliaDefault")
 				, false);
 
 		for(int i = 0; i < noOfThreads; i++) {
