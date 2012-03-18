@@ -79,6 +79,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	private float dragLastY;
 	private int dragID = -1;
 	private boolean currentlyDragging = false;
+	private boolean isMoving = false;
 	
 	private ScaleGestureDetector gestureDetector;
 	
@@ -298,7 +299,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    /* Adds the little fractal view and its border, if not showing
     * Also determines its height, width based on large fractal view's size
     */
-   public void addLittleView() {   
+   public void addLittleView(boolean centre) {   
 	   //Check to see if view has already or should never be included
 	   if (showingLittle) {
 		   relativeLayout.bringChildToFront(littleFractalView);
@@ -323,8 +324,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   width /= 7;
 	   height = (int)(width/ratio);   
 	   
-	   Log.d("RectChecking", "Little view width: " + width + " and height: " + height);
-	   
 	   //Add border view (behind little view, slightly larger)
 	   borderView = new View(this);
 	   borderView.setBackgroundColor(Color.GRAY);
@@ -340,7 +339,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   littleFractalView.loadLocation(mjLocation); 
 		   
 		   double[] jParams;		   
-		   if(((MandelbrotFractalView)fractalView).currentJuliaParams != null) {
+		   if(((MandelbrotFractalView)fractalView).currentJuliaParams != null || centre) {
 			   jParams = ((MandelbrotFractalView)fractalView).currentJuliaParams;
 		   }
 		   else
@@ -356,6 +355,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	   setContentView(relativeLayout);
 	   
 	   showingLittle = true;
+	   fractalView.holdingPin = false; // Might fix an intermittent bug where the circle stays large.
    }
    
    /* Hides the little fractal view, if showing */
@@ -447,7 +447,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     		  removeLittleView();
     	  }
     	  else {
-    		  addLittleView();
+    		  addLittleView(true);
     	  }
     	  return true;
     	  
@@ -630,6 +630,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			case MotionEvent.ACTION_MOVE:
 				if(!gestureDetector.isInProgress()) {
 					if(currentlyDragging) {
+						isMoving = true;
 						dragFractal(evt);
 					}
 					else if (showingLittle && !littleFractalSelected && fractalType == FractalType.MANDELBROT && fractalView.holdingPin)	{
@@ -656,6 +657,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			case MotionEvent.ACTION_UP:
 				if(currentlyDragging) {
 					stopDragging();
+					isMoving = false;
 				}
 				else if (littleFractalSelected) {
 					borderView.setBackgroundColor(Color.GRAY);
@@ -796,8 +798,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		Bundle bundle = new Bundle();
 		bundle.putString("FractalType", FractalType.JULIA.toString());
 		bundle.putBoolean("ShowLittleAtStart", true);
-		
-		Log.d(TAG, "Mandelbrot Graph Area at launch: " + (mjLocation.getMandelbrotGraphArea())[0]);
 		bundle.putDoubleArray("LittleMandelbrotLocation", fractalView.graphArea);
 		
 		bundle.putDouble("JULIA_X", juliaParams[0]);
@@ -811,12 +811,19 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	
 	private void updateLittleJulia(float x, float y) {
-		if(fractalType != FractalType.MANDELBROT || littleFractalView == null)
+		if(fractalType != FractalType.MANDELBROT)
 			return;
 		
 		fractalView.invalidate();
-		double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(x, y);
-		((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+		
+		if(showingLittle) {
+			double[] juliaParams = ((MandelbrotFractalView)fractalView).getJuliaParams(x, y);
+			((JuliaFractalView)littleFractalView).setJuliaParameter(juliaParams[0], juliaParams[1]);
+		}
+		else {
+			((MandelbrotFractalView)fractalView).getJuliaParams(x, y);
+			addLittleView(false);
+		}
 	}
 
 	
@@ -921,7 +928,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	
 	
 	public boolean onLongClick(View v) {
-		if(!gestureDetector.isInProgress()) {
+		// Check that it's not scaling, dragging (check for dragging is a little hacky, but seems to work), or already holding the pin
+		if(!gestureDetector.isInProgress() && fractalView.totalDragX < 1 && fractalView.totalDragY < 1 && !fractalView.holdingPin) {
 			updateLittleJulia((float)dragLastX, (float)dragLastY);
 			return true;
 		}

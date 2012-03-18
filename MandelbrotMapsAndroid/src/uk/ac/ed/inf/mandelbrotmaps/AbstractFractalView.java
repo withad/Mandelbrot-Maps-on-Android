@@ -186,7 +186,7 @@ abstract class AbstractFractalView extends View {
 	   
 		// Show the little view at the start, if allowed.
 		if(fractalViewSize == FractalViewSize.LARGE && parentActivity.showLittleAtStart) {
-			parentActivity.addLittleView();
+			parentActivity.addLittleView(true);
 		}
 		
 		// Set linesToDrawAfter to a reasonable portion of size (1/12th works nicely).

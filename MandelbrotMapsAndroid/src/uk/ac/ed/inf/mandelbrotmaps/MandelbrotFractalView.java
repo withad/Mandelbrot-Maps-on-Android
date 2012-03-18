@@ -286,8 +286,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		juliaParams[0] = mandelbrotGraphArea[0] + ( (double)touchX * pixelSize );
 		juliaParams[1] = mandelbrotGraphArea[1] - ( (double)touchY * pixelSize );
 		
-		Log.d(TAG, "Getting new Julia...");
-		
 		currentJuliaParams = juliaParams;
 		
 		return juliaParams;
