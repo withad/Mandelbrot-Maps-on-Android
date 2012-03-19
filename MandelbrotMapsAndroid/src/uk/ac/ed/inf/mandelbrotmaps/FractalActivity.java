@@ -835,7 +835,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		}
 		
 		else if(changedPref.equals("JULIA_COLOURS")) {
-			String juliaScheme = prefs.getString(changedPref, "MandelbrotDefault");
+			String juliaScheme = prefs.getString(changedPref, "JuliaDefault");
 			
 			if(fractalType == FractalType.JULIA) {
 				fractalView.setColouringScheme(juliaScheme, true);

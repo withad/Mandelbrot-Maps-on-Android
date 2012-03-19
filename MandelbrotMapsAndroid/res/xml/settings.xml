@@ -28,7 +28,7 @@
 	      android:key="JULIA_COLOURS"
 	      android:title="Julia Set colouring scheme"
 	      android:summary="Colours are determined by how many iterations it takes to eliminate a point from the Julia Set."
-	      android:defaultValue="MandelbrotDefault"
+	      android:defaultValue="JuliaDefault"
 	      android:entries="@array/colourSchemeEntries"
 	      android:entryValues="@array/colourSchemeValues" />
 	      
