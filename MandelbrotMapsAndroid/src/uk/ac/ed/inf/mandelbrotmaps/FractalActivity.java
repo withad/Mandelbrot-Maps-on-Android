@@ -609,7 +609,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 				else if (showingLittle && fractalType == FractalType.MANDELBROT && !gestureDetector.isInProgress() 
 						&& !fractalView.holdingPin && (touchingPin(evt.getX(), evt.getY())))	{
 					// Take hold of the pin, reset the little fractal view.
-					Log.d(TAG, "Action down triggered");
 					fractalView.holdingPin = true;
 					updateLittleJulia(evt.getX(), evt.getY());
 				}
