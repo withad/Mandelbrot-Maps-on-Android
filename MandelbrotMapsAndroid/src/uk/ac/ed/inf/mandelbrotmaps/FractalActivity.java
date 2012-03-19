@@ -334,7 +334,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		   littleFractalView.loadLocation(mjLocation); 
 		   
 		   double[] jParams;		   
-		   if(((MandelbrotFractalView)fractalView).currentJuliaParams != null || centre) {
+		   if(!centre) {
 			   jParams = ((MandelbrotFractalView)fractalView).currentJuliaParams;
 		   }
 		   else {
