@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">MandelbrotMaps</string>
+	<string name="app_name">Mandelbrot Maps</string>
 	<string name="main_title">Mandelbrot Maps</string>
 	<string name="continue_label">Continue</string>
 	<string name="fractal_label">Fractal - single thread</string>
