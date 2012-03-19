@@ -926,7 +926,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		// Check that it's not scaling, dragging (check for dragging is a little hacky, but seems to work), or already holding the pin
 		if(!gestureDetector.isInProgress() && fractalView.totalDragX < 1 && fractalView.totalDragY < 1 && !fractalView.holdingPin) {
 			updateLittleJulia((float)dragLastX, (float)dragLastY);
-			currentlyDragging = false;
+			if(currentlyDragging) {
+				stopDragging();
+			}
 			return true;
 		}
 		

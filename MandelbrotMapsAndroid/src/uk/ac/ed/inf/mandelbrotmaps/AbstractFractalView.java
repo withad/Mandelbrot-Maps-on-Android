@@ -22,6 +22,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -224,7 +225,9 @@ abstract class AbstractFractalView extends View {
 		midY = 0.0f;
 		
 		//Create new image only if not dragging, zooming, or moving the Julia pin
+		Log.d(TAG, "holdingPin = " + holdingPin);
 		if(controlmode == ControlMode.STATIC && !holdingPin) {
+			Log.d(TAG, "Creating new bitmaps");
 			bitmapCreations++;
 			fractalBitmap = Bitmap.createBitmap(fractalPixels, 0, getWidth(), getWidth(), getHeight(), Bitmap.Config.RGB_565);
 		}
@@ -233,7 +236,7 @@ abstract class AbstractFractalView extends View {
 		canvas.drawBitmap(fractalBitmap, matrix, new Paint());
 		
 		// Brings little view to front if it's hidden but shouldn't be, as can happen.
-		if(parentActivity.showingLittle) parentActivity.addLittleView(false);
+		//if(parentActivity.showingLittle) parentActivity.addLittleView(false);
 	}
 	
 	
