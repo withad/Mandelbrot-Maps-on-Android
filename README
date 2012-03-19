@@ -1,0 +1,7 @@
+For each point in the famous Mandelbrot set fractal, there is a unique Julia set fractal parametrised by that point. Mandelbrot Maps is designed to demonstrate the relationship between the two by generating the relevant Julia fractal in real-time as you move a pin across the Mandelbrot set.
+
+It also aims to be one of the fastest fractal generators available for Android, optimised to take advantage of all the available processing power on your device.
+
+I'm developing Mandelbrot Maps as part of my undergraduate dissertation project, based on earlier Java web app versions (Google "Mandelbrot Maps" and you should find them). Any feedback you can provide about usability, features, or bugs is greatly appreciated, as are reviews and ratings. If reporting a bug, please try to include as much detail as possible, such as the make and model of your device, what you were doing when the bug occurred, what version of Android you're running and so on.
+
+The code is currently in a bit of a state, as my deadline is rapidly approaching. I intend to tidy it up after I'm done with my exams, as I've grown rather attached to it (although I may need to leave it alone for someone to enhance next year).
