@@ -5,3 +5,5 @@ It also aims to be one of the fastest fractal generators available for Android, 
 I'm developing Mandelbrot Maps as part of my undergraduate dissertation project, based on earlier Java web app versions (Google "Mandelbrot Maps" and you should find them). Any feedback you can provide about usability, features, or bugs is greatly appreciated, as are reviews and ratings. If reporting a bug, please try to include as much detail as possible, such as the make and model of your device, what you were doing when the bug occurred, what version of Android you're running and so on.
 
 The code is currently in a bit of a state, as my deadline is rapidly approaching. I intend to tidy it up after I'm done with my exams, as I've grown rather attached to it (although I may need to leave it alone for someone to enhance next year).
+
+This Android port of Mandelbrot Maps is based on the original web app created by Iain Parris (http://homepages.inf.ed.ac.uk/wadler/mandelbrot-maps/mmaps.html, http://www.inf.ed.ac.uk/publications/thesis/online/IM080583.pdf) and further developed by Edward Mallia (http://edwardmallia.com/mandelbrotmaps/) and Taige Liu.
