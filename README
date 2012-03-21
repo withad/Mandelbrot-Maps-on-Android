@@ -6,4 +6,4 @@ I'm developing Mandelbrot Maps as part of my undergraduate dissertation project,
 
 The code is currently in a bit of a state, as my deadline is rapidly approaching. I intend to tidy it up after I'm done with my exams, as I've grown rather attached to it (although I may need to leave it alone for someone to enhance next year).
 
-This Android port of Mandelbrot Maps is based on the original web app created by Iain Parris (http://homepages.inf.ed.ac.uk/wadler/mandelbrot-maps/mmaps.html, http://www.inf.ed.ac.uk/publications/thesis/online/IM080583.pdf) and further developed by Edward Mallia (http://edwardmallia.com/mandelbrotmaps/) and Taige Liu.
+This Android port of Mandelbrot Maps is based on the original web app created by Iain Parris (http://homepages.inf.ed.ac.uk/wadler/mandelbrot-maps/mmaps.html, http://www.inf.ed.ac.uk/publications/thesis/online/IM080583.pdf) and further developed by Edward Mallia (http://edwardmallia.com/mandelbrotmaps/) and Taige Liu. All versions were done under the supervision of Philip Wadler (http://homepages.inf.ed.ac.uk/wadler/) at the University of Edinburgh.
