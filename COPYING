@@ -14,6 +14,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Code authors/Copyright holders:
 
-This Android port by Alasdair Corbett is based on Iain Parris's original web applet version of Mandelbrot Maps. Some of the colour scheme code is taken from Edward Mallia's later version. A third version was produced by Taige Liu but, to the best of my knowledge, none of his code was reused.
+This Android port by Alasdair Corbett is based on Iain Parris's original web applet 
+version of Mandelbrot Maps. Some of the colour scheme code is taken from Edward 
+Mallia's later version. A third version was produced by Taige Liu but, to the 
+best of my knowledge, none of his code was reused.
 
 
