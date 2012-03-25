@@ -773,7 +773,7 @@ abstract class AbstractFractalView extends View {
 /*-----------------------------------------------------------------------------------*/
 	/* Clear the sizes array of its current values, so anything new is smaller
 	 * (Fills it with 1000s) */
-	private void clearPixelSizes() {
+	protected void clearPixelSizes() {
 		for (int i = 0; i < pixelSizes.length; i++)
 		{
 			pixelSizes[i] = 1000;
