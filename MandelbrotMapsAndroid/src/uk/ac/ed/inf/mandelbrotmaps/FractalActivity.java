@@ -470,7 +470,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
     	  return true;
     	  
       case R.id.printbookmark:
-    	  printLocation();
+    	  setBookmark();
     	  return true;
     	  
       case R.id.loadbookmark:
@@ -927,7 +927,10 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
 
 	
-	private void printLocation() {
+	/* Set the bookmark location in Prefs to the current location
+	 * (Proof-of-concept, currently unused)
+	 */
+	private void setBookmark() {
 		MandelbrotJuliaLocation bookmark;
 		if(fractalType == FractalType.MANDELBROT) {
 			if(littleFractalView != null) {
@@ -952,6 +955,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
 	
 	
+	/* Set the current location to the bookmark
+	 * (Proof-of-concept, currently unused)
+	 */
 	private void loadBookmark() {
 		String bookmark = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("BOOKMARK", null);
 		
