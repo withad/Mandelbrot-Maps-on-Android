@@ -468,6 +468,14 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
       case R.id.help:
     	  showHelpDialog();
     	  return true;
+    	  
+      case R.id.printbookmark:
+    	  setBookmark();
+    	  return true;
+    	  
+      case R.id.loadbookmark:
+    	  loadBookmark();
+    	  return true;
       }
       return false;
    }
@@ -480,7 +488,6 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    /* TODO: Fix the saving/sharing code so that it's not a godawful monstrosity.
     * Possibly switch to using Handlers and postDelayed or something.
    */
-   
    //Wait for render to finish, then save the fractal image
    private void saveImage() {
 	cancelledSave = false;
@@ -919,6 +926,47 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		builder.create().show();
 	}
 
+	
+	/* Set the bookmark location in Prefs to the current location
+	 * (Proof-of-concept, currently unused)
+	 */
+	private void setBookmark() {
+		MandelbrotJuliaLocation bookmark;
+		if(fractalType == FractalType.MANDELBROT) {
+			if(littleFractalView != null) {
+				Log.d(TAG, "Showing little...");
+				bookmark = new MandelbrotJuliaLocation(fractalView.graphArea, littleFractalView.graphArea, 
+															((MandelbrotFractalView)fractalView).currentJuliaParams);
+			}
+			else {
+				bookmark = new MandelbrotJuliaLocation(fractalView.graphArea);
+			}
+		}
+		else {
+			bookmark = new MandelbrotJuliaLocation(littleFractalView.graphArea, fractalView.graphArea, 
+														((MandelbrotFractalView)littleFractalView).currentJuliaParams);
+		}
+		
+		Log.d(TAG, bookmark.toString());
+		
+		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+		editor.putString("BOOKMARK", bookmark.toString());
+		editor.commit();
+	}
+	
+	
+	/* Set the current location to the bookmark
+	 * (Proof-of-concept, currently unused)
+	 */
+	private void loadBookmark() {
+		String bookmark = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("BOOKMARK", null);
+		
+		if(bookmark != null) {
+			Log.d(TAG,"Loaded bookmark " + bookmark);
+			MandelbrotJuliaLocation newLocation = new MandelbrotJuliaLocation(bookmark);
+			fractalView.loadLocation(newLocation);
+		}
+	}
 	
 	
 	public boolean onLongClick(View v) {
