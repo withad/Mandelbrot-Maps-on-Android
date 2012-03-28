@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
 
@@ -122,10 +123,13 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	
 	
 	// Load a location
-	void loadLocation(MandelbrotJuliaLocation mjLocation) {
+	void loadLocation(MandelbrotJuliaLocation _mjLocation) {
 		//setScaledIterationCount(mjLocation.getMandelbrotContrast());
-		setGraphArea(mjLocation.getMandelbrotGraphArea(), true);
-		currentJuliaParams = mjLocation.getJuliaParam();
+		if(pixelSizes != null)
+			clearPixelSizes();
+		Log.d(TAG, ""+ _mjLocation.getMandelbrotGraphArea()[0]);
+		setGraphArea(_mjLocation.getMandelbrotGraphArea(), true);
+		currentJuliaParams = _mjLocation.getJuliaParam();
 	}
 	
 	// Iterate a rectangle of pixels, in range (xPixelMin, yPixelMin) to (xPixelMax, yPixelMax)
