@@ -127,7 +127,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		//setScaledIterationCount(mjLocation.getMandelbrotContrast());
 		if(pixelSizes != null)
 			clearPixelSizes();
-		Log.d(TAG, ""+ _mjLocation.getMandelbrotGraphArea()[0]);
+		//Log.d(TAG, ""+ _mjLocation.getMandelbrotGraphArea()[0]);
 		setGraphArea(_mjLocation.getMandelbrotGraphArea(), true);
 		currentJuliaParams = _mjLocation.getJuliaParam();
 	}

@@ -55,7 +55,7 @@ abstract class AbstractFractalView extends View {
 	
 	
 	// How often to redraw fractal when rendering. Set to 1/12th screen size in onSizeChanged()
-	public int linesToDrawAfter = 20;
+	public int linesToDrawAfter = 20; // This default value normally isn't used.
 	
 	// Tracks current control (zooming, dragging, or none)
 	public static enum ControlMode {
@@ -795,7 +795,7 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	/* Sets to a predetermined spot that takes a while to render (just used for debugging) */
-	public void setToBookmark()
+	public void setToTestLocation()
 	{	
 		stopAllRendering();
 		
@@ -811,6 +811,8 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
+	/* Reloads the current location if it needs to be re-rendered 
+	 * (After detail or colouring change) */
 	public void reloadCurrentLocation() {
 		stopAllRendering();
 		
@@ -819,6 +821,7 @@ abstract class AbstractFractalView extends View {
 	}
 	
 	
+	/* Change the colouring scheme */
 	public void setColouringScheme(String newScheme, boolean reload) {		
 		if(newScheme.equals("MandelbrotDefault"))
 			colourer = new DefaultColouringScheme();

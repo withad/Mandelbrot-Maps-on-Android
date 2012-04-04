@@ -113,10 +113,9 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);   
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);      
 		
-		// Check for first time launch
+		// If first time launch, show the tutorial/intro
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		if(prefs.getBoolean(FIRST_TIME_KEY, true)) firstTime();
-		//firstTime();
+		if(prefs.getBoolean(FIRST_TIME_KEY, true)) showIntro();
 	  
 	  	Bundle bundle = getIntent().getExtras();
 	  
@@ -432,8 +431,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
    @Override
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
-      case R.id.settobookmark:
-    	  fractalView.setToBookmark();
+      case R.id.testlocation:
+    	  fractalView.setToTestLocation();
     	  return true;
     	  
       case R.id.toggleLittle:
@@ -485,8 +484,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 /*-----------------------------------------------------------------------------------*/
 /*Image saving/sharing*/
 /*-----------------------------------------------------------------------------------*/
-   /* TODO: Fix the saving/sharing code so that it's not a godawful monstrosity.
-    * Possibly switch to using Handlers and postDelayed or something.
+   /* TODO: Tidy up this code. Possibly switch to using Handlers and postDelayed.
    */
    //Wait for render to finish, then save the fractal image
    private void saveImage() {
@@ -752,6 +750,21 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
 
 	
+	/* Detect a long click, place the Julia pin */
+	public boolean onLongClick(View v) {
+		// Check that it's not scaling, dragging (check for dragging is a little hacky, but seems to work), or already holding the pin
+		if(!gestureDetector.isInProgress() && fractalView.totalDragX < 1 && fractalView.totalDragY < 1 && !fractalView.holdingPin) {
+			updateLittleJulia((float)dragLastX, (float)dragLastY);
+			if(currentlyDragging) {
+				stopDragging();
+			}
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
 	
 /*-----------------------------------------------------------------------------------*/
 /*Utilities*/
@@ -885,7 +898,8 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
 
 
-	private void firstTime() {		
+	/* Show the short tutorial/intro dialog */
+	private void showIntro() {		
 		TextView text = new TextView(this);
         text.setMovementMethod(LinkMovementMethod.getInstance());
         text.setText(Html.fromHtml(getString(R.string.intro_text)));
@@ -908,6 +922,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 	}
 	
 	
+	/* Show the large help dialog */
 	private void showHelpDialog() {
 		ScrollView scrollView = new ScrollView(this);
 		TextView text = new TextView(this);
@@ -966,19 +981,5 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 			MandelbrotJuliaLocation newLocation = new MandelbrotJuliaLocation(bookmark);
 			fractalView.loadLocation(newLocation);
 		}
-	}
-	
-	
-	public boolean onLongClick(View v) {
-		// Check that it's not scaling, dragging (check for dragging is a little hacky, but seems to work), or already holding the pin
-		if(!gestureDetector.isInProgress() && fractalView.totalDragX < 1 && fractalView.totalDragY < 1 && !fractalView.holdingPin) {
-			updateLittleJulia((float)dragLastX, (float)dragLastY);
-			if(currentlyDragging) {
-				stopDragging();
-			}
-			return true;
-		}
-		
-		return false;
 	}
 }
