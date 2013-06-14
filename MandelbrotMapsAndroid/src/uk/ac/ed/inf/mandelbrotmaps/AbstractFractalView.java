@@ -22,13 +22,11 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 
 abstract class AbstractFractalView extends View {
-	private final String TAG = "MMaps";
 	
 	// How many different discrete zoom levels?
 	public final int ZOOM_SLIDER_SCALING = 300;

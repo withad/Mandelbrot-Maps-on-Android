@@ -4,8 +4,6 @@ import android.content.Context;
 import android.preference.PreferenceManager;
 
 public class JuliaFractalView extends AbstractFractalView{
-
-	private String TAG = "MMaps";
 	
 	// Point paramaterising this Julia set
 	private double juliaX = 0;
@@ -83,13 +81,9 @@ public class JuliaFractalView extends AbstractFractalView{
 			double x, y;
 			double newx, newy;
 			
-			long initialMillis = System.currentTimeMillis();
-			//Log.d(TAG, "Initial time: " + initialMillis);
-			
 			int pixelIncrement = pixelBlockSize * noOfThreads;
 			int originalIncrement = pixelIncrement;
 			
-			int skippedCount = 0;
 			int loopCount = 0;
 			
 			for (yIncrement = yPixelMin; yPixel < yPixelMax+(noOfThreads*pixelBlockSize); yIncrement+= pixelIncrement) {	
@@ -114,7 +108,6 @@ public class JuliaFractalView extends AbstractFractalView{
 					//Check to see if this pixel is already iterated to the necessary block size
 					try {
 						if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
-							skippedCount++;
 							continue;
 						}
 					}
@@ -183,7 +176,5 @@ public class JuliaFractalView extends AbstractFractalView{
 			
 			postInvalidate();
 			notifyCompleteRender(threadID, pixelBlockSize);
-			/*Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
-			Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));*/
 		}
 }

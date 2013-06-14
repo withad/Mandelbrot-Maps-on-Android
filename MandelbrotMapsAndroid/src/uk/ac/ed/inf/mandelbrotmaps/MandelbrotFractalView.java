@@ -7,11 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 
 public class MandelbrotFractalView extends AbstractFractalView{
-
-	private final String TAG = "MMaps";
 	
 	public float lastTouchX = 0;
 	public float lastTouchY = 0;
@@ -165,13 +162,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			// ... NB: newz = (z^2 + c)
 			double newx, newy;
 			
-			long initialMillis = System.currentTimeMillis();
-			//Log.d(TAG, "Initial time: " + initialMillis);
-			
 			int pixelIncrement = pixelBlockSize * noOfThreads;
 			int originalIncrement = pixelIncrement;
-			
-			int skippedCount = 0;
 			
 			int loopCount = 0;
 			
@@ -200,7 +192,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {					
 					//Check to see if this pixel is already iterated to the necessary block size
 					if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
-						skippedCount++;
 						continue;
 					}
 					
@@ -260,14 +251,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 					}
 			}
 			
-			/*Log.d("ThreadEnding", "yIncrement of thread " + threadID + " is " + yIncrement + " and yPixel " + yPixel);*/
-			
-			
-			//Log.d(TAG, "Ended on yIncrement " + yIncrement);
 			postInvalidate();
 			notifyCompleteRender(threadID, pixelBlockSize);
-			//Log.d(TAG, "Reached end of computation loop. Skipped: " + skippedCount);
-			//Log.d(TAG, callingThread.getName() + " complete. Time elapsed: " + (System.currentTimeMillis() - initialMillis));*/
 		}
 	
 	
