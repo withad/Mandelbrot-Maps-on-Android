@@ -41,12 +41,14 @@ public class JuliaFractalView extends AbstractFractalView{
 		setGraphArea(graphArea, true);
 	}
 	
+	
 	public double[] getJuliaParam() {
 		double[] juliaParam = new double[2];
 		juliaParam[0] = juliaX;
 		juliaParam[1] = juliaY;
 		return juliaParam;
 	}
+	
 	
 	// Load a location
 	void loadLocation(MandelbrotJuliaLocation mjLocation) {
@@ -56,131 +58,8 @@ public class JuliaFractalView extends AbstractFractalView{
 		setJuliaParameter(juliaParam[0], juliaParam[1]);
 	}
 	
-	// Iterate a rectangle of pixels, in range (xPixelMin, yPixelMin) to (xPixelMax, yPixelMax)
-	void computePixels(
-		int pixelBlockSize,  // Pixel "blockiness"
-		final boolean showRenderingProgress,  // Call newPixels() on outputMIS as we go?
-		final int xPixelMin,
-		final int xPixelMax,
-		final int yPixelMin,
-		final int yPixelMax,
-		final double xMin,
-		final double yMax,
-		final double pixelSize,
-		final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
-		final int threadID,
-		final int noOfThreads) {	
-			
-		RenderThread callingThread = renderThreadList.get(threadID);
-			
-		int maxIterations = getMaxIterations();
-		int imgWidth = xPixelMax - xPixelMin;
-		
-		int xPixel = 0, yPixel = 0, yIncrement = 0;
-		int colourCodeHex;
-		int pixelBlockA, pixelBlockB;
-		
-		this.xMin = xMin;
-		this.yMax = yMax;
-		this.pixelSize = pixelSize;
-		
-		double x0 = 0, y0 = 0;
-		
-		int pixelIncrement = pixelBlockSize * noOfThreads;
-		int originalIncrement = pixelIncrement;
-		
-		int loopCount = 0;
-		
-		
-		for (yIncrement = yPixelMin; yPixel < yPixelMax+(noOfThreads*pixelBlockSize); yIncrement+= pixelIncrement) {	
-			yPixel = yIncrement;
-			
-			pixelIncrement = (loopCount * originalIncrement);
-			if(loopCount % 2 == 0)
-				pixelIncrement*=-1;
-			loopCount++;
-			
-			//If we've exceeded the bounds of the image (as can happen with many threads), exit the loop.
-			if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length ||
-					 yPixel < 0) {
-				continue;
-			}
-			
-			// Detect rendering abortion.			
-			if (allowInterruption && (callingThread.abortSignalled())) {
-				return;
-			}
-		
-			
-			
-			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {
-				//Check to see if this pixel is already iterated to the necessary block size
-				if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
-					continue;
-				}
-				
-				// Initial coordinates
-				/*x = xMin + ( (double)xPixel * pixelSize);
-				y = yMax - ( (double)yPixel * pixelSize);
-			
-				boolean inside = true;
-				
-				for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
-					// z^2 + c
-					newx = (x*x) - (y*y) + juliaX;
-					newy = (2 * x * y) + juliaY;
-				
-					x = newx;
-					y = newy;
-				
-					// Well known result: if distance is >2, escapes to infinity...
-					if ( (x*x + y*y) > 4) { 
-						inside = false;
-						break;
-					}
-				}
-				
-				if(inside)
-					colourCodeHex = colourer.colourInsidePoint();
-				else
-					colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);*/
-				
-				colourCodeHex = pixelInSet(xPixel, yPixel, maxIterations);
-				
-				
-				//Note that the pixel being calculated has been calculated in full (upper right of a block)
-				if(fractalViewSize == FractalViewSize.LARGE)
-					pixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
-				
-				// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
-				int p = 0;
-				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
-					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
-						if(fractalViewSize == FractalViewSize.LARGE) {
-							if(p != 0) {
-								pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
-							}
-							p++;
-						}
-						if(fractalPixels == null) return;
-						fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
-					}
-				}
-			}
-			// Show thread's work in progress
-			if ((showRenderingProgress) && (yPixel % linesToDrawAfter == 0)
-			) 
-				{
-					postInvalidate();
-				}
-		}
-		
-		postInvalidate();
-		notifyCompleteRender(threadID, pixelBlockSize);
-	}
 	
-	
-	protected int pixelInSet(int xPixel, int yPixel, int maxIterations) {
+	int pixelInSet(int xPixel, int yPixel, int maxIterations) {
 		boolean inside = true;
 		int iterationNr;
 		double newx, newy;
