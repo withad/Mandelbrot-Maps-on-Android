@@ -154,22 +154,17 @@ public class JuliaFractalView extends AbstractFractalView{
 				
 				// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
 				int p = 0;
-				try {
-					for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
-						for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
-							if(fractalViewSize == FractalViewSize.LARGE) {
-								if(p != 0) {
-									pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
-								}
-								p++;
+				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
+					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
+						if(fractalViewSize == FractalViewSize.LARGE) {
+							if(p != 0) {
+								pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
 							}
-							if(fractalPixels == null) return;
-							fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
+							p++;
 						}
+						if(fractalPixels == null) return;
+						fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 					}
-				} 
-				catch (ArrayIndexOutOfBoundsException ae) {
-					break;
 				}
 			}
 			// Show thread's work in progress
