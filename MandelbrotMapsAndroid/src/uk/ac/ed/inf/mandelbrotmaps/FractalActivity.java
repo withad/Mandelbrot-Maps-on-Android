@@ -134,7 +134,7 @@ public class FractalActivity extends Activity implements OnTouchListener, OnScal
 		catch (NullPointerException npe) {}
 		
 		if (fractalType == FractalType.MANDELBROT) {
-			fractalView = new CubicMandelbrotFractalView(this, FractalViewSize.LARGE);
+			fractalView = new MandelbrotFractalView(this, FractalViewSize.LARGE);
 		}
 		else if (fractalType == FractalType.JULIA) {
 			fractalView = new JuliaFractalView(this, FractalViewSize.LARGE);
