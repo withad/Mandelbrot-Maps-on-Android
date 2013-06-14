@@ -155,16 +155,8 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		this.xMin = xMin;
 		this.yMax = yMax;
 		this.pixelSize = pixelSize;
-	
-		// c = (x0) + (y0)i
-		double x0, y0;
-	
-		// z = (x) + (y)i
-		//double x, y;
-	
-		// newz = (newx) + (newy)i
-		// ... NB: newz = (z^2 + c)
-		//double newx, newy;
+
+		double x0 = 0, y0 = 0;
 		
 		int pixelIncrement = pixelBlockSize * noOfThreads;
 		int originalIncrement = pixelIncrement;
@@ -192,7 +184,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			}
 			
 			// Set y0 (im part of c)
-			y0 = yMax - ( (double)yPixel * pixelSize );			
+			//y0 = yMax - ( (double)yPixel * pixelSize );			
 		
 			
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {					
@@ -202,7 +194,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				}
 				
 				// Set x0 (real part of c)
-				x0 = xMin + ( (double)xPixel * pixelSize);
+				//x0 = xMin + ( (double)xPixel * pixelSize);
 			
 				// Start at x0, y0
 				/*x = x0;
@@ -231,7 +223,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				else
 					colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);*/
 				
-				colourCodeHex = pixelInSet(xPixel, yPixel, x0, y0, maxIterations);
+				colourCodeHex = pixelInSet(xPixel, yPixel, maxIterations);
 				
 				//Note that the pixel being calculated has been calculated in full (upper right of a block)
 				if(fractalViewSize == FractalViewSize.LARGE)
@@ -264,15 +256,15 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	}
 	
 	
-	protected int pixelInSet (int xPixel, int yPixel, double x0, double y0, int maxIterations) {
+	protected int pixelInSet (int xPixel, int yPixel, int maxIterations) {
 		boolean inside = true;
 		int iterationNr;
 		double newx, newy;
 		double x, y;
 		
 		// Set x0 (real part of c)
-		//double x0 = xMin + ( (double)xPixel * pixelSize);
-		//double y0 = yMax - ( (double)yPixel * pixelSize );
+		double x0 = xMin + ( (double)xPixel * pixelSize);
+		double y0 = yMax - ( (double)yPixel * pixelSize ); //TODO This shouldn't be calculated every time
 	
 		// Start at x0, y0
 		x = x0;

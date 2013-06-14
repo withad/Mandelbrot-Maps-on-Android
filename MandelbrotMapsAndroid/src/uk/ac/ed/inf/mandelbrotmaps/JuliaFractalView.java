@@ -78,20 +78,19 @@ public class JuliaFractalView extends AbstractFractalView{
 		
 		int xPixel = 0, yPixel = 0, yIncrement = 0;
 		int colourCodeHex;
-		int pixelBlockA = 0, pixelBlockB = 0;
+		int pixelBlockA, pixelBlockB;
 		
 		this.xMin = xMin;
 		this.yMax = yMax;
 		this.pixelSize = pixelSize;
+		
 		double x0 = 0, y0 = 0;
-	
-		double x, y;
-		double newx, newy;
 		
 		int pixelIncrement = pixelBlockSize * noOfThreads;
 		int originalIncrement = pixelIncrement;
 		
 		int loopCount = 0;
+		
 		
 		for (yIncrement = yPixelMin; yPixel < yPixelMax+(noOfThreads*pixelBlockSize); yIncrement+= pixelIncrement) {	
 			yPixel = yIncrement;
@@ -146,7 +145,7 @@ public class JuliaFractalView extends AbstractFractalView{
 				else
 					colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);*/
 				
-				colourCodeHex = pixelInSet(xPixel, yPixel, x0, y0, maxIterations);
+				colourCodeHex = pixelInSet(xPixel, yPixel, maxIterations);
 				
 				
 				//Note that the pixel being calculated has been calculated in full (upper right of a block)
@@ -186,7 +185,7 @@ public class JuliaFractalView extends AbstractFractalView{
 	}
 	
 	
-	protected int pixelInSet(int xPixel, int yPixel, double x0, double y0, int maxIterations) {
+	protected int pixelInSet(int xPixel, int yPixel, int maxIterations) {
 		boolean inside = true;
 		int iterationNr;
 		double newx, newy;

@@ -857,7 +857,7 @@ abstract class AbstractFractalView extends View {
 			final int threadID,
 			final int noOfThreads
 		);
-	protected abstract int pixelInSet(int xPixel, int yPixel, double x0, double y0, int maxIterations);
+	abstract int pixelInSet(int xPixel, int yPixel, int maxIterations);
 }
 
 
