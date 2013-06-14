@@ -29,6 +29,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	public float smallPinRadius = 5.0f;
 	public float largePinRadius = 20.0f;
 	
+	private double xMin;
+	private double yMax;
+	private double pixelSize;
 	
 	
 	
@@ -152,6 +155,10 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
 		int colourCodeHex;
 		int pixelBlockA, pixelBlockB;
+		
+		this.xMin = xMin;
+		this.yMax = yMax;
+		this.pixelSize = pixelSize;
 	
 		// c = (x0) + (y0)i
 		double x0, y0;
@@ -258,19 +265,22 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	}
 	
 	
-	/*private int pixelInSet (double x, double y) {
+	private int pixelInSet (int xPixel, int yPixel) {
 		boolean inside = true;
 		int iterationNr;
 		int maxIterations = getMaxIterations();
 		double newx, newy;
+		double x, y;
 		
 		// Set x0 (real part of c)
-		x0 = xMin + ( (double)xPixel * pixelSize);
+		double x0 = xMin + ( (double)xPixel * pixelSize);
+		double y0 = yMax - ( (double)yPixel * pixelSize );
 	
 		// Start at x0, y0
 		x = x0;
 		y = y0;
 		
+		//Run iterations over this point
 		for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
 			// z^2 + c
 			newx = (x*x) - (y*y) + x0;
@@ -290,7 +300,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			return colourer.colourInsidePoint();
 		else
 			return colourer.colourOutsidePoint(iterationNr, maxIterations);
-	}*/
+	}
 	
 	
 	public double[] getJuliaParams(float touchX, float touchY)
