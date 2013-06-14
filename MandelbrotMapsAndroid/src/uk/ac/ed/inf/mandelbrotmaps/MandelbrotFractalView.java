@@ -143,117 +143,154 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		final boolean allowInterruption,  // Shall we abort if renderThread signals an abort?
 		final int threadID,
 		final int noOfThreads) {				
-			RenderThread callingThread = renderThreadList.get(threadID);
+			
+		RenderThread callingThread = renderThreadList.get(threadID);
 		
-			int maxIterations = getMaxIterations();
-			int imgWidth = xPixelMax - xPixelMin;
-			
-			int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
-			int colourCodeHex;
-			int pixelBlockA, pixelBlockB;
+		int maxIterations = getMaxIterations();
+		int imgWidth = xPixelMax - xPixelMin;
 		
-			// c = (x0) + (y0)i
-			double x0, y0;
+		int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
+		int colourCodeHex;
+		int pixelBlockA, pixelBlockB;
+	
+		// c = (x0) + (y0)i
+		double x0, y0;
+	
+		// z = (x) + (y)i
+		double x, y;
+	
+		// newz = (newx) + (newy)i
+		// ... NB: newz = (z^2 + c)
+		double newx, newy;
 		
-			// z = (x) + (y)i
-			double x, y;
+		int pixelIncrement = pixelBlockSize * noOfThreads;
+		int originalIncrement = pixelIncrement;
 		
-			// newz = (newx) + (newy)i
-			// ... NB: newz = (z^2 + c)
-			double newx, newy;
+		int loopCount = 0;
+		
+		
+		for (yIncrement = yPixelMin; yPixel < yPixelMax+(noOfThreads*pixelBlockSize) ; yIncrement += pixelIncrement) {			
+			yPixel = yIncrement;
 			
-			int pixelIncrement = pixelBlockSize * noOfThreads;
-			int originalIncrement = pixelIncrement;
+			pixelIncrement = (loopCount * originalIncrement);
+			if(loopCount % 2 == 0)
+				pixelIncrement*=-1;
+			loopCount++;
 			
-			int loopCount = 0;
+			//If we've exceeded the bounds of the image (as can happen with many threads), exit the loop.
+			if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length || 
+					 yPixel < 0) {
+				continue;
+			}
 			
+			// Detect rendering abortion.
+			if (allowInterruption && (callingThread.abortSignalled())) {
+				return;
+			}
 			
-			for (yIncrement = yPixelMin; yPixel < yPixelMax+(noOfThreads*pixelBlockSize) ; yIncrement += pixelIncrement) {			
-				yPixel = yIncrement;
-				
-				pixelIncrement = (loopCount * originalIncrement);
-				if(loopCount % 2 == 0)
-					pixelIncrement*=-1;
-				loopCount++;
-				
-				//If we've exceeded the bounds of the image (as can happen with many threads), exit the loop.
-				if(((imgWidth * (yPixel+pixelBlockSize - 1)) + xPixelMax) > pixelSizes.length || 
-						 yPixel < 0) {
+			// Set y0 (im part of c)
+			y0 = yMax - ( (double)yPixel * pixelSize );			
+		
+			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {					
+				//Check to see if this pixel is already iterated to the necessary block size
+				if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
 					continue;
 				}
 				
-				if (allowInterruption && (callingThread.abortSignalled())) {
-					return;
+				// Set x0 (real part of c)
+				x0 = xMin + ( (double)xPixel * pixelSize);
+			
+				// Start at x0, y0
+				x = x0;
+				y = y0;
+			
+				boolean inside = true;
+				
+				//Run iterations over this point
+				for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
+					// z^2 + c
+					newx = (x*x) - (y*y) + x0;
+					newy = (2 * x * y) + y0;
+				
+					x = newx;
+					y = newy;
+				
+					// Well known result: if distance is >2, escapes to infinity...
+					if ( (x*x + y*y) > 4) {
+						inside = false;
+						break;
+					}
 				}
 				
-				// Set y0 (im part of c)
-				y0 = yMax - ( (double)yPixel * pixelSize );			
-			
-				for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {					
-					//Check to see if this pixel is already iterated to the necessary block size
-					if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
-						continue;
-					}
-					
-					// Set x0 (real part of c)
-					x0 = xMin + ( (double)xPixel * pixelSize);
+				if(inside)
+					colourCodeHex = colourer.colourInsidePoint();
+				else
+					colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);
 				
-					// Start at x0, y0
-					x = x0;
-					y = y0;
+				//Note that the pixel being calculated has been calculated in full (upper right of a block)
+				if(fractalViewSize == FractalViewSize.LARGE)
+					pixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
 				
-					boolean inside = true;
-					
-					//Run iterations over this point
-					for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
-						// z^2 + c
-						newx = (x*x) - (y*y) + x0;
-						newy = (2 * x * y) + y0;
-					
-						x = newx;
-						y = newy;
-					
-						// Well known result: if distance is >2, escapes to infinity...
-						if ( (x*x + y*y) > 4) {
-							inside = false;
-							break;
-						}
-					}
-					
-					if(inside)
-						colourCodeHex = colourer.colourInsidePoint();
-					else
-						colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);
-					
-					//Note that the pixel being calculated has been calculated in full (upper right of a block)
-					if(fractalViewSize == FractalViewSize.LARGE)
-						pixelSizes[(imgWidth*yPixel) + (xPixel)] = DEFAULT_PIXEL_SIZE;
-					
-					// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
-					int p = 0;
-					for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
-						for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
-							if(fractalViewSize == FractalViewSize.LARGE) {
-								if(p != 0) {
-									pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
-								}
-								p++;
+				// Save colour info for this pixel. int, interpreted: 0xAARRGGBB
+				int p = 0;
+				for (pixelBlockA=0; pixelBlockA<pixelBlockSize; pixelBlockA++) {
+					for (pixelBlockB=0; pixelBlockB<pixelBlockSize; pixelBlockB++) {
+						if(fractalViewSize == FractalViewSize.LARGE) {
+							if(p != 0) {
+								pixelSizes[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = pixelBlockSize;
 							}
-							if(fractalPixels == null) return;
-							fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
+							p++;
 						}
+						if(fractalPixels == null) return;
+						fractalPixels[imgWidth*(yPixel+pixelBlockB) + (xPixel+pixelBlockA)] = colourCodeHex;
 					}
 				}
-				// Show thread's work in progress
-				if ((showRenderingProgress) && (loopCount % linesToDrawAfter == 0)) 
-					{
-						postInvalidate();
-					}
 			}
-			
-			postInvalidate();
-			notifyCompleteRender(threadID, pixelBlockSize);
+			// Show thread's work in progress
+			if ((showRenderingProgress) && (loopCount % linesToDrawAfter == 0)) 
+				{
+					postInvalidate();
+				}
 		}
+		
+		postInvalidate();
+		notifyCompleteRender(threadID, pixelBlockSize);
+	}
+	
+	
+	/*private int pixelInSet (double x, double y) {
+		boolean inside = true;
+		int iterationNr;
+		int maxIterations = getMaxIterations();
+		double newx, newy;
+		
+		// Set x0 (real part of c)
+		x0 = xMin + ( (double)xPixel * pixelSize);
+	
+		// Start at x0, y0
+		x = x0;
+		y = y0;
+		
+		for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
+			// z^2 + c
+			newx = (x*x) - (y*y) + x0;
+			newy = (2 * x * y) + y0;
+		
+			x = newx;
+			y = newy;
+		
+			// Well known result: if distance is >2, escapes to infinity...
+			if ( (x*x + y*y) > 4) {
+				inside = false;
+				break;
+			}
+		}
+		
+		if(inside)
+			return colourer.colourInsidePoint();
+		else
+			return colourer.colourOutsidePoint(iterationNr, maxIterations);
+	}*/
 	
 	
 	public double[] getJuliaParams(float touchX, float touchY)
