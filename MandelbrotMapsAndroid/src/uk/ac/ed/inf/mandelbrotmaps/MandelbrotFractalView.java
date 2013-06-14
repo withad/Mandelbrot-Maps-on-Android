@@ -29,10 +29,6 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	public float smallPinRadius = 5.0f;
 	public float largePinRadius = 20.0f;
 	
-	private double xMin;
-	private double yMax;
-	private double pixelSize;
-	
 	
 	
 	public MandelbrotFractalView(Context context, FractalViewSize size) {
@@ -152,7 +148,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		int maxIterations = getMaxIterations();
 		int imgWidth = xPixelMax - xPixelMin;
 		
-		int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
+		int xPixel = 0, yPixel = 0, yIncrement = 0;
 		int colourCodeHex;
 		int pixelBlockA, pixelBlockB;
 		
@@ -164,11 +160,11 @@ public class MandelbrotFractalView extends AbstractFractalView{
 		double x0, y0;
 	
 		// z = (x) + (y)i
-		double x, y;
+		//double x, y;
 	
 		// newz = (newx) + (newy)i
 		// ... NB: newz = (z^2 + c)
-		double newx, newy;
+		//double newx, newy;
 		
 		int pixelIncrement = pixelBlockSize * noOfThreads;
 		int originalIncrement = pixelIncrement;
@@ -198,6 +194,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 			// Set y0 (im part of c)
 			y0 = yMax - ( (double)yPixel * pixelSize );			
 		
+			
 			for (xPixel=xPixelMin; xPixel<xPixelMax+1-pixelBlockSize; xPixel+=pixelBlockSize) {					
 				//Check to see if this pixel is already iterated to the necessary block size
 				if(fractalViewSize == FractalViewSize.LARGE && pixelSizes[(imgWidth*yPixel) + xPixel] <= pixelBlockSize) {
@@ -208,7 +205,7 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				x0 = xMin + ( (double)xPixel * pixelSize);
 			
 				// Start at x0, y0
-				x = x0;
+				/*x = x0;
 				y = y0;
 			
 				boolean inside = true;
@@ -232,7 +229,9 @@ public class MandelbrotFractalView extends AbstractFractalView{
 				if(inside)
 					colourCodeHex = colourer.colourInsidePoint();
 				else
-					colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);
+					colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);*/
+				
+				colourCodeHex = pixelInSet(xPixel, yPixel, x0, y0, maxIterations);
 				
 				//Note that the pixel being calculated has been calculated in full (upper right of a block)
 				if(fractalViewSize == FractalViewSize.LARGE)
@@ -265,16 +264,15 @@ public class MandelbrotFractalView extends AbstractFractalView{
 	}
 	
 	
-	private int pixelInSet (int xPixel, int yPixel) {
+	protected int pixelInSet (int xPixel, int yPixel, double x0, double y0, int maxIterations) {
 		boolean inside = true;
 		int iterationNr;
-		int maxIterations = getMaxIterations();
 		double newx, newy;
 		double x, y;
 		
 		// Set x0 (real part of c)
-		double x0 = xMin + ( (double)xPixel * pixelSize);
-		double y0 = yMax - ( (double)yPixel * pixelSize );
+		//double x0 = xMin + ( (double)xPixel * pixelSize);
+		//double y0 = yMax - ( (double)yPixel * pixelSize );
 	
 		// Start at x0, y0
 		x = x0;

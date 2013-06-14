@@ -10,6 +10,7 @@ public class JuliaFractalView extends AbstractFractalView{
 	private double juliaY = 0;
 	
 	
+	
 	public JuliaFractalView(Context context, FractalViewSize size) {
 		super(context, size);
 		
@@ -75,9 +76,14 @@ public class JuliaFractalView extends AbstractFractalView{
 		int maxIterations = getMaxIterations();
 		int imgWidth = xPixelMax - xPixelMin;
 		
-		int xPixel = 0, yPixel = 0, yIncrement = 0, iterationNr = 0;
+		int xPixel = 0, yPixel = 0, yIncrement = 0;
 		int colourCodeHex;
 		int pixelBlockA = 0, pixelBlockB = 0;
+		
+		this.xMin = xMin;
+		this.yMax = yMax;
+		this.pixelSize = pixelSize;
+		double x0 = 0, y0 = 0;
 	
 		double x, y;
 		double newx, newy;
@@ -115,7 +121,7 @@ public class JuliaFractalView extends AbstractFractalView{
 				}
 				
 				// Initial coordinates
-				x = xMin + ( (double)xPixel * pixelSize);
+				/*x = xMin + ( (double)xPixel * pixelSize);
 				y = yMax - ( (double)yPixel * pixelSize);
 			
 				boolean inside = true;
@@ -138,7 +144,9 @@ public class JuliaFractalView extends AbstractFractalView{
 				if(inside)
 					colourCodeHex = colourer.colourInsidePoint();
 				else
-					colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);
+					colourCodeHex = colourer.colourOutsidePoint(iterationNr, maxIterations);*/
+				
+				colourCodeHex = pixelInSet(xPixel, yPixel, x0, y0, maxIterations);
 				
 				
 				//Note that the pixel being calculated has been calculated in full (upper right of a block)
@@ -175,6 +183,38 @@ public class JuliaFractalView extends AbstractFractalView{
 		
 		postInvalidate();
 		notifyCompleteRender(threadID, pixelBlockSize);
+	}
+	
+	
+	protected int pixelInSet(int xPixel, int yPixel, double x0, double y0, int maxIterations) {
+		boolean inside = true;
+		int iterationNr;
+		double newx, newy;
+		double x, y;
+		
+		x = xMin + ( (double)xPixel * pixelSize);
+		y = yMax - ( (double)yPixel * pixelSize);
+		
+		for (iterationNr=0; iterationNr<maxIterations; iterationNr++) {
+			// z^2 + c
+			newx = (x*x) - (y*y) + juliaX;
+			newy = (2 * x * y) + juliaY;
+		
+			x = newx;
+			y = newy;
+		
+			// Well known result: if distance is >2, escapes to infinity...
+			if ( (x*x + y*y) > 4) { 
+				inside = false;
+				break;
+			}
+		}
+		
+		if(inside)
+			return colourer.colourInsidePoint();
+		else
+			return colourer.colourOutsidePoint(iterationNr, maxIterations);
+		
 	}
 	
 }

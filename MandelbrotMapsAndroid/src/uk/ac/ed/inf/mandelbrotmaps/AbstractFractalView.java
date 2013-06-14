@@ -128,6 +128,9 @@ abstract class AbstractFractalView extends View {
 	
 	boolean completedLastRender = false;
 	
+	// Render calculating variables
+	double xMin, yMax, pixelSize;
+	
 	
 	
 /*-----------------------------------------------------------------------------------*/
@@ -854,7 +857,7 @@ abstract class AbstractFractalView extends View {
 			final int threadID,
 			final int noOfThreads
 		);
-
+	protected abstract int pixelInSet(int xPixel, int yPixel, double x0, double y0, int maxIterations);
 }
 
 
