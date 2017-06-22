@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mandelbrot Maps</string>
+    <string name="main_title">Mandelbrot Maps</string>
+    <string name="continue_label">Continuar</string>
+    <string name="fractal_label">Fractal - single thread</string>
+    <string name="bitmap_test_label">Fractal - dual threads</string>
+    <string name="exit_label">Sair</string>
+
+    <string name="settings_label">Configurações…</string>
+    <string name="settings_title">Configurações Mandelbrot Maps </string>
+    <string name="settings_shortcut">s</string>
+
+    <string name="mmaps_title">Mandelbrot Maps</string>
+
+    <string name="detail_title">Detalhes</string>
+
+    <string name="about_text">\
+	Uma modificação do Mandelbrot Maps para Android,
+	atualmente capaz de exibir e mover o
+	fractal de Mandelbrot.
+	</string>
+
+    <string name="intro_text">
+	<![CDATA[
+	<h2>Seja bem-vindo ao <span style="font-style: italic;">Mandelbrot Maps</span>!</h2>
+	<p>Este app é projetado para mostrar a relação entre os fractais do conjunto de Mandelbrot e do conjunto de Julia.
+	<p>Mexa com os fractais com um dedo e faça o movimento de pinça para usar o zoom. Quando você aproxima, o fractal será renderizar com mais detalhes.
+	<p>Fique com o dedo em um ponto no Mandelbrot ou selecione <b>Adicionar Julia</b> do menu para exibir um fractal de Julia.
+	Há um único fractal de Julia para cada ponto no conjunto de Mandelbrot - mudar o ponto definindo-o arrastando o pino colorido. Toque para ver
+	em mais detalhes.
+	<p><b>O Mandelbrot Maps</b> está sendo desenvolvido como meu projeto de dissertação de graduação, então qualquer sugestão que você deixar na página da Google Play Store
+	é enormemente apreciada.
+	<p><b>O Mandelbrot Maps</b> é um software de código aberto, lançado sob a GNU General Public License (v3). O código fonte pode ser
+	encontrado <a href="https://github.com/withad/Mandelbrot-Maps-on-Android">aqui</a>.
+	]]>
+	</string>
+
+    <string name="help_text">
+	<![CDATA[
+	<h1>Sobre fractais</h1>
+	<p>Um fractal é uma forma \"autossemelhante\" , significando que o mesmo padrão detalhado repete-se toda vez que você aproximar. No conjunto fractal de
+	Mandelbrot, por exemplo, aquelas distintas lâmpadas em forma de coração continuarão aparecendo.
+	<p>Fractais são gerados pela iteração de uma função matemática em um conjunto de pontos. Fazer mais iterações leva mais tempo mas produz
+	formas mais detalhadas. Mais iterações devem ser feitas quando aproximado, para manter o mesmo nível aparente de detalhes.
+	<h1>Sobre os conjuntos de Mandelbrot e Julia</h1>
+	<p>Provavelmente o fractal mais reconhecível de todos, o conjunto de Mandelbrot foi descoberto e popularizado pelo matemático Benoit Mandelbrot,
+	quem também o termo \"fractal\" para descrever as formas que ele estudou. Foi um dos primeiros fratais a ser visualizado em um computador,
+	em 1º de Março de 1980, No IBM\'s Thomas J. Watson Research Centre.
+	<p>Conjuntos de Julia são uma ideia mais antiga, primeiro pesquisada no início do século 20 por Gaston Julia. Quando um conjunto Julia é definido usando a mesma
+	função que define o conjunto de Mandelbrot, um comportamento bem interessante aparece. Se o conjunto de Julia está parametrizado por um ponto dentro do
+	conjunto de Mandelbrot, ele será conexo. Mover para fora do conjunto de Mandelbrot causa o fractal de Julia ser quebrado em partes desconexas.
+	<p>Os conjuntos de Mandelbrot e Julia também parecem similares em certas regiões, particularmente nos limites de Mandelbrot. São para essas relações
+	que o <b>Mandelbrot Maps</b> foi desenvolvido para demonstrar.
+
+	<h1>Controles</h1>
+	<p>Arrastar com um dedo move os fractais. Qualquer área nova serão preenchidas assim que você parar.
+	<p>Use dois dedos para aumentar ou diminuir a aproximação. Novamente, o fractal será reprocessado assim que você parar.
+	<p>Para comparar os conjuntos de Mandelbrot e de Julia, segure em um ponto do conjunto de Mandelbrot ou toque em <b>Adicionar Julia</b> no menu. Arraste o círculo
+	colorido para alterar o ponto para parametrizar o conjunto de Julia. Para ver o fractal com mais detalhes, toque nele. O nível de aproximação e a região
+	exibida permanecerá constante enquanto você muda entre os dois fractais. Toque <b>Restaurar</b> no menu para retornar para a área padrão. Dispense o pequeno
+	fractal tocando em <b>Remover Julia/Mandelbrot</b> no menu. Se você perder o pino de Julia, pressione e segure novamente ou adicione e remova
+	Julia a partir do menu para trazê-lo até você (o pino).
+
+	<h1>Outras Opções do Menu</h1>
+	<p>Em <b>Preferências</b>, você pode escolher a configuração de coloração para cada fractal, a cor do pino de Julia, fazer ou não um processamento inicial
+	cru (a blockier first pass that gives a faster first impression but takes slightly longer overall), e mostrar ou não o tempo
+	para cada processamento após completo.
+	<p>Toque em <b>Nível de detalhe</b> para controlar o nível de detalhe em cada fractal. Maior detalhe significa que mais iterações serão feitas quando estiver processando,
+	levando mais tempo mas fornecendo uma imagem mais clara.
+	<p><b>Salvar/Compartilhar</b> lhe permite salvar uma imagem do fractal atual na pasta Imagens ou compartilhá-la usando o e-mail, Facebook, Twitter, etc.
+	(se você tiver esses apps instalados).
+
+	<h1>Sobre o Mandelbrot Maps</h1>
+	<p><b>O Mandelbrot Maps</b> está sendo desenvolvido como meus projeto de dissertação de graduação, então qualquer sugestão que você deixar na página da Google Play Store
+	é altamente apreciada. Se você encontrar qualquer problema, por favor inclua o máximo de detalhes possível, como o dispositivo que você está utilizando, o que você estava
+	fazendo quando o erro ocorreu, e qual versão do Android você está utilizando.
+	<p><b>O Mandelbrot Maps</b> é um software de código aberto, lançado sob a GNU General Public License (v3). O código fonte está no link da página
+	da Google Play Store.
+	]]>
+	</string>
+
+    <string name="about_label">Sobre</string>
+    <string name="bitmap_label">Bitmap (não implementado)</string>
+    <string name="side_by_side_label">Fractais lado a lado</string>
+</resources>
