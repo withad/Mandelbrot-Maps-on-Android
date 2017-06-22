@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ! Excerpted from "Hello, Android! 3e",
+ ! published by The Pragmatic Bookshelf.
+ ! Copyrights apply to this code. It may not be used to create training material,
+ ! courses, books, articles, and the like. Contact us if you are in doubt.
+ ! We make no guarantees that this code is fit for any purpose.
+ ! Visit http://www.pragmaticprogrammer.com/titles/eband3 for more book information.
+-->
+<resources>
+    <string-array name="colourSchemeEntries">
+        <item>Violeta e Vermelho</item>
+        <item>Violeta e Amarelho</item>
+        <item>RGB</item>
+        <item>Pastels</item>
+    </string-array>
+
+    <string-array name="colourSchemeValues">
+        <item>Mandelbrot Padrão</item>
+        <item>Julia Padrãot</item>
+        <item>Escala RGB</item>
+        <item>Psicodélico</item>
+    </string-array>
+
+    <string-array name="pinColourEntries">
+
+        <item>Vermelho</item>
+        <item>Verde</item><item>Azul</item>
+        <item>Amarelo</item>
+        <item>Magenta</item>
+        <item>Preto</item>
+    </string-array>
+
+    <string-array name="pinColourValues">
+        <item>vermelho</item>
+        <item>verde</item>
+        <item>azul</item>
+        <item>amarelo</item>
+        <item>magenta</item>
+        <item>preto</item>
+    </string-array>
+</resources>
